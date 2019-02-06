@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		84CF05BD220B9E6F00024360 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 84CF05BC220B9E6F00024360 /* main.cpp */; };
+		84CF05C8220B9F0200024360 /* mainwindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 84CF05C4220B9F0100024360 /* mainwindow.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +26,11 @@
 /* Begin PBXFileReference section */
 		84CF05B9220B9E6F00024360 /* JPEG-Image-Compression */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "JPEG-Image-Compression"; sourceTree = BUILT_PRODUCTS_DIR; };
 		84CF05BC220B9E6F00024360 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		84CF05C3220B9F0000024360 /* CMPT365PA2.pro */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMPT365PA2.pro; sourceTree = "<group>"; };
+		84CF05C4220B9F0100024360 /* mainwindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mainwindow.cpp; sourceTree = "<group>"; };
+		84CF05C5220B9F0100024360 /* CMPT365PA2.pro.user */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = CMPT365PA2.pro.user; sourceTree = "<group>"; };
+		84CF05C6220B9F0100024360 /* mainwindow.ui */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mainwindow.ui; sourceTree = "<group>"; };
+		84CF05C7220B9F0200024360 /* mainwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mainwindow.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +63,11 @@
 		84CF05BB220B9E6F00024360 /* JPEG-Image-Compression */ = {
 			isa = PBXGroup;
 			children = (
+				84CF05C3220B9F0000024360 /* CMPT365PA2.pro */,
+				84CF05C5220B9F0100024360 /* CMPT365PA2.pro.user */,
+				84CF05C4220B9F0100024360 /* mainwindow.cpp */,
+				84CF05C7220B9F0200024360 /* mainwindow.h */,
+				84CF05C6220B9F0100024360 /* mainwindow.ui */,
 				84CF05BC220B9E6F00024360 /* main.cpp */,
 			);
 			path = "JPEG-Image-Compression";
@@ -118,6 +129,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84CF05C8220B9F0200024360 /* mainwindow.cpp in Sources */,
 				84CF05BD220B9E6F00024360 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
