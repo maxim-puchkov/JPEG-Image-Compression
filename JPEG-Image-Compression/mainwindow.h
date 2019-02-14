@@ -18,14 +18,16 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
+
 using namespace cv;
 
+
 namespace Ui {
-class MainWindow;
+    class MainWindow;
 }
 
-class MainWindow : public QMainWindow
-{
+
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
@@ -37,7 +39,11 @@ private slots:
     void convertImage();
 
 private:
+    
+    // Convert an RGB Matrix to an Qt image
     QImage MatRGB2QImage(const cv::Mat3b &src);
+    
+    // Convert Grayscale matrix to Qt image
     QImage MatGrayScale2QImage(const cv::Mat_<double> &src);
 
     Ui::MainWindow *ui;
