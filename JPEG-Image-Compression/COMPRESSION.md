@@ -1,5 +1,5 @@
 # JPEG Image Compression
-### Algorithms describe every required step of encoding a JPEG image solution.
+### Algorithms describe every required step of encoding a JPEG image.
 
 
 ## Requirement 1. Conversion.
