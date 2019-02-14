@@ -1,4 +1,18 @@
- # CMPT 365 PA2 Qt Skeleton Code README
+#Git
+
+## Clone repository 
+git clone https://csil-git1.cs.surrey.sfu.ca/A2-365/JPEG-Image-Compression.git
+
+## Commit & Push
+git add .
+git commit -m "Message"
+git push
+
+## New branch 
+git checkout -b "Branch_Name"
+
+
+#CMPT 365 PA2 Qt Skeleton Code README
  
  This is the skeleton code for assignment 2. The code uses the Qt framework. It is a cross-platform GUI framework for C++. You can open and run the code using an IDE called Qt creator. The tutorial for Qt is here: https://wiki.qt.io/ Qt_for_Beginners.
  
