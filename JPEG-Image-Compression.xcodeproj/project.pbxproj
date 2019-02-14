@@ -26,6 +26,7 @@
 /* Begin PBXFileReference section */
 		843AB8E02215B2FB00778FA5 /* Glossary+Algorithms.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "Glossary+Algorithms.hpp"; sourceTree = "<group>"; };
 		843AB8E32215B35E00778FA5 /* Mat+Vec3d.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "Mat+Vec3d.hpp"; sourceTree = "<group>"; };
+		843AB8E52215C7E500778FA5 /* COMPRESSION.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = COMPRESSION.md; sourceTree = "<group>"; };
 		84BD62EC220BA46C00C03768 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		84CF05B9220B9E6F00024360 /* JPEG-Image-Compression */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "JPEG-Image-Compression"; sourceTree = BUILT_PRODUCTS_DIR; };
 		84CF05BC220B9E6F00024360 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -71,6 +72,7 @@
 				84CF05C4220B9F0100024360 /* mainwindow.cpp */,
 				843AB8E02215B2FB00778FA5 /* Glossary+Algorithms.hpp */,
 				843AB8E32215B35E00778FA5 /* Mat+Vec3d.hpp */,
+				843AB8E52215C7E500778FA5 /* COMPRESSION.md */,
 				84CF05C7220B9F0200024360 /* mainwindow.h */,
 				84CF05C6220B9F0100024360 /* mainwindow.ui */,
 				84CF05BC220B9E6F00024360 /* main.cpp */,
