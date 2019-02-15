@@ -42,7 +42,7 @@
 
 ## _Step 1_ Color Conversion from RGB to YUV 
 1. Input image is always RGB
-2. Values of processed RGB vectors of the input  stored in __M×N__ __RGB_Matrix__
+2. All RGB vectors are saved stored in __RGB_Matrix__
 ``` 
     cvImg = cv::imread(fileName.toStdString(), IMREAD_COLOR);
 ```
@@ -54,11 +54,11 @@
 | -0.299  | -0.587  |  0.114 |
 | 0.299   | -0.587  | -0.114 |
 
-4. __YUV_Matrix__  saves results of multiplying  matrix __RGB_to_YUV__ with all vectors of __RGB_Matrix__
-```
-for (r ∈ rows) {
-    for (c ∈ columns) {
-        YUV_Matrix[r, c] = RGB_to_YUV * RGB_Vector
+4. __YUV_Matrix__  saves product of __RGB_to_YUV__ and vectors of __RGB_Matrix__
+```c++
+for (col : columns) {
+    for (row : rows) {
+        YUV_Matrix[col, row] = RGB_to_YUV * RGB_Matrix[col, row]
     }
 }
 ```
