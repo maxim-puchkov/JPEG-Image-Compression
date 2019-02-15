@@ -1,69 +1,134 @@
 # JPEG Image Compression
-### Algorithms describe every required step of encoding a JPEG image.
 
 
-## Requirement 1. Conversion.
-    1. Input image (_M_*_N_) is always converted to RGB color space
-    2. RGB vectors of input image are saved in a **RGB_Matrix** (_M_*_N_)
-    3. __(Important)__ Values of **RGBtoYUV_Matrix** (3x3) are given by [equation (2)](http://www.cs.sfu.ca/CourseCentral/365/li/material/work/RGB-YUV.pdf):
-        $$
-        \left(
-        \begin{array}{cc}
-        0.299 & 0.587 & 0.114\\
-        −0.299 & −0.587 & 0.886\\
-        0.701 & −0.587 & −0.114
-        \end{array}\right)
-        $$
-    4. Color space is converted from RGB to YUV if  **RGBtoYUV_Matrix** multiplies any 1x3 RGB vector:
-        $$
-        \left(\begin{array}{cc}
-        Y \\
-        U \\
-        V \\
-        \end{array}\right)
-        
-        \left(
-        \begin{array}{cc}
-        0.299 & 0.587 & 0.114\\
-        −0.299 & −0.587 & 0.886\\
-        0.701 & −0.587 & −0.114
-        \end{array}\right)
-        
-        \left(\begin{array}{cc}
-        R \\
-        G \\
-        B \\
-        \end{array}\right)
-        $$
-    5. Every RGB vector of **RGB_Matrix** (_M_*_N_) is converted and stored in **YUV_Matrix** (_M_*_N_)
-    6. Conversion is completed: **RGB_Matrix** stores the input colors; and 
-    **YUV_Matrix** now stores YUV colors converted from the input's RGB.
+### Decode
+1. Load image
+2. Dequantize
+3. Inverse Discrete Cosine Transform
+4. Convert color from YUV to RGB
+5. Save
 
 
-## Requirement 2. Sampling. **INCOMPLETE**
-    1. Step 1
-    2. Step 2
-    3. Step 3 ...
-    
-    
-
-
-## Requirement 3. Partitioning. **INCOMPLETE**
+### Encode
+1. Load image
+2. Convert color from RGB to YUV
+3. Partition
+4. Chroma subsample
+5. Discrete Cosine Transform
+6. Quantize 
+7. Compress
 
 
 
 
-## Requirement 4. 2D DCT. **INCOMPLETE**
-    1. 2D DCT is applied to each 8x8 partitioned block to compute the DCT coefficients.
-    2. 
-    
-    
-    
-## Requirement 5. Quantization. **INCOMPLETE**
-    1. Quantization is needed to remove high frequency DCT coefficients.
-    2. Every resulting matrix from DCT transformations is divided by standard JPEG quantization table (both luminance and chrominance).
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# JPEG Encoder
+
+## _Step 1_ Color Conversion from RGB to YUV 
+1. Input image is always RGB
+2. Values of processed RGB vectors of the input  stored in __M×N__ __RGB_Matrix__
+``` 
+    cvImg = cv::imread(fileName.toStdString(), IMREAD_COLOR);
+```
+3. [Equation (2)](http://www.cs.sfu.ca/CourseCentral/365/li/material/work/RGB-YUV.pdf) gives __3×3__  translation  __RGB_to_YUV__ :
+
+||||
+| - | - | - |
+| 0.299   |  0.587  |  0.114  |
+| -0.299  | -0.587  |  0.114 |
+| 0.299   | -0.587  | -0.114 |
+
+4. __YUV_Matrix__  saves results of multiplying  matrix __RGB_to_YUV__ with all vectors of __RGB_Matrix__
+```
+for (r ∈ rows) {
+    for (c ∈ columns) {
+        YUV_Matrix[r, c] = RGB_to_YUV * RGB_Vector
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+ 
+ ## _Step 2_ Partitioning Image into 8×8 blocks 
+1.  
+2. 
+3.
+4.
+5.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## _Step 3_ Chroma Subsampling 4:2:0 
+1.  
+2. 
+3.
+4.
+5.
+
+
+
+
+
+
+
+
+
+## _Step 4_ DCT: Discrete Cosine Transform
+1. Two dimiensional DCT is applied to each 8x8 block to compute the DCT coefficients.
+2. 
+3.
+4.
+5.
+
+
+
+
+
+
+
+
+
+
+## _Step 5_ Quantization
+1. ...... Quantization is needed to remove high frequency DCT coefficients.
+2. ....... Every resulting matrix from DCT transformations is divided by standard JPEG quantization table (both luminance and chrominance).
+
+
 _Quantization Refs:_
 https://www.impulseadventure.com/photo/jpeg-quantization.html
 
@@ -77,6 +142,11 @@ https://www.impulseadventure.com/photo/jpeg-quantization.html
 
 
 
+> Color Conversion from YUV to RGB 
+
+> IDCT: Inverse Discrete Cosine Transform
+
+> ...
 
 
 
@@ -87,8 +157,10 @@ https://www.impulseadventure.com/photo/jpeg-quantization.html
 
 
 
-```javascript
-if ( var ) {
-    return true
-}
-```
+
+
+
+
+
+
+
