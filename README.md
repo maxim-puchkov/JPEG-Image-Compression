@@ -1,44 +1,23 @@
 # JPEG Image Compression
 ### Contents
 * [JPEG Encoder](#jpeg_encoder)
-    1. [Color Conversion to YUV](##color-conversion-to-yuv)
-    2. [Chroma Subsampling](#chroma-subsampling)
-    3. [Partitioning Image](#partitioning-image)
-    4. [DCT](#dct)
-    5. [Quantization](#quantization)
+    * [ ] 1.  [Color Conversion to YUV](##color-conversion-to-yuv)
+    * [ ] 2. [Chroma Subsampling](#chroma-subsampling)
+    * [ ] 3. [Partitioning Image](#partitioning-image)
+    * [ ] 4. [DCT](#dct)
+    * [ ] 5. [Quantization](#quantization)
 * [JPEG Decoder](#jpeg-decoder)
-    1. [IDCT](#idct)
-    2. [Reverse Subsample](#reverse-subsample)
-    3. [Color Conversion to RBG](#color-conversion-to-rbg)
+    * [ ] 1. [IDCT](#idct)
+    * [ ] 2. [Reverse Subsample](#reverse-subsample)
+    * [ ] 3. [Color Conversion to RBG](#color-conversion-to-rbg)
 * Help
     * [Lecture slides](#lectures)
     * [Example code](#examples)
     * [Setup OpenCV and Qt](#setup-opencv-with-qt)
     * [Source control](#git-commands)
     
+>   Check any correct section after you read it
 
-
-
-
-
-
-# Overview
-###  ```Checklist```: check any correct section after you read it
-* __JPEG Image Compression__
-    * [ ] Image representation 
-    * [ ] Encode steps
-    * [ ] Decode steps
-* __JPEG Encoder__
-    * [ ] 1. Convert RGB to YUV
-    * [ ] 2. Subsampling
-    * [ ] 3. Partitioning
-    * [ ] 4. DCT
-    * [ ] 5. Quantization
-* __JPEG Decoder__
-    * [ ] 1. IDCT
-    * [ ] 2. Reverse subsampling
-    * [ ] 3. Convert YUV to RGB 
-    
 
 ### Encode
 1. Convert RGB to YUV
