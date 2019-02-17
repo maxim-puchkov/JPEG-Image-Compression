@@ -1,7 +1,7 @@
 # JPEG Image Compression
 ### Contents
-* [JPEG Encoder](#jpeg_encoder)
-    * [ ] 1.  [Color Conversion to YUV](##color-conversion-to-yuv)
+* [JPEG Encoder](#jpeg-encoder)
+    * [ ] 1. [Color Conversion to YUV](#color-conversion-to-yuv)
     * [ ] 2. [Chroma Subsampling](#chroma-subsampling)
     * [ ] 3. [Partitioning Image](#partitioning-image)
     * [ ] 4. [DCT](#dct)
@@ -9,14 +9,14 @@
 * [JPEG Decoder](#jpeg-decoder)
     * [ ] 1. [IDCT](#idct)
     * [ ] 2. [Reverse Subsample](#reverse-subsample)
-    * [ ] 3. [Color Conversion to RBG](#color-conversion-to-rbg)
+    * [ ] 3. [Color Conversion to RGB](#color-conversion-to-rgb)
 * Help
     * [Lecture slides](#lectures)
     * [Example code](#examples)
     * [Setup OpenCV and Qt](#setup-opencv-with-qt)
     * [Source control](#git-commands)
     
->   Check any correct section after you read it
+>   __Check__ any correct section after you read it
 
 
 ### Encode
@@ -63,7 +63,7 @@
 
 
 
-# 1. Color Conversion to YUV
+# Color Conversion to YUV
 
 ### Input
 * _Description_: RGB image
@@ -138,9 +138,9 @@ for (col : columns) {
 ## Implementation
 1.  (4:2:0)
 2. 
-3.
-4.
-5.
+3. 
+4. 
+5. 
 
 
 
@@ -183,7 +183,7 @@ for (col : columns) {
 
 
 &nbsp;
-## 4. DCT
+## DCT
 
 ### Input
 * _Description_: An __8×8__ image block
@@ -207,7 +207,7 @@ for (col : columns) {
                 cos( ((2 × j + 1) × vπ) / (2 × N) ) ×
                 f(i, j)
 ```
-* Given input function ```f(i, j)``` over  ```i``` and ```j``` (piece of an image), 2D DCT transforms it into new function ```F(u, v)``` with ```u``` and ```v``` running over the same range as ```i``` and ```j```
+* Given input function ```f(i, j)``` over  _i_ and _j_ (piece of an image), 2D DCT transforms it into new function ```F(u, v)``` with _u_ and _v_ running over the same range as _i_ and _j_
 * ```f(i, j)``` outputs DCT coefficeints ```F(u, v)``` of the image block 
 * 2D DCT can be seperated into sequence of two one-dimensional DCT.
 
@@ -254,7 +254,7 @@ for (col : columns) {
 
 
 &nbsp;
-## 5. Quantization
+## Quantization
 
 ### Input
 * _Description_: DCT coefficients ```F(u, v)```
@@ -301,7 +301,7 @@ for (col : columns) {
 # JPEG Decoder
 
 &nbsp;
-## 1. IDCT
+## IDCT
 
 ### Input
 * _Description_:  ```?```
@@ -331,7 +331,7 @@ for (col : columns) {
 
 
 &nbsp;
-## 2. Reverse Subsample
+## Reverse Subsample
 
 ### Input
 * _Description_: YUV subsampled image
@@ -352,7 +352,7 @@ for (col : columns) {
 
 
 &nbsp;
-## 3. Color Conversion to RGB
+## Color Conversion to RGB
 
 ### Input
 * _Description_: YUV image
