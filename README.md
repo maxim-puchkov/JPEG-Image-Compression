@@ -1,9 +1,28 @@
 # JPEG Image Compression
+### Contents
+* [JPEG Encoder](#jpeg_encoder)
+    1. [Color Conversion to YUV](##color-conversion-to-yuv)
+    2. [Chroma Subsampling](#chroma-subsampling)
+    3. [Partitioning Image](#partitioning-image)
+    4. [DCT](#dct)
+    5. [Quantization](#quantization)
+* [JPEG Decoder](#jpeg-decoder)
+    1. [IDCT](#idct)
+    2. [Reverse Subsample](#reverse-subsample)
+    3. [Color Conversion to RBG](#color-conversion-to-rbg)
+* Help
+    * [Lecture slides](#lectures)
+    * [Example code](#examples)
+    * [Setup OpenCV and Qt](#setup-opencv-with-qt)
+    * [Source control](#git-commands)
+    
 
 
 
 
-## Overview
+
+
+# Overview
 ###  ```Checklist```: check any correct section after you read it
 * __JPEG Image Compression__
     * [ ] Image representation 
@@ -39,9 +58,7 @@
 
 
 
-&nbsp;
 # JPEG Encoder
-
 
 
 ### Image Representation
@@ -67,7 +84,7 @@
 
 
 
-# 1. Color Conversion from RGB to YUV 
+# 1. Color Conversion to YUV
 
 ### Input
 * _Description_: RGB image
@@ -119,7 +136,7 @@ for (col : columns) {
 
 
 &nbsp;
-# 2. Chroma Subsampling (4:2:0) 
+# Chroma Subsampling
 
 ### Input
 * _Description_: YUV image
@@ -140,7 +157,7 @@ for (col : columns) {
 
 &nbsp;
 ## Implementation
-1.  
+1.  (4:2:0)
 2. 
 3.
 4.
@@ -156,7 +173,7 @@ for (col : columns) {
 
 
 &nbsp;
-## 3. Partitioning Image into 8×8 blocks 
+## Partitioning Image
 
 ### Input
 * _Description_: An image
@@ -187,7 +204,7 @@ for (col : columns) {
 
 
 &nbsp;
-## 4. Transform Coding
+## 4. DCT
 
 ### Input
 * _Description_: An __8×8__ image block
@@ -305,7 +322,7 @@ for (col : columns) {
 # JPEG Decoder
 
 &nbsp;
-## 1. IDCT: Inverse Discrete Cosine Transform
+## 1. IDCT
 
 ### Input
 * _Description_:  ```?```
@@ -335,7 +352,7 @@ for (col : columns) {
 
 
 &nbsp;
-## 2. Reverse subsample color
+## 2. Reverse Subsample
 
 ### Input
 * _Description_: YUV subsampled image
@@ -356,7 +373,7 @@ for (col : columns) {
 
 
 &nbsp;
-## 3. Color Conversion from YUV to RGB
+## 3. Color Conversion to RGB
 
 ### Input
 * _Description_: YUV image
