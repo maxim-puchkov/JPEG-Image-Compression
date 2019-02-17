@@ -40,10 +40,17 @@ const Mat YUV_RGB = (Mat_<double>(N, N) <<
                         1.00,   2.03211,     0);
 
 
-
-
-
 // Help: https://docs.opencv.org/3.4.3/d6/d6d/tutorial_mat_the_basic_image_container.html
 
+/*
+ Create and display:
+ Mat M = (Mat_<double>(2, 3) << 1, 1, 1, 2, 2, 2);
+ cout << "M = " << endl << " " << M << endl << endl;
+ 
+ Outputs:
+    M =
+     [1, 1, 1;
+     2, 2, 2];
+ */
 
 #endif /* Color_h */
