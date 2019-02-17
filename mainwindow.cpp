@@ -99,10 +99,8 @@ MainWindow::~MainWindow() {
 /*******************************************************************************
                             Step 1. Load a new image
  *******************************************************************************/
+
 /*
-    <Step 1> -- Image selected in the file dialog, converted to 3-channel RGB,
-                and stored in the input image Matrix of RGB vectors.
- 
     Algorithm loadImage.
  
     1. Choose an image in the dialog and save its RGB colors in Mat cvImg.
@@ -125,20 +123,12 @@ void MainWindow::loadImage() {
 
 
 
-//
-//
-// TODO: Calculate both U = B - Y, V = R - Y chromas to convert to YUV space
-//
-//
+
 /*******************************************************************************
                     Step 2. Color Space Conversion: RGB to YUV
  *******************************************************************************/
 
 /*
-    <Step 2> -- Image's color space is converted from RGB to YUV, where
-                    Luminance Y = the sum of weighted RGB channels,
- 
- 
     Algorithm convertImage.
  
     1. Calculate Mat cvImg's Y-Channel, then store the result in Mat convertedImg.
@@ -146,7 +136,6 @@ void MainWindow::loadImage() {
     3. QLabel* img2 displays the Grayscale pixel map.
  
     • Input:  none.
-    • Output:
  */
 void MainWindow::convertImage() {
     
@@ -277,7 +266,7 @@ QImage MainWindow::MatGrayScale2QImage(const cv::Mat_<double> &src) {
         QRgb *destrow = (QRgb*)dest.scanLine(y);
         for (int x = 0; x < src.cols; ++x) {
             unsigned int color = srcrow[x] * scale;
-            destrow[x] = qRgba(color, color, color, 255); // Opaque RGBa (alpha = 255)
+            destrow[x] = qRgba(color, color, color, 255);
         }
     }
     return dest;
@@ -295,10 +284,9 @@ QImage MainWindow::MatGrayScale2QImage(const cv::Mat_<double> &src) {
  
     Algorithm subsample.
  
-    1. (steps)... Determine the luminance, Y, and Chr
-        .... 4:2:0 = Y + (Cr, Cb)
+    1. (steps)... Determine the luminance, Y, and  (Cr, Cb)
  
-    • Input: YUV or similar color space.
+    • Input:  YUV color
     • Output: .......
  */
 void subsample() {
