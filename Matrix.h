@@ -9,6 +9,8 @@
 #ifndef Matrix_h
 #define Matrix_h
 
+#include <opencv2/core/core.hpp>
+
 
 /* Matrix operations */
 
