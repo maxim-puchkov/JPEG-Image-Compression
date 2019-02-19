@@ -39,7 +39,7 @@ Mat dct_matrix(int n) {
 
 // Coefficients = 1D DCT * Image Block * Transpose(1D DCT)
 // F(u, v) = T * f(i, j) * Transpose(T)
-Mat dct_2d(Mat f) {
+Mat dct_2d(const Mat &f) {
     int n = f.rows;
     
     Mat F(n, n, CV_64F);
@@ -49,6 +49,21 @@ Mat dct_2d(Mat f) {
     
     
     return F;
+}
+
+
+// Image Block = Transpose(1D DCT) * Coefficients * 1D DCT
+// f(i, j) = Transpose(T) * F(u, v) * T
+Mat idct(const Mat &F) {
+    int n = f.rows;
+    
+    Mat f(n, n, CV_64F);
+    Mat T = dct_matrix(n);
+    
+    // ...
+    
+    
+    return f;
 }
 
 #endif /* TransformCoding_h */
