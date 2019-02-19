@@ -2,6 +2,7 @@
 ### Contents
 * [JPEG Encoder](#jpeg-encoder)
     * [ ] 1. [Color Conversion to YUV](#color-conversion-to-yuv)
+        * [Normalization](#normalization)
     * [ ] 2. [Chroma Subsampling](#chroma-subsampling)
     * [ ] 3. [Partitioning Image](#partitioning-image)
     * [ ] 4. [DCT](#dct)
@@ -81,14 +82,9 @@
 
 
 
-
 &nbsp;
 ## Implementation
-1. When image is selected, RGB value of every pixel of the input image is saved in a matrix of RGB vectors.
-``` 
-    RGB_input = cv::imread(fileName.toStdString(), IMREAD_COLOR);
-```
-2. [Eq. (4)](http://www.cs.sfu.ca/CourseCentral/365/li/material/work/RGB-YUV.pdf) gives translation matrix  __RGB_to_YUV__:
+1. [Eq. (4)](http://www.cs.sfu.ca/CourseCentral/365/li/material/work/RGB-YUV.pdf) gives translation matrix  __RGB_to_YUV__:
 
 |                     |                     |                     |
 |            ----:  |            ----:   |            ----:  |
@@ -96,7 +92,7 @@
 |   −0.14713   |  −0.28886    |    0.436        |
 |     0.615       |  −0.51499    |  −0.10001    |
 
-3. Converted image is a matrix of YUV vectors. Each entry is calculated by multiplying matrix __RGB_to_YUV__ and the RGB vector corresponding to the same position in RGB matrix. 
+2. Converted image is a matrix of YUV vectors. Each entry is calculated by multiplying matrix __RGB_to_YUV__ and the RGB vector corresponding to the same position in RGB matrix. 
 ```
 for (col : columns) {
     for (row : rows) {
@@ -105,7 +101,17 @@ for (col : columns) {
 }
 ```
 
+## Normalization
+### Input
+* _Description_: Image with color range 0-255  
 
+### Output
+* _Description_: Image with color range 0.00-1.00
+
+### Implementation
+1. 
+2. 
+3. 
 
 
 
@@ -183,7 +189,7 @@ for (col : columns) {
 
 
 &nbsp;
-## DCT
+# DCT
 
 ### Input
 * _Description_: An __8×8__ image block
@@ -194,35 +200,11 @@ for (col : columns) {
 * _Type_: ```Mat_<double>``` __8×8__ matrix
 
 
-### Two-dimensional DCT (2D DCT)
-* Eq. (8.17) defines a general transform given by, where:
-    * Block size = M×N
-    * i, u  = 0, 1, ..., M - 1
-    * j, v  = 0, 1, ..., N - 1
-```
-    F(u, v) = ( (2 × C(u) × C(v)) / √(M × N) ) ×
-        ∑ [i = 0 .. M - 1]
-            ∑ [j = 0 .. N - 1]
-                cos( ((2 × i + 1) × uπ) / (2 × M) ) ×
-                cos( ((2 × j + 1) × vπ) / (2 × N) ) ×
-                f(i, j)
-```
-* Given input function ```f(i, j)``` over  _i_ and _j_ (piece of an image), 2D DCT transforms it into new function ```F(u, v)``` with _u_ and _v_ running over the same range as _i_ and _j_
-* ```f(i, j)``` outputs DCT coefficeints ```F(u, v)``` of the image block 
-* 2D DCT can be seperated into sequence of two one-dimensional DCT.
-
-
-
-
-
-
-
-
 
 
 &nbsp;
 ### 2D DCT Matrix Implementation
-1. 2D DCT is implemented by two consecutive matrix multiplications
+1. 2D DCT is implemented by two consecutive 1D DCT matrix multiplications
 ```
     F(u, v) = T * f(i, j) * Transpose(T)
 ```
@@ -254,7 +236,7 @@ for (col : columns) {
 
 
 &nbsp;
-## Quantization
+# Quantization
 
 ### Input
 * _Description_: DCT coefficients ```F(u, v)```
