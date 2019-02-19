@@ -20,8 +20,8 @@ using cv::Scalar;
 /* Discrete Cosine Transform */
 
 
-// T[i, j]     = 1 / (2*√(2))                          if i = 0
-//             = 1/2 * cos((2j+1) * iπ) / 16)          if i > 0
+// T[i, j]     = 1 / √(N)                              if i = 0
+//             = √(2/N) * cos((2j+1) * iπ) / 2N)       if i > 0
 Mat dct_matrix(int n) {
     double init = 1 / sqrt(n);
     Mat T(n, n, CV_64F, Scalar::all(init));
