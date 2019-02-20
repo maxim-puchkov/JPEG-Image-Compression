@@ -1,60 +1,38 @@
 # JPEG Image Compression
-### Contents
-* [JPEG Encoder](#jpeg-encoder)
-    * [ ] 1. [Color Conversion to YUV](#color-conversion-to-yuv)
-        * [Normalization](#normalization)
-    * [ ] 2. [Chroma Subsampling](#chroma-subsampling)
-    * [ ] 3. [Partitioning Image](#partitioning-image)
-    * [ ] 4. [DCT](#dct)
-    * [ ] 5. [Quantization](#quantization)
-* [JPEG Decoder](#jpeg-decoder)
-    * [ ] 1. [IDCT](#idct)
-    * [ ] 2. [Reverse Subsample](#reverse-subsample)
-    * [ ] 3. [Color Conversion to RGB](#color-conversion-to-rgb)
-* Help
-    * [Lecture slides](#lectures)
-    * [Example code](#examples)
-    * [Setup OpenCV and Qt](#setup-opencv-with-qt)
-    * [Source control](#git-commands)
+
+## Contents
+* [ ] [Color Conversion](#color-conversion)
+* [ ] [Subsampling](#subsampling)
+* [ ] [Partitioning Image](#partitioning-image)
+* [ ] [Transform Coding](#transform-coding)
+* [ ] [Quantization](#quantization)
+
+
+### Help
+* [Lecture slides](#lectures)
+* [Example code](#examples)
+* [Setup OpenCV and Qt](#setup-opencv-with-qt)
+* [Source control](#git-commands)
+
+
+## Procedure
+* Encode
+    1. [Color Conversion](#color-conversion) RGB to YUV
+    2. [Color Conversion](#color-conversion) YUV to YCbCr
+    3. [Subsampling](#subsampling) _4:2:0_ 
+    4. [DCT](#dct) on image blocks
+    5. [Quantization](#quantization)
+* Decode
+    1. [IDCT](#idct) on image blocks
+    2. [Subsampling](#subsampling) reverse 
+    3. [Color Conversion](#color-conversion) YCbCr to YUV
+    4. [Color Conversion](#color-conversion) YUV to RGB
     
->   __Check__ any correct section after you read it
-
-
-### Encode
-1. Convert RGB to YUV
-2. Subsample color
-3. DCT on image blocks
-4. Quantization
-
-
-### Decode
-1. IDCT on image blocks
-2. Reverse subsample color
-3. Convert YUV to RGB
 > The decoding process reverses Encoding steps, except the quantization because it is irreversible
 
 
 
 
-
-
-# JPEG Encoder
-
-
-### Image Representation
-* Syntax: 
-    * (0, 0, 0):  __1×3__ vertical vector (1 row, 3 columns)
-    * [0, 0, 0]:  __3×1__ horizontal vector (3 rows, 1 column) 
-&nbsp;
-* Examples:
-    * __4×3__ image, white center, black background 
-    
-    |                  |                              |                 |
-    |            --:  |                        --:  |            --:  |
-    |   (0, 0, 0)   |   (0, 0, 0)               |   (0, 0, 0)   |
-    |   (0, 0, 0)   |   (255, 255, 255)   |   (0, 0, 0)   |
-    |   (0, 0, 0)   |   (255, 255, 255)   |   (0, 0, 0)   |
-    |   (0, 0, 0)   |   (0, 0, 0)               |   (0, 0, 0)   |
 
 
 
@@ -65,6 +43,9 @@
 
 
 # Color Conversion to YUV
+* [RGB YUV](#implementation-rgb-to-yuv)
+* [YUV RGB](#implementation-yuv-to-rgb)
+* [YUV YCbCr](#implementation-yuv-to-ycbcr)
 
 ### Input
 * _Description_: RGB image
@@ -78,13 +59,8 @@
 
 
 
-
-
-
-
-&nbsp;
-## Implementation
-1. [Eq. (4)](http://www.cs.sfu.ca/CourseCentral/365/li/material/work/RGB-YUV.pdf) gives translation matrix  __RGB_to_YUV__:
+## Implementation RGB to YUV
+1. [Matrix (4)](http://www.cs.sfu.ca/CourseCentral/365/li/material/work/RGB-YUV.pdf) __RGB_to_YUV__:
 
 |                     |                     |                     |
 |            ----:  |            ----:   |            ----:  |
@@ -101,48 +77,48 @@ for (col : columns) {
 }
 ```
 
-## Normalization
+
+
+
+## Implementation YUV to RGB
+* [Matrix (5)](http://www.cs.sfu.ca/CourseCentral/365/li/material/work/RGB-YUV.pdf) __YUV_to_RGB__ :
+
+|               |                    |                      |
+|     ----:   |           ----:   |            ----:   |
+|    1.00    |    0              |     1.1398      |
+|    1.00    |  −0.3946     |   −0.58060    |
+|    1.00    |    2.03211   |     0               |
+
+
+
+
+## Implementation YUV to YCbCr
+* ...
+
+
+
+
+
+
+
+
+
+
+# Subsampling
+
 ### Input
-* _Description_: Image with color range 0-255  
-
-### Output
-* _Description_: Image with color range 0.00-1.00
-
-### Implementation
-1. 
-2. 
-3. 
-
-
-
-
-
-
-
-
-&nbsp;
-# Chroma Subsampling
-
-### Input
-* _Description_: YUV image
+* _Description_: YCbCr image
 * _Type_: ```Mat3b``` matrix of  ```Vec3b```
 
 ### Output
 * _Description_: ```?```
-* _Type_: ```?```
+* _Type_: ```Mat3b``` matrix of  ```Vec3b```
 
 
 
 
-
-
-
-
-
-
-&nbsp;
-## Implementation
-1.  (4:2:0)
+## _4:2:0_ Implementation
+1.  
 2. 
 3. 
 4. 
@@ -150,6 +126,12 @@ for (col : columns) {
 
 
 
+## Reverse Implementation 
+1. 
+
+
+### More
+* [Tutorial](https://www.codeproject.com/Articles/402391/RGB-to-YUV-conversion-with-different-chroma-sampli?fbclid=IwAR1r-hgcEminEt4WBuuohpu5snnwruVHr8WHiXz-a3EL6jp1kH1lduds9A8)
 
 
 
@@ -157,8 +139,15 @@ for (col : columns) {
 
 
 
-&nbsp;
-## Partitioning Image
+
+
+
+
+
+
+
+
+# Partitioning Image
 
 ### Input
 * _Description_: An image
@@ -171,8 +160,8 @@ for (col : columns) {
 
 
 
-&nbsp;
-### Implementation
+
+## Implementation
 1.  
 2. 
 3.
@@ -188,32 +177,24 @@ for (col : columns) {
 
 
 
-&nbsp;
-# DCT
-
-### Input
-* _Description_: An __8×8__ image block
-* _Type_:   ```Mat3b```  __8×8__ matrix
-
-### Output
-* _Description_: DCT coefficients ```F(u, v)``` of the input block
-* _Type_: ```Mat_<double>``` __8×8__ matrix
 
 
 
 
-&nbsp;
-### 2D DCT Matrix Implementation
-1. 2D DCT is implemented by two consecutive 1D DCT matrix multiplications
-```
-    F(u, v) = T * f(i, j) * Transpose(T)
-```
-2. __T__ is a DCT-matrix defined as:
+
+
+# Transform Coding
+
+
+## DCT
+
+### DCT Matrix Implementation
+* __T__ is a DCT-matrix defined as:
 ```
     T[i, j]     = 1 / √(N)                              if i = 0
                 = √(2/N) * cos((2j+1) * iπ) / 2N)       if i > 0
 ```
-3. For __N__=8, DCT-matrix __T_8__:
+* For block size __N__=8, DCT-matrix __T_8__:
 ```
     T_8[i, j]     = 1 / (2*√(2))                        if i = 0
                   = 1/2 * cos((2j+1) * iπ) / 16)        if i > 0 
@@ -221,21 +202,39 @@ for (col : columns) {
 
 
 
-
-* More
-    * Chapter 8 slides: [page 30](http://www.cs.sfu.ca/CourseCentral/365/li/material/lectureslides/Chapter8-365.pdf)
-    * DCT: [concepts and applications](http://homepages.cae.wisc.edu/~ece554/website/Xilinx/app_notes/DCT_IDCT%20Customer%20Tutorial%20custdct.pdf) 
-
-
-
+### 2D DCT Matrix Implementation
+* 2D DCT is implemented by two consecutive 1D DCT matrix multiplications
+```
+    F(u, v) = T * f(i, j) * Transpose(T)
+```
 
 
 
 
+## IDCT
+
+### 2D IDCT Matrix Implementation 
+*  The equation of 2D inverse DCT based on:
+```
+    f(i, j) = Transpose(T) * F(u, v) * T
+```
+* Every __8×8__ block is decoded with 2D IDCT  
+
+> DCT matrix is orthogonal: Transpose(T) = Inverse(T)
 
 
 
-&nbsp;
+### More
+* Chapter 8 slides: [page 30](http://www.cs.sfu.ca/CourseCentral/365/li/material/lectureslides/Chapter8-365.pdf)
+* DCT: [concepts and applications](http://homepages.cae.wisc.edu/~ece554/website/Xilinx/app_notes/DCT_IDCT%20Customer%20Tutorial%20custdct.pdf) 
+
+
+
+
+
+
+
+
 # Quantization
 
 ### Input
@@ -249,80 +248,19 @@ for (col : columns) {
 
 
 
-
-
-
-
-
-
-&nbsp;
-### Implementation
-1. To calculate quantized DCT coefficients   ```F^(u, v)``` each resulting matrix from DCT transformations ```F(u, v)``` is divided by quantization matrix entry ```Q(u, v)``` 
-    * Quantization formula:
+## Implementation
+1. Quantization formula:
 ```
-        F^(u, v) = round( F(u, v) / Q(u, v) )
+    F^(u, v) = round( F(u, v) / Q(u, v) )
 ```
-2. Quantization reduces high frequency DCT coefficients
+2. 
 3. 
 
 
-> Standard JPEG quantization tables: Table 9.1 Luminance, Table 9.2 Chrominance
-
-> Quantization forms: uniform, nonuniform, and vector quantization
-
-
-
-
-
-
-
-
-
-
-&nbsp;
-# JPEG Decoder
-
-&nbsp;
-## IDCT
-
-### Input
-* _Description_:  ```?```
-* _Type_: ```?```
-
-### Output
-* _Description_: Decoded __8×8__ image block 
-* _Type_: ```Mat3b```  __8×8__ matrix
-
-
-
-
-&nbsp;
-### Implementation:  2D IDCT Matrix
-1.  The equation of 2D inverse DCT based on:
-```
-    f(i, j) = Transpose(T) * F(u, v) * T
-```
-2. Inverse matrix every __8×8__ block is decoded with 2D IDCT  
-> DCT matrix is orthogonal: Transpose(T) = Inverse(T)
-
-
-
-
-
-
-
-
-&nbsp;
-## Reverse Subsample
-
-### Input
-* _Description_: YUV subsampled image
-* _Type_: ```?```
-
-
-### Output
-* _Description_: YUV image
-* _Type_:  ```Mat3b``` matrix
+### More
+* __Standard JPEG quantization tables__: Table 9.1 Luminance, Table 9.2 Chrominance
+* Quantization reduces high frequency DCT coefficients
+* Quantization forms: uniform, nonuniform, and vector quantization
 
 
 
@@ -333,26 +271,6 @@ for (col : columns) {
 
 
 
-&nbsp;
-## Color Conversion to RGB
-
-### Input
-* _Description_: YUV image
-* _Type_: ```Mat3b``` matrix
-
-### Output
-* _Description_: Original RGB image
-* _Type_: ```Mat3b``` matrix
-
-&nbsp;
-### Implementation
-* [Eq. (5)](http://www.cs.sfu.ca/CourseCentral/365/li/material/work/RGB-YUV.pdf) gives conversion matrix  __YUV_to_RGB__ :
-
-|               |                    |                      |
-|     ----:   |           ----:   |            ----:   |
-|    1.00    |    0              |     1.1398      |
-|    1.00    |  −0.3946     |   −0.58060    |
-|    1.00    |    2.03211   |     0               |
 
 
 
@@ -361,7 +279,37 @@ for (col : columns) {
 
 
 
-&nbsp;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Helpful Links
 
 ## Lectures
@@ -408,7 +356,7 @@ for (col : columns) {
 
 
 
-&nbsp;
+
 # Extra
 ## Qt Skeleton Code
 * This is the skeleton code for assignment 2. The code uses the Qt framework. It is a cross-platform GUI framework for C++. You can open and run the code using an IDE called Qt creator. 
