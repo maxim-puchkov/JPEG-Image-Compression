@@ -70,9 +70,9 @@
 
 2. Converted image is a matrix of YUV vectors. Each entry is calculated by multiplying matrix __RGB_to_YUV__ and the RGB vector corresponding to the same position in RGB matrix. 
 ```
-for (col : columns) {
-    for (row : rows) {
-        YUV_converted[col, row] = RGB_to_YUV * RGB_input[col, row]
+for (row : rows) {
+    for (col : columns) {
+        YUV_converted[row, col] = RGB_to_YUV * RGB_input[row, col]
     }
 }
 ```
