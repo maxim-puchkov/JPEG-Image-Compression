@@ -42,10 +42,10 @@
 
 
 
-# Color Conversion to YUV
-* [RGB YUV](#implementation-rgb-to-yuv)
-* [YUV RGB](#implementation-yuv-to-rgb)
-* [YUV YCbCr](#implementation-yuv-to-ycbcr)
+# Color Conversion
+* [RGB YUV](#rgb-to-yuv)
+* [YUV RGB](#yuv-to-rgb)
+* [YUV YCbCr](#yuv-to-ycbcr)
 
 ### Input
 * _Description_: RGB image
@@ -59,7 +59,7 @@
 
 
 
-## Implementation RGB to YUV
+## RGB to YUV
 1. [Matrix (4)](http://www.cs.sfu.ca/CourseCentral/365/li/material/work/RGB-YUV.pdf) __RGB_to_YUV__:
 
 |                     |                     |                     |
@@ -80,7 +80,7 @@ for (col : columns) {
 
 
 
-## Implementation YUV to RGB
+## YUV to RGB
 * [Matrix (5)](http://www.cs.sfu.ca/CourseCentral/365/li/material/work/RGB-YUV.pdf) __YUV_to_RGB__ :
 
 |               |                    |                      |
@@ -92,7 +92,7 @@ for (col : columns) {
 
 
 
-## Implementation YUV to YCbCr
+## YUV to YCbCr
 * ...
 
 
