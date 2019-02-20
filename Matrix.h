@@ -28,11 +28,13 @@ Mat mul(const Mat &A, const Mat &B) {
     Mat R(m, p, CV_64F);
     for (int row = 0; row < m; row++) {
         for (int col = 0; col < p; col++) {
+            
             int product = 0;
             for (int i = 0; i < n; i++) {
                 product += A.at<double>(row, i) * B.at<double>(i, col);
             }
             R.at<double>(row, col) = product;
+            
         }
     }
     
@@ -40,10 +42,22 @@ Mat mul(const Mat &A, const Mat &B) {
 }
 
 
-Mat transpose(const mat &A) {
-    Mat AT = (A.cols, A.rows, CV_64F);
+
+
+// m×n  ~>  n×m
+Mat transpose(const Mat &A) {
+    int m = A.rows;
+    int n = A.cols;
     
-    // ...
+    Mat AT(n, m, CV_64F);
+    
+    for (int row = 0; row < m; row++) {
+        for (int col = 0; col < n; col++) {
+            
+            AT.at<double>(col, row) = A.at<double>(row, col);
+            
+        }
+    }
     
     return AT;
 }
