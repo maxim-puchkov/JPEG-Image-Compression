@@ -48,15 +48,9 @@ Mat dct_2d(const Mat &f) {
 // Image Block = Transpose(1D DCT) * Coefficients * 1D DCT
 // f(i, j) = Transpose(T) * F(u, v) * T
 Mat idct(const Mat &F) {
-    int n = f.rows;
-    
-    Mat f(n, n, CV_64F);
-    Mat T = dct_matrix(n);
-    
-    // ...
-    
-    
-    return f;
+    Mat T = dct_matrix(F.rows);
+    return mul(mul(transpose(T), F), T);
 }
+
 
 #endif /* TransformCoding_h */
