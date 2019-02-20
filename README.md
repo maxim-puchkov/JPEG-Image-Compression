@@ -4,7 +4,7 @@
 * [ ] [Color Conversion](#color-conversion)
 * [ ] [Subsampling](#subsampling)
 * [ ] [Partitioning Image](#partitioning-image)
-* [ ] [Transform Coding](#transform-coding)
+* [x] [Transform Coding](#transform-coding)
 * [ ] [Quantization](#quantization)
 
 
