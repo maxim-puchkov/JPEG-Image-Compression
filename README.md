@@ -364,7 +364,7 @@ for (row : rows) {
  
  * The code basically creates a window, add two buttons and labels. When the open button is clicked, it loads an image and displays it using the first label. When the convert button is clicked, it computes the Y channel of the loaded image and displays it using second label.
  
-*  If you want to set up things on your own machine. The download link for Qt creator is here: https://www.qt.io/download. When downloading Qt, remember to download Qt creator and a version of Qt, for example, Qt 5.12.
+* [Download Qt](https://www.qt.io/download), remember to download Qt creator and a version of Qt, for example, Qt 5.12.
 
 ## Setup OpenCV with Qt
 * [macOS](https://www.learnopencv.com/configuring-qt-for-opencv-on-osx/)
