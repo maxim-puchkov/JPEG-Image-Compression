@@ -9,12 +9,17 @@
 #ifndef Compression_h
 #define Compression_h
 
+// Debug
+#include "SampleData.h"
+
+
 #include <opencv2/opencv.hpp>
 #include "Color.h"
 #include "TransformCoding.h"
 
 using cv::Mat3b;
 using cv::Vec3b;
+using cv::Rect;
 
 
 /* JPEG Compression */
@@ -52,25 +57,40 @@ Mat3b rgbImage(int rows, int cols) {
 
 /** Compression **/
 
+Mat3s DEBUG_convert(const Mat3b &source) {
+    // Convert...
+    
+    return yuv_block;
+}
+
+
 const int BLOCK_DIMENSION = 8;
+
 
 // JPEG compression of source image
 /* Mat3b */ void compress(const Mat3b &source) {
-    Mat3b compressed = source.clone();
+    // Mat3b compressed = source.clone();
     
     // 1. convert RGB (CV_8UC3) to YUV (CV_8SC3)
+    Mat3s yuvImage = DEBUG_convert(source);
+    std::cout << yuvImage << std::endl;
+    
     
     // 2. chroma subsampling 4:2:0 (CV_8SC3)
     
+    
     // 3. Partition image into 8×8 blocks (CV_8SC3)
     const int N = BLOCK_DIMENSION;
-    int rowLimit = (source.rows % N) * N;
-    int colLimit = (source.cols % N) * N;
+    int rowLimit = source.rows / N;
+    int colLimit = source.cols / N;
+    std::cout << "RC Limits = (" << rowLimit << ", " << colLimit << ")\n";
+    
     
     for (int row = 0; row < rowLimit; row += N) {
         for (int col = 0; col < colLimit; col += N) {
             
-            Mat block(N, N, CV_8SC3);
+            Mat block = yuvImage(cv::Rect(row, col, (row + N), (col + N)));
+            std::cout << "Block: " << block << std::endl;
             
             // 4. DCT transformation of each image block (CV_8SC3)
             
