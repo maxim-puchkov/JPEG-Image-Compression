@@ -10,6 +10,7 @@
 #define TransformCoding_h
 
 #include <opencv2/opencv.hpp>
+#include "Matrix.h"
 
 
 using cv::Mat;

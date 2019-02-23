@@ -12,16 +12,15 @@
 
 #include <opencv2/opencv.hpp>
 
+
 using cv::Mat;
 using cv::Mat_;
+
 
 const int N = 3;
 
 
 /* Color Conversion Matrices */
-
-// Conversion equation:
-//  toColor = FROM_TO * fromColor
 
 
 const Mat RGB_YUV = (Mat_<double>(N, N) <<

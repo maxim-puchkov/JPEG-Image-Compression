@@ -12,6 +12,9 @@
 #include <opencv2/opencv.hpp>
 
 
+using cv::Mat;
+
+
 /* Matrix operations */
 
 
