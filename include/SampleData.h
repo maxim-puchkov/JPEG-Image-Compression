@@ -19,6 +19,11 @@ using cv::Vec3b;
 using cv::Vec3s;
 
 
+template<typename ...T>
+void print(T &&...ts) {
+    (std::cout << ... << ts) << std::endl;
+}
+
 /** Sample data **/
 
 

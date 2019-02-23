@@ -73,7 +73,7 @@ const int BLOCK_DIMENSION = 8;
     
     // 1. convert RGB (CV_8UC3) to YUV (CV_8SC3)
     Mat3s yuvImage = DEBUG_convert(source);
-    std::cout << yuvImage << std::endl;
+    print(yuvImage);
     
     
     // 2. chroma subsampling 4:2:0 (CV_8SC3)
@@ -83,14 +83,14 @@ const int BLOCK_DIMENSION = 8;
     const int N = BLOCK_DIMENSION;
     int rowLimit = source.rows / N;
     int colLimit = source.cols / N;
-    std::cout << "RC Limits = (" << rowLimit << ", " << colLimit << ")\n";
+    print("RC Limits = (", rowLimit, ", ", colLimit, ")");
     
     
     for (int row = 0; row < rowLimit; row += N) {
         for (int col = 0; col < colLimit; col += N) {
             
             Mat block = yuvImage(cv::Rect(row, col, (row + N), (col + N)));
-            std::cout << "Block: " << block << std::endl;
+            print("Block:\n", block);
             
             // 4. DCT transformation of each image block (CV_8SC3)
             
