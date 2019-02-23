@@ -17,7 +17,7 @@
 /* JPEG Compression */
 
 
-/** Sample data **/ 
+/** Sample data **/
 
 // samples/grayscale-values.txt
 const Mat1b grayscale_block = (
@@ -88,22 +88,22 @@ Mat3b rgbImage(int rows, int cols) {
 /** Compression **/
 
 // JPEG compression of source image
-Mat3b compress(const Mat3b &source) {
+/* Mat3b */ void compress(const Mat3b &source) {
     Mat3b compressed = source.clone();
     
-    // 1.   yuvImage = convert rgbImage
+    // 1. Convert RGB to YUV
     
-    // 2.   ycbcrImage = convert yuvImage
+    // 2. Convert YUV to YCbCr
     
-    // 3.   ycbcrImage = subsample ycbcrImage
+    // 3. Chroma subsampling 4:2:0
     
-    // 4. Partitioning 8×8 blocks
+    // 4. Partition image into 8×8 blocks
     for (int row = 0; row < source.rows; row++) {
         for (int col = 0; col < source.cols; col++) {
             
-            // 5. DCT transformation
+            // 5. DCT transformation of each image block
             
-            // 6. Quantization
+            // 6. Quantizing DCT coefficients
             
         }
     }
