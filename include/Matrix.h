@@ -13,12 +13,13 @@
 
 
 using cv::Mat;
+using cv::DataType;
 
 
 /* Matrix operations */
 
 
-// m×n  mul  n×p  ~>  m×p
+// Compute R[m×p] - matrix product of A[m×n] and B[n×p]
 Mat mul(const Mat &A, const Mat &B) {
     int m = A.rows;
     int n = A.cols;
@@ -47,18 +48,16 @@ Mat mul(const Mat &A, const Mat &B) {
 
 
 
-// m×n  ~>  n×m
-Mat transpose(const Mat &A) {
+// Compute AT[n×m] - transpose of A[m×n]
+template<class V>
+Mat transpose(const Mat_<V> &A) {
     int m = A.rows;
     int n = A.cols;
-    
-    Mat AT(n, m, CV_64F);
+    Mat AT(n, m, DataType<V>::type);
     
     for (int row = 0; row < m; row++) {
         for (int col = 0; col < n; col++) {
-            
-            AT.at<double>(col, row) = A.at<double>(row, col);
-            
+            AT.at<typename DataType<V>::value_type>(col, row) = A.template at<typename DataType<V>::value_type>(row, col);
         }
     }
     

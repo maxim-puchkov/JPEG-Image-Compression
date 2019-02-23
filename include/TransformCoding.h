@@ -14,6 +14,7 @@
 
 
 using cv::Mat;
+using cv::Mat1d;
 using cv::Mat_;
 using cv::Scalar;
 
@@ -23,7 +24,7 @@ using cv::Scalar;
 
 // T[i, j]     = 1 / √(N)                              if i = 0
 //             = √(2/N) * cos((2j+1) * iπ) / 2N)       if i > 0
-Mat dct_matrix(int n) {
+Mat1d dct_matrix(int n) {
     double init = 1 / sqrt(n);
     Mat T(n, n, CV_64F, Scalar::all(init));
     
@@ -42,16 +43,16 @@ Mat dct_matrix(int n) {
 
 // Coefficients = 1D DCT * Image Block * Transpose(1D DCT)
 // F(u, v) = T * f(i, j) * Transpose(T)
-Mat dct_2d(const Mat &f) {
-    Mat T = dct_matrix(f.rows);
+Mat dct2(const Mat &f) {
+    Mat1d T = dct_matrix(f.rows);
     return mul(mul(T, f), transpose(T));
 }
 
 
 // Image Block = Transpose(1D DCT) * Coefficients * 1D DCT
 // f(i, j) = Transpose(T) * F(u, v) * T
-Mat idct(const Mat &F) {
-    Mat T = dct_matrix(F.rows);
+Mat idct2(const Mat &F) {
+    Mat1d T = dct_matrix(F.rows);
     return mul(mul(transpose(T), F), T);
 }
 
