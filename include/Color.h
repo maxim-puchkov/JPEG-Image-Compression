@@ -9,8 +9,7 @@
 #ifndef Color_h
 #define Color_h
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc.hpp>
+
 #include <opencv2/opencv.hpp>
 
 using cv::Mat;

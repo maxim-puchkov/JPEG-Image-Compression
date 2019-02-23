@@ -9,7 +9,7 @@
 #ifndef TransformCoding_h
 #define TransformCoding_h
 
-#include <opencv2/core/core.hpp>
+#include <opencv2/opencv.hpp>
 
 
 using cv::Mat;
@@ -28,8 +28,10 @@ Mat dct_matrix(int n) {
     
     for (int row = 1; row < n; row++) {
         for (int col = 0; col < n; col++) {
+            
             double value = sqrt(2.0 / n) * cos(((2 * col + 1) * (row * M_PI)) / (2 * n));
             T.at<double>(row, col) = value;
+        
         }
     }
     
