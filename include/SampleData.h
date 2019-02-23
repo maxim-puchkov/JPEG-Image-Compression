@@ -11,6 +11,7 @@
 
 #include <opencv2/opencv.hpp>
 
+using cv::Mat;
 using cv::Mat1b;
 using cv::Mat3b;
 using cv::Mat3s;
