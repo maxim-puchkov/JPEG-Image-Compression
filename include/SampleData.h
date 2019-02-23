@@ -19,12 +19,46 @@ using cv::Vec3b;
 using cv::Vec3s;
 
 
+
+
+/* Debug functions */
+
 template<typename ...T>
 void print(T &&...ts) {
     (std::cout << ... << ts) << std::endl;
 }
 
-/** Sample data **/
+
+unsigned char uchar_random() {
+    return rand() % 256;
+}
+
+
+// Create and fill a new debug image with randomized RGB vectors
+Mat3b rgbImage(int rows, int cols) {
+    Mat3b image = Mat(rows, cols, CV_8UC3);
+    
+    for (int row = 0; row < rows; row++) {
+        for (int col = 0; col < cols; col++) {
+            
+            Vec3b entry(uchar_random(), uchar_random(), uchar_random());
+            image.at<Vec3b>(row, col) = entry;
+            
+        }
+    }
+    
+    return image;
+}
+
+
+
+
+
+
+
+
+
+/* Sample data */
 
 
 // samples/grayscale-values.txt

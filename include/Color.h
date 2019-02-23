@@ -17,10 +17,9 @@ using cv::Mat;
 using cv::Mat_;
 
 
-const int N = 3;
-
-
 /* Color Conversion Matrices */
+
+const int N = 3;
 
 
 const Mat RGB_YUV = (Mat_<double>(N, N) <<
@@ -33,6 +32,18 @@ const Mat YUV_RGB = (Mat_<double>(N, N) <<
                      1.00,      0,          1.1398,
                      1.00,     -0.3946,     -0.58060,
                      1.00,      2.03211,    0);
+
+
+
+
+
+/* Conversion Algorithm */
+
+Mat3s convert_RGB_YUV(const Mat3b &source) {
+    // Convert...
+    
+    return yuv_block;
+}
 
 
 #endif /* Color_h */

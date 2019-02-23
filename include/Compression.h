@@ -24,55 +24,15 @@ using cv::Rect;
 
 /* JPEG Compression */
 
-
-
-
-
-/** Debug **/
-
-unsigned char uchar_random() {
-    return rand() % 256;
-}
-
-
-// Create and fill a new debug image with randomized RGB vectors
-Mat3b rgbImage(int rows, int cols) {
-    Mat3b image = Mat(rows, cols, CV_8UC3);
-    
-    for (int row = 0; row < rows; row++) {
-        for (int col = 0; col < cols; col++) {
-            
-            Vec3b entry(uchar_random(), uchar_random(), uchar_random());
-            image.at<Vec3b>(row, col) = entry;
-            
-        }
-    }
-    
-    return image;
-}
-
-
-
-
-
-/** Compression **/
-
-Mat3s DEBUG_convert(const Mat3b &source) {
-    // Convert...
-    
-    return yuv_block;
-}
-
-
 const int BLOCK_DIMENSION = 8;
 
 
-// JPEG compression of source image
+// JPEG compression of source RGB image
 /* Mat3b */ void compress(const Mat3b &source) {
     // Mat3b compressed = source.clone();
     
     // 1. convert RGB (CV_8UC3) to YUV (CV_8SC3)
-    Mat3s yuvImage = DEBUG_convert(source);
+    Mat3s yuvImage = convert_RGB_YUV(source);
     print(yuvImage);
     
     
