@@ -9,6 +9,10 @@
 #ifndef Compression_h
 #define Compression_h
 
+#include <opencv2/opencv.hpp>
+#include "Color.h"
+#include "TransformCoding.h"
+
 
 /* JPEG Compression */
 
@@ -30,6 +34,8 @@ Mat3b rgbImage(int rows, int cols) {
     
     return image;
 }
+
+
 
 
 
