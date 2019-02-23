@@ -18,7 +18,6 @@ using cv::DataType;
 
 /* Matrix operations */
 
-
 // Compute R[m×p] - matrix product of A[m×n] and B[n×p]
 Mat mul(const Mat &A, const Mat &B) {
     int m = A.rows;
@@ -46,8 +45,6 @@ Mat mul(const Mat &A, const Mat &B) {
 }
 
 
-
-
 // Compute AT[n×m] - transpose of A[m×n]
 template<class V>
 Mat transpose(const Mat_<V> &A) {
@@ -63,6 +60,5 @@ Mat transpose(const Mat_<V> &A) {
     
     return AT;
 }
-
 
 #endif /* Matrix_h */

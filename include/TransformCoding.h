@@ -19,8 +19,10 @@ using cv::Mat_;
 using cv::Scalar;
 
 
-/* Discrete Cosine Transform */
+/* Transform Coding */
 
+
+/** Discrete Cosine Transform **/
 
 // T[i, j]     = 1 / √(N)                              if i = 0
 //             = √(2/N) * cos((2j+1) * iπ) / 2N)       if i > 0
@@ -49,12 +51,16 @@ Mat dct2(const Mat &f) {
 }
 
 
+
+
+
+/** Inverse Discrete Cosine Transform **/
+
 // Image Block = Transpose(1D DCT) * Coefficients * 1D DCT
 // f(i, j) = Transpose(T) * F(u, v) * T
 Mat idct2(const Mat &F) {
     Mat1d T = dct_matrix(F.rows);
     return mul(mul(transpose(T), F), T);
 }
-
 
 #endif /* TransformCoding_h */

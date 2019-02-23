@@ -20,13 +20,14 @@ using cv::Vec3b;
 using cv::Vec3s;
 
 
+/* Debugging */
 
 
-/* Debug functions */
+/** Generate input/output **/
 
 template<typename ...T>
 void print(T &&...ts) {
-    (std::cout << ... << ts) << std::endl;
+    (std::cout << ... << std::forward<T>(ts)) << std::endl;
 }
 
 
@@ -55,12 +56,54 @@ Mat3b rgbImage(int rows, int cols) {
 
 
 
+/** YUV Range Adjustment **/
+
+struct YUV {
+    YUV(int y, int u, int v)
+    : y(y), u(u), v(v)
+    { }
+    
+    int y;
+    int u;
+    int v;
+};
+
+
+// Values after conversion
+const YUV RED(76, -36, 157);
+const YUV GREEN(150, -74, -131);
+const YUV BLUE(29, 111, -26);
+const YUV WHITE(255, 0, 0);
+const YUV BLACK(0, 0, 0);
+
+
+// Range center point and shift
+const int RCP = 128;
+const int S = 8;
+
+
+// Incorrect
+void yuv_adjust(const YUV yuv) {
+    print("Step 1. Converted YUV: ", yuv.y, ", ", yuv.u, ", ", yuv.v, '\n');
+    
+    // Step 2
+    int yt = (yuv.y - RCP) >> S;
+    int ut = (yuv.u - RCP) >> S;
+    int vt = (yuv.v - RCP) >> S;
+    print("Step 2. Scaled: ", yt, ", ", ut, ", ", vt, '\n');
+    
+    // Step 3
+    int yu = yt;
+    int uu = ut + RCP;
+    int vu = vt + RCP;
+    print("Step 3. Adjusted: ", yu, ", ", uu, ", ", vu, '\n');
+}
 
 
 
 
-/* Sample data */
 
+/** Sample data **/
 
 // samples/grayscale-values.txt
 const Mat1b grayscale_block = (

@@ -9,13 +9,10 @@
 #ifndef Compression_h
 #define Compression_h
 
-// Debug
-#include "SampleData.h"
-
-
 #include <opencv2/opencv.hpp>
 #include "Color.h"
 #include "TransformCoding.h"
+
 
 using cv::Mat3b;
 using cv::Vec3b;
@@ -53,6 +50,8 @@ const int BLOCK_DIMENSION = 8;
             print("Block:\n", block);
             
             // 4. DCT transformation of each image block (CV_8SC3)
+            // Mat coefficients = dct_2d(block);
+            // print("DCT coefficients: ", coefficients);
             
             // 5. Quantizing DCT coefficients (CV_8SC3)
             

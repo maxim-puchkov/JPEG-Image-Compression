@@ -47,7 +47,7 @@ Mat3s convert_RGB_YUV(const Mat3b &source) {
 }
 
 // https://convertingcolors.com/
-
+// https://stackoverflow.com/questions/8427786/how-to-adjust-image-saturation-in-yuv-color-space
 
 
 
