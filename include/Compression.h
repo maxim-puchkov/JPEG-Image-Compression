@@ -91,19 +91,17 @@ Mat3b rgbImage(int rows, int cols) {
 /* Mat3b */ void compress(const Mat3b &source) {
     Mat3b compressed = source.clone();
     
-    // 1. Convert RGB to YUV
+    // 1. convert RGB (CV_8UC3) to YUV (CV_8SC3)
     
-    // 2. Convert YUV to YCbCr
+    // 2. chroma subsampling 4:2:0 (CV_8SC3)
     
-    // 3. Chroma subsampling 4:2:0
-    
-    // 4. Partition image into 8×8 blocks
+    // 3. Partition image into 8×8 blocks (CV_8SC3)
     for (int row = 0; row < source.rows; row++) {
         for (int col = 0; col < source.cols; col++) {
             
-            // 5. DCT transformation of each image block
+            // 4. DCT transformation of each image block (CV_8SC3)
             
-            // 6. Quantizing DCT coefficients
+            // 5. Quantizing DCT coefficients (CV_8SC3)
             
         }
     }
