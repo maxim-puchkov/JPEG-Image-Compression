@@ -35,8 +35,28 @@ Mat3b rgbImage(int rows, int cols) {
 
 /** Compression **/
 
-void patrition() {
+// JPEG compression of source image
+Mat3b compress(const Mat3b &source) {
+    Mat3b compressed = source.clone();
     
+    // 1.   yuvImage = convert rgbImage
+    
+    // 2.   ycbcrImage = convert yuvImage
+    
+    // 3.   ycbcrImage = subsample ycbcrImage
+    
+    // 4. Partitioning 8×8 blocks
+    for (int row = 0; row < source.rows; row++) {
+        for (int col = 0; col < source.cols; col++) {
+            
+            // 5. DCT transformation
+            
+            // 6. Quantization
+            
+        }
+    }
+    
+    // return compressed;
 }
 
 #endif /* Compression_h */
