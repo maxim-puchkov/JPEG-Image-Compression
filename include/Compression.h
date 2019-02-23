@@ -19,6 +19,11 @@
 
 /** Debug **/
 
+unsigned char uchar_random() {
+    return rand() % 256;
+}
+
+
 // Create and fill a new debug image with randomized RGB vectors
 Mat3b rgbImage(int rows, int cols) {
     Mat3b image = Mat(rows, cols, CV_8UC3);
