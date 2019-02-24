@@ -30,29 +30,6 @@ const int BLOCK_DIMENSION = 8;
  *******************************************************************************/
 
 
-struct Limit {
-    
-    Limit(int imageRows, int imageCols, const int N) {
-        int rowCount = imageRows / N;
-        int colCount = imageCols / N;
-        
-        this->blockCount = rowCount * colCount;
-        this->rows = rowCount * N;
-        this->cols = colCount * N;
-        
-        print("RC counts:    \t(", rowCount, ", ", colCount, ")");
-        print("RC limits:    \t(", this->rows, ", ", this->cols, ")");
-        print("Total blocks: \t", this->blockCount);
-    }
-    
-    int rows;
-    int cols;
-    int blockCount;
-    
-};
-
-
-
 class Codec {
 public:
     
@@ -73,7 +50,15 @@ private:
 };
 
 
-
+struct Limit {
+    
+    Limit(int imageRows, int imageCols, int N);
+    
+    int rows;
+    int cols;
+    int blockCount;
+    
+};
 
 
 
@@ -139,6 +124,27 @@ void Codec::encode(const Mat3b &source) {
     }
     
     // return compressed;
+}
+
+
+
+
+
+
+
+
+
+Limit::Limit(int imageRows, int imageCols, int N) {
+    int rowCount = imageRows / N;
+    int colCount = imageCols / N;
+    
+    this->blockCount = rowCount * colCount;
+    this->rows = rowCount * N;
+    this->cols = colCount * N;
+    
+    print("RC counts:    \t(", rowCount, ", ", colCount, ")");
+    print("RC limits:    \t(", this->rows, ", ", this->cols, ")");
+    print("Total blocks: \t", this->blockCount);
 }
 
 #endif /* Codec_h */
