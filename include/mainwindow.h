@@ -1,3 +1,10 @@
+//
+//  mainwindow.cpp
+//  JPEG-Image-Compression
+//
+//  Created on 2019-02-03.
+//
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -17,7 +24,6 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/opencv.hpp>
-
 
 using namespace cv;
 
