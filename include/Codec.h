@@ -26,6 +26,11 @@ const int N = 8;
 const Size2i BLOCK_SIZE = {N, N};
 
 
+struct Limit;
+
+class Codec;
+
+
 /*******************************************************************************
                                    JPEG Codec
  *******************************************************************************/
@@ -41,6 +46,8 @@ public:
     void /* Mat3b */ encode(const Mat3b &source);
     
     Mat3b decode(const Mat3b &source); /* undefined */
+    
+    Limit partitionLimit(int rows, int cols);
     
     template<typename _Tp, int cn>
     void partition(const Mat_<Vec<_Tp, cn>> &source, Rect area);
@@ -64,12 +71,14 @@ struct Limit {
 };
 
 
-
-
-
-
-
-
+template<typename _Tp, int cn>
+struct Channel {
+    
+    Channel(const Mat3b &source, Rect block) {
+        
+    }
+    
+};
 
 
 
@@ -104,7 +113,7 @@ void Codec::encode(const Mat3b &source) {
     
     
     // 3. Compute limits. Disregard incomplete blocks less than 8×8
-    Limit limit(source.rows, source.cols, N);
+    Limit limit = this->partitionLimit(source.rows, source.cols);
     
     
     for (int row = 0; row < limit.rows; row += N) {
@@ -128,6 +137,11 @@ void Codec::encode(const Mat3b &source) {
     }
     
     // return compressed;
+}
+
+
+Limit Codec::partitionLimit(int rows, int cols) {
+    return Limit(rows, cols, N);
 }
 
 
