@@ -53,15 +53,15 @@ Mat mul(const Mat &A, const Vec<_Tp, cn> &vec) {
 
 
 // Compute AT[n×m] - transpose of A[m×n]
-template<class V>
-Mat transpose(const Mat_<V> &A) {
+template<class _Tp>
+Mat transpose(const Mat_<_Tp> &A) {
     int m = A.rows;
     int n = A.cols;
-    Mat AT(n, m, DataType<V>::type);
+    Mat AT(n, m, DataType<_Tp>::type);
     
     for (int row = 0; row < m; row++) {
         for (int col = 0; col < n; col++) {
-            AT.at<typename DataType<V>::value_type>(col, row) = A.template at<typename DataType<V>::value_type>(row, col);
+            AT.at<typename DataType<_Tp>::value_type>(col, row) = A.template at<typename DataType<_Tp>::value_type>(row, col);
         }
     }
     
