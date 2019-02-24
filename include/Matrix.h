@@ -20,24 +20,22 @@ using cv::DataType;
 /* Matrix operations */
 
 // Compute R[m×p] - matrix product of A[m×n] and B[n×p]
+template<typename _Tp>
 Mat mul(const Mat &A, const Mat &B) {
-    int m = A.rows;
-    int n = A.cols;
-    int p = B.cols;
-    
-    if (n != B.rows) {
-        return Mat(0, 0, CV_64F);
+    if (A.cols != B.rows) {
+        return Mat(0, 0, CV_8U);
     }
     
-    Mat R(m, p, CV_64F);
-    for (int row = 0; row < m; row++) {
-        for (int col = 0; col < p; col++) {
+    Mat R(A.rows, B.cols, DataType<_Tp>::type);
+    
+    for (int rowA = 0; rowA < A.rows; rowA++) {
+        for (int colB = 0; colB < B.cols; colB++) {
             
-            int product = 0;
-            for (int i = 0; i < n; i++) {
-                product += A.at<double>(row, i) * B.at<double>(i, col);
+            _Tp product = 0;
+            for (int colA = 0; colA < A.cols; colA++) {
+                product += A.at<_Tp>(rowA, colA) * B.at<_Tp>(colA, colB);
             }
-            R.at<double>(row, col) = product;
+            R.at<_Tp>(rowA, colB) = product;
             
         }
     }
@@ -46,9 +44,10 @@ Mat mul(const Mat &A, const Mat &B) {
 }
 
 
-template<typename _Tp, int cn>
-Mat mul(const Mat &A, const Vec<_Tp, cn> &vec) {
-    return mul(A, Mat(vec));
+// Compute R[m×p] - matrix product of A[m×n] and vec[n×1]
+template<typename _Tp, int n>
+Mat mul(const Mat &A, const Vec<_Tp, n> &vec) {
+    return mul<_Tp>(A, Mat(vec));
 }
 
 
