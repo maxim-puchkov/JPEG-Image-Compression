@@ -48,11 +48,11 @@ unsigned char uchar_random() {
 
 
 // Create and fill a new debug image with randomized RGB vectors
-Mat3b rgbImage(int rows, int cols) {
-    Mat3b image = Mat(rows, cols, CV_8UC3);
+Mat3b rgbImage(int width, int height) {
+    Mat3b image = Mat(height, width, CV_8UC3);
     
-    for (int row = 0; row < rows; row++) {
-        for (int col = 0; col < cols; col++) {
+    for (int col = 0; col < width; col++) {
+        for (int row = 0; row < height; row++) {
             
             Vec3b entry(uchar_random(), uchar_random(), uchar_random());
             image.at<Vec3b>(row, col) = entry;
