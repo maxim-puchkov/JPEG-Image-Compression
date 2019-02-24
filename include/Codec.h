@@ -75,15 +75,15 @@ private:
 void Codec::encode(const Mat3b &source) {
     // Mat3b compressed = source.clone();
     
-    // 1. convert RGB (CV_8UC3) to YUV (CV_8SC3)
+    // 1. Convert RGB (CV_8UC3) to YUV
     Mat3b yuvImage = convert_RGB_YUV(source);
     print_spaced(10, yuvImage);
     
     
-    // 2. chroma subsampling 4:2:0 (CV_8SC3)
+    // 2. Chroma subsampling 4:2:0
     
     
-    // 3. Partition image into 8×8 blocks (CV_8SC3)
+    // 3. Compute total block count
     const int N = BLOCK_DIMENSION;
     int rowCount = source.rows / N;
     int colCount = source.cols / N;
@@ -98,17 +98,20 @@ void Codec::encode(const Mat3b &source) {
     for (int row = 0; row < rowLimit; row += N) {
         for (int col = 0; col < colLimit; col += N) {
             
-            
+            // 4. Partition each 8×8 3-channel block into
+            //    three 8×8 1-channel blocks
             Rect blockRect(row, col, N, N);
             Mat block = yuvImage(blockRect);
             print("Image block ", blockRect);
             print_spaced(5, "Block data:\n", block);
             
-            // 4. DCT transformation of each image block (CV_8SC3)
+            
+            // 5. DCT transformation of each image block channel
             // Mat coefficients = dct_2d(block);
             // print("DCT coefficients: ", coefficients);
             
-            // 5. Quantizing DCT coefficients (CV_8SC3)
+            
+            // 6. Quantizing DCT coefficients
             
         }
     }
