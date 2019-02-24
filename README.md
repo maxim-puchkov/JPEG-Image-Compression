@@ -114,7 +114,10 @@ for (row : rows) {
 
 
 
-
+### Resources
+* [Color converter](https://convertingcolors.com/)
+* [YUV dara range](http://discoverybiz.net/enu0/faq/faq_yuvdatarangebybreeze.html)
+* [YUV adjustment](https://stackoverflow.com/questions/8427786/how-to-adjust-image-saturation-in-yuv-color-space)
 
 
 
@@ -153,7 +156,8 @@ for (row : rows) {
 
 ### Resources
 * [Conversion with different sampling](https://www.codeproject.com/Articles/402391/RGB-to-YUV-conversion-with-different-chroma-sampli?fbclid=IwAR1r-hgcEminEt4WBuuohpu5snnwruVHr8WHiXz-a3EL6jp1kH1lduds9A8)
-
+* [YUV subsample](http://discoverybiz.net/enu0/faq/faq_YUVSubSampleByBreeze.html)
+* [Chroma subsampling](https://en.wikipedia.org/wiki/Chroma_subsampling) _Wikepedia_
 
 
 
