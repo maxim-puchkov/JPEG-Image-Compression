@@ -47,12 +47,14 @@ public:
     
     Mat3b decode(const Mat3b &source); /* undefined */
     
+private:
+    
     Limit partitionLimit(int rows, int cols);
     
     template<typename _Tp, int cn>
     void partition(const Mat_<Vec<_Tp, cn>> &source, Rect area);
     
-private:
+    
     
     // unsigned long inputSize;
     // unsigned long outputSize;
