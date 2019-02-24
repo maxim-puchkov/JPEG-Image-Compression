@@ -50,10 +50,6 @@ Mat3b convert_RGB_YUV(const Mat3b &source) {
 
 
 
-// https://convertingcolors.com/
-// https://stackoverflow.com/questions/8427786/how-to-adjust-image-saturation-in-yuv-color-space
-
-
 
 
 
@@ -68,9 +64,5 @@ Mat3b sample(const Mat3b &source, int width = 4, int chromSamples = 2, int chrom
 }
 
 
-
-// http://discoverybiz.net/enu0/faq/faq_YUVSubSampleByBreeze.html
-// http://discoverybiz.net/enu0/faq/faq_yuvdatarangebybreeze.html
-// https://en.wikipedia.org/wiki/Chroma_subsampling
 
 #endif /* Color_h */
