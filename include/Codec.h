@@ -19,10 +19,11 @@
 using cv::Mat3b;
 using cv::Vec3b;
 using cv::Rect;
+using cv::Point2i;
+using cv::Size2i;
 
-const int BLOCK_DIMENSION = 8;
-
-
+const int N = 8;
+const Size2i BLOCK_SIZE = {N, N};
 
 
 /*******************************************************************************
@@ -42,7 +43,7 @@ public:
     Mat3b decode(const Mat3b &source); /* undefined */
     
     template<typename _Tp, int cn>
-    void partition(const Mat_<Vec<_Tp, cn>> &c);
+    void partition(const Mat_<Vec<_Tp, cn>> &source, Rect area);
     
 private:
     
@@ -61,7 +62,6 @@ struct Limit {
     int blockCount;
     
 };
-
 
 
 
@@ -104,8 +104,7 @@ void Codec::encode(const Mat3b &source) {
     
     
     // 3. Compute total block count
-    const int N = BLOCK_DIMENSION;
-    Limit limit(source.rows, source.cols, BLOCK_DIMENSION);
+    Limit limit(source.rows, source.cols, N);
     
     
     for (int row = 0; row < limit.rows; row += N) {
@@ -113,10 +112,9 @@ void Codec::encode(const Mat3b &source) {
             
             // 4. Partition each 8×8 3-channel block into
             //    three 8×8 1-channel blocks
-            Rect blockRect(row, col, N, N);
-            Mat block = yuvImage(blockRect);
-            print("Image block ", blockRect);
-            print_spaced(5, "Block data:\n", block);
+            Point2i blockOrigin(row, col);
+            Rect blockArea(blockOrigin, BLOCK_SIZE);
+            this->partition(source, blockArea);
             
             
             // 5. DCT transformation of each image block channel
@@ -134,9 +132,16 @@ void Codec::encode(const Mat3b &source) {
 
 
 template<typename _Tp, int cn>
-void Codec::partition(const Mat_<Vec<_Tp, cn>> &c) {
+void Codec::partition(const Mat_<Vec<_Tp, cn>> &source, Rect area) {
     
+    Mat_<Vec<_Tp, cn>> blockCN = source(area);
+    
+    print("Channels:\t", cn);
+    print("Image block", cn, " area:\t", area);
+    print_spaced(5, "Block", cn, " data:\n", blockCN);
 }
+
+
 
 
 
