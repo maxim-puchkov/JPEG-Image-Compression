@@ -31,6 +31,17 @@ void print(T &&...ts) {
 }
 
 
+template<typename ...T>
+void print_spaced(int lines, T &&...ts) {
+    print(std::forward<T>(ts)...);
+    
+    const char WS = '\n';
+    for (int i = 0; i < lines; i ++) {
+        print(WS);
+    }
+}
+
+
 unsigned char uchar_random() {
     return rand() % 256;
 }
