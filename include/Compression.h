@@ -30,7 +30,7 @@ void /* Mat3b */ compress(const Mat3b &source) {
     
     // 1. convert RGB (CV_8UC3) to YUV (CV_8SC3)
     Mat3b yuvImage = convert_RGB_YUV(source);
-    print(yuvImage);
+    print_spaced(10, yuvImage);
     
     
     // 2. chroma subsampling 4:2:0 (CV_8SC3)
@@ -38,16 +38,23 @@ void /* Mat3b */ compress(const Mat3b &source) {
     
     // 3. Partition image into 8×8 blocks (CV_8SC3)
     const int N = BLOCK_DIMENSION;
-    int rowLimit = source.rows / N;
-    int colLimit = source.cols / N;
-    print("RC Limits = (", rowLimit, ", ", colLimit, ")");
+    int rowCount = source.rows / N;
+    int colCount = source.cols / N;
+    int rowLimit = rowCount * N;
+    int colLimit = colCount * N;
+    int blockCount = rowCount * colCount;
+    print("RC counts:    \t(", rowCount, ", ", colCount, ")");
+    print("RC limits:    \t(", rowLimit, ", ", colLimit, ")");
+    print("Total blocks: \t", blockCount);
     
     
     for (int row = 0; row < rowLimit; row += N) {
         for (int col = 0; col < colLimit; col += N) {
             
-            Mat block = yuvImage(cv::Rect(row, col, (row + N), (col + N)));
-            print("Block:\n", block);
+            Rect blockRect(row, col, N, N);
+            Mat block = yuvImage(blockRect);
+            print("Image block ", blockRect);
+            print_spaced(5, "Block data:\n", block);
             
             // 4. DCT transformation of each image block (CV_8SC3)
             // Mat coefficients = dct_2d(block);

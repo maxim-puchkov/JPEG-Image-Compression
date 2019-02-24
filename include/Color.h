@@ -41,10 +41,14 @@ const Mat YUV_RGB = (Mat1d(CM_SIZE) <<
 /** Conversion **/
 
 Mat3b convert_RGB_YUV(const Mat3b &source) {
+    Mat3b yuvImage = source.clone();
+    
     // Convert...
     
-    return yuv_block;
+    return yuvImage;
 }
+
+
 
 // https://convertingcolors.com/
 // https://stackoverflow.com/questions/8427786/how-to-adjust-image-saturation-in-yuv-color-space
@@ -52,11 +56,18 @@ Mat3b convert_RGB_YUV(const Mat3b &source) {
 
 
 
+
 /** Sampling **/
 
-void /* RType */ subsample(int width = 4, int chromSamples = 2, int chromChange = 0) {
+Mat3b sample(const Mat3b &source, int width = 4, int chromSamples = 2, int chromChange = 0) {
+    Mat3b sampled = source.clone();
     
+    // Sample...
+    
+    return sampled;
 }
+
+
 
 // http://discoverybiz.net/enu0/faq/faq_YUVSubSampleByBreeze.html
 // http://discoverybiz.net/enu0/faq/faq_yuvdatarangebybreeze.html
