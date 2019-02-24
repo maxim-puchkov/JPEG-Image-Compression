@@ -103,7 +103,7 @@ void Codec::encode(const Mat3b &source) {
     // 2. Chroma subsampling 4:2:0
     
     
-    // 3. Compute total block count
+    // 3. Compute limits. Disregard incomplete blocks less than 8×8
     Limit limit(source.rows, source.cols, N);
     
     
