@@ -30,6 +30,29 @@ const int BLOCK_DIMENSION = 8;
  *******************************************************************************/
 
 
+struct Limit {
+    
+    Limit(int imageRows, int imageCols, const int N) {
+        int rowCount = imageRows / N;
+        int colCount = imageCols / N;
+        
+        this->blockCount = rowCount * colCount;
+        this->rows = rowCount * N;
+        this->cols = colCount * N;
+        
+        print("RC counts:    \t(", rowCount, ", ", colCount, ")");
+        print("RC limits:    \t(", this->rows, ", ", this->cols, ")");
+        print("Total blocks: \t", this->blockCount);
+    }
+    
+    int rows;
+    int cols;
+    int blockCount;
+    
+};
+
+
+
 class Codec {
 public:
     
@@ -72,6 +95,12 @@ private:
  *******************************************************************************/
 
 
+Codec::Codec() { }
+
+
+Codec::~Codec() { }
+
+
 void Codec::encode(const Mat3b &source) {
     // Mat3b compressed = source.clone();
     
@@ -85,18 +114,11 @@ void Codec::encode(const Mat3b &source) {
     
     // 3. Compute total block count
     const int N = BLOCK_DIMENSION;
-    int rowCount = source.rows / N;
-    int colCount = source.cols / N;
-    int rowLimit = rowCount * N;
-    int colLimit = colCount * N;
-    int blockCount = rowCount * colCount;
-    print("RC counts:    \t(", rowCount, ", ", colCount, ")");
-    print("RC limits:    \t(", rowLimit, ", ", colLimit, ")");
-    print("Total blocks: \t", blockCount);
+    Limit limit(source.rows, source.cols, BLOCK_DIMENSION);
     
     
-    for (int row = 0; row < rowLimit; row += N) {
-        for (int col = 0; col < colLimit; col += N) {
+    for (int row = 0; row < limit.rows; row += N) {
+        for (int col = 0; col < limit.cols; col += N) {
             
             // 4. Partition each 8×8 3-channel block into
             //    three 8×8 1-channel blocks
