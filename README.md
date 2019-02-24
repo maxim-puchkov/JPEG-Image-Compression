@@ -1,6 +1,6 @@
 # Overview
 
-## Contents
+### Contents
 * [Codec](#jpeg-codec)
     * [ ] [Color Conversion](#color-conversion)
     * [ ] [Sampling](#sampling)
@@ -21,7 +21,7 @@
 
 
 
-
+&nbsp;
 # JPEG Codec
 
 ### Input
@@ -65,7 +65,7 @@
 
 
 
-
+&nbsp;
 # Color Conversion
 * [RGB YUV](#rgb-to-yuv)
 * [YUV RGB](#yuv-to-rgb)
@@ -114,7 +114,7 @@ for (row : rows) {
 
 
 
-### Resources
+## Resources
 * [Color converter](https://convertingcolors.com/)
 * [YUV dara range](http://discoverybiz.net/enu0/faq/faq_yuvdatarangebybreeze.html)
 * [YUV adjustment](https://stackoverflow.com/questions/8427786/how-to-adjust-image-saturation-in-yuv-color-space)
@@ -126,7 +126,7 @@ for (row : rows) {
 
 
 
-
+&nbsp;
 # Sampling
 * [_4:2:0_ pattern](#420-pattern)
 * [_4:2:0_ reverse](#420-reverse)
@@ -154,7 +154,7 @@ for (row : rows) {
 
 
 
-### Resources
+## Resources
 * [Conversion with different sampling](https://www.codeproject.com/Articles/402391/RGB-to-YUV-conversion-with-different-chroma-sampli?fbclid=IwAR1r-hgcEminEt4WBuuohpu5snnwruVHr8WHiXz-a3EL6jp1kH1lduds9A8)
 * [YUV subsample](http://discoverybiz.net/enu0/faq/faq_YUVSubSampleByBreeze.html)
 * [Chroma subsampling](https://en.wikipedia.org/wiki/Chroma_subsampling) _Wikepedia_
@@ -183,7 +183,7 @@ for (row : rows) {
 
 
 
-
+&nbsp;
 # Transform Coding
 * [DCT](#discrete-cosine-transform)
 * [IDCT](#inverse-discrete-cosine-transform)
@@ -226,7 +226,7 @@ for (row : rows) {
 
 
 
-### Resources
+## Resources
 * [Chapter 8](http://www.cs.sfu.ca/CourseCentral/365/li/material/lectureslides/Chapter8-365.pdf) _p. 30_
 * [Concepts and applications](http://homepages.cae.wisc.edu/~ece554/website/Xilinx/app_notes/DCT_IDCT%20Customer%20Tutorial%20custdct.pdf) 
 
@@ -236,7 +236,7 @@ for (row : rows) {
 
 
 
-
+&nbsp;
 # Quantization
 
 ### Input
@@ -251,16 +251,14 @@ for (row : rows) {
 
 
 ## Implementation
-* Quantization formula:
+* Quantization reduces high frequency DCT coefficients. Quantization formula:
 ```
     F^(u, v) = round( F(u, v) / Q(u, v) )
 ```
 
 
-### More
-* _Standard JPEG quantization tables_: Table 9.1 Luminance, Table 9.2 Chrominance
-* Quantization reduces high frequency DCT coefficients
-* Quantization forms: uniform, nonuniform, and vector quantization
+## Resources
+* [Standard JPEG quantization tables](http://www.cs.sfu.ca/CourseCentral/365/li/material/lectureslides/Chapter8-365.pdf) _p. 9; tables 9.1, 9.2_
 
 
 
@@ -341,9 +339,7 @@ for (row : rows) {
 
 
 
-
-
-
+&nbsp;
 # Extra
 ## Qt
 * The code uses the Qt framework. It is a cross-platform GUI framework for C++. You can open and run the code using an IDE called Qt creator. The code basically creates a window, add two buttons and labels. When the open button is clicked, it loads an image and displays it using the first label. When the convert button is clicked, it computes the Y channel of the loaded image and displays it using second label.
