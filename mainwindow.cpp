@@ -140,10 +140,10 @@ void MainWindow::convertImage() {
     convertedImg.create(cvImg.size(), CV_8U);
     int nWidth = convertedImg.cols;
     int nHeight = convertedImg.rows;
+    std::cout << convertedImg;
     
-    
-    for (int width = 0; width < width; width += 1) { /* For: Width - Horizontal - Columns */
-        for (int height = 0; height < height; height += 1) { /* For: Height - Vertical - Rows */
+    for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
+        for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
             
             cv::Vec3b vRGB = cvImg.at<cv::Vec3b>(height, width);
             
@@ -165,6 +165,7 @@ void MainWindow::convertImage() {
 
 
     // QImage is created with Grayscale values of Mat convertedImg.
+
     QImage qImage = MatGrayScale2QImage(convertedImg);
     img2->setPixmap(QPixmap::fromImage(qImage));
     
