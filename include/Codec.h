@@ -41,11 +41,13 @@ public:
     
     Mat3b decode(const Mat3b &source); /* undefined */
     
+    template<typename _Tp, int cn>
+    void partition(const Mat_<Vec<_Tp, cn>> &c);
+    
 private:
     
-    unsigned long sourceSize;
-    
-    unsigned long outputSize;
+    // unsigned long inputSize;
+    // unsigned long outputSize;
     
 };
 
@@ -59,6 +61,10 @@ struct Limit {
     int blockCount;
     
 };
+
+
+
+
 
 
 
@@ -127,6 +133,10 @@ void Codec::encode(const Mat3b &source) {
 }
 
 
+template<typename _Tp, int cn>
+void Codec::partition(const Mat_<Vec<_Tp, cn>> &c) {
+    
+}
 
 
 
