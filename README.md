@@ -18,7 +18,8 @@
     * [OpenCV and Qt](#opencv-with-qt)
     * [Source control](#git-commands)
 
-## Examples
+
+
 
 
 # JPEG Codec
@@ -36,23 +37,22 @@
 
 
 ## Encode
-* Preprocess image
-1. Color conversion [RGB to YUV](#rgb-to-yuv)
-2. Chroma subsampling [_4:2:0_](#420-pattern)
+* Preprocess original image
+    1. Color conversion [RGB to YUV](#rgb-to-yuv)
+    2. Chroma subsampling [_4:2:0_](#420-pattern)
 * Iterate over each __8×8__ block
-1. Apply [2D DCT](#2d-dct) transformation
-2. [Quantize](#quantization) DCT coefficients
-3. 
-4. ...
+    1. Apply [2D DCT](#2d-dct) transformation
+    2. [Quantize](#quantization) DCT coefficients
+    3. 
+    4. ...
 
 
 ## Decode 
-* Decode
 1. [2D IDCT](#2d-idct) on image blocks
 2. [Reverse](#420-reverse) _4:2:0_ subsampling
 3. Color Conversion [YUV to RGB](#yuv-to-rgb)
 
-> __Note__: The decoding process reverses Encoding steps, except the quantization because it is irreversible
+> __*Note:*__ The decoding process reverses Encoding steps, except the quantization because it is irreversible
 
 
 
@@ -104,7 +104,7 @@ for (row : rows) {
 
 
 ## YUV to RGB
-* [Matrix (5)](http://www.cs.sfu.ca/CourseCentral/365/li/material/work/RGB-YUV.pdf) __YUV_RGB__ :
+* [Matrix (5)](http://www.cs.sfu.ca/CourseCentral/365/li/material/work/RGB-YUV.pdf) __YUV_RGB__:
 
 |               |                    |                      |
 |     ----:   |           ----:   |            ----:   |
@@ -150,6 +150,7 @@ for (row : rows) {
 2. 
 
 
+
 ### Resources
 * [Conversion with different sampling](https://www.codeproject.com/Articles/402391/RGB-to-YUV-conversion-with-different-chroma-sampli?fbclid=IwAR1r-hgcEminEt4WBuuohpu5snnwruVHr8WHiXz-a3EL6jp1kH1lduds9A8)
 
@@ -188,13 +189,13 @@ for (row : rows) {
 ### DCT
 * __T__ is a DCT-matrix defined as:
 ```
-T[i, j]     = 1 / √(N)                              if i = 0
-= √(2/N) * cos((2j+1) * iπ) / 2N)       if i > 0
+    T[i, j]     = 1 / √(N)                              if i = 0
+                = √(2/N) * cos((2j+1) * iπ) / 2N)       if i > 0
 ```
 * For block size __N__=8, DCT-matrix __T_8__:
 ```
-T_8[i, j]     = 1 / (2*√(2))                        if i = 0
-= 1/2 * cos((2j+1) * iπ) / 16)        if i > 0 
+    T_8[i, j]     = 1 / (2*√(2))                        if i = 0
+                  = 1/2 * cos((2j+1) * iπ) / 16)        if i > 0 
 ```
 
 
@@ -202,7 +203,7 @@ T_8[i, j]     = 1 / (2*√(2))                        if i = 0
 ### 2D DCT
 * 2D DCT is implemented by two consecutive 1D DCT matrix multiplications
 ```
-F(u, v) = T * f(i, j) * Transpose(T)
+    F(u, v) = T * f(i, j) * Transpose(T)
 ```
 
 
@@ -213,11 +214,11 @@ F(u, v) = T * f(i, j) * Transpose(T)
 ### 2D IDCT
 *  The equation of 2D inverse DCT based on:
 ```
-f(i, j) = Transpose(T) * F(u, v) * T
+    f(i, j) = Transpose(T) * F(u, v) * T
 ```
 * Every __8×8__ block is decoded with 2D IDCT  
 
-> __Note__: DCT matrix is orthogonal: Transpose(T) = Inverse(T)
+> __*Note:*__ DCT matrix is orthogonal: Transpose(T) = Inverse(T)
 
 
 
@@ -248,12 +249,12 @@ f(i, j) = Transpose(T) * F(u, v) * T
 ## Implementation
 * Quantization formula:
 ```
-F^(u, v) = round( F(u, v) / Q(u, v) )
+    F^(u, v) = round( F(u, v) / Q(u, v) )
 ```
 
 
 ### More
-* __Standard JPEG quantization tables__: Table 9.1 Luminance, Table 9.2 Chrominance
+* _Standard JPEG quantization tables_: Table 9.1 Luminance, Table 9.2 Chrominance
 * Quantization reduces high frequency DCT coefficients
 * Quantization forms: uniform, nonuniform, and vector quantization
 
@@ -347,14 +348,14 @@ F^(u, v) = round( F(u, v) / Q(u, v) )
 
 * [Download Qt](https://www.qt.io/download)
 
-> Rmember to download Qt creator and a version of Qt, for example, Qt 5.12.
+> __*Note:*__ remember to download Qt creator and a version of Qt, for example, Qt 5.12.
 
 ## OpenCV with Qt
 
 * [macOS](https://www.learnopencv.com/configuring-qt-for-opencv-on-osx/)
     * Note: you may need to type in the following command after you successfully installed OpenCV. Basically, you need to create a link for opencv4.pc 
 ```
-ln /usr/local/Cellar/opencv/4.0.1/lib/pkgconfig/opencv4.pc /usr/local/Cellar/opencv/4.0.1/lib/pkgconfig/opencv.pc
+    ln /usr/local/Cellar/opencv/4.0.1/lib/pkgconfig/opencv4.pc /usr/local/Cellar/opencv/4.0.1/lib/pkgconfig/opencv.pc
 ```    
 
 
@@ -367,17 +368,17 @@ ln /usr/local/Cellar/opencv/4.0.1/lib/pkgconfig/opencv4.pc /usr/local/Cellar/ope
 ## Git Commands
 * Clone this repository 
 ```
-git clone https://csil-git1.cs.surrey.sfu.ca/A2-365/JPEG-Image-Compression.git
+    git clone https://csil-git1.cs.surrey.sfu.ca/A2-365/JPEG-Image-Compression.git
 ```
 
 * Commit all changes and push
 ```
-git add .
-git commit -m "Message"
-git push
+    git add .
+    git commit -m "Message"
+    git push
 ```
 
 * Create a new branch 
 ```
-git checkout -b "Branch_Name"
+    git checkout -b "Branch_Name"
 ```
