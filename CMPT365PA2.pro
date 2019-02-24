@@ -41,6 +41,8 @@ PKGCONFIG += opencv
 INCLUDEPATH += /usr/local/Cellar/opencv/4.0.1/include
 LIBS += -L/usr/local/Cellar/opencv/4.0.1/lib
 
+INCLUDEPATH += $$PWD/include
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
