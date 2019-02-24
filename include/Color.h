@@ -40,7 +40,7 @@ const Mat YUV_RGB = (Mat1d(CM_SIZE) <<
 
 /** Conversion **/
 
-Mat3s convert_RGB_YUV(const Mat3b &source) {
+Mat3b convert_RGB_YUV(const Mat3b &source) {
     // Convert...
     
     return yuv_block;

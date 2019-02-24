@@ -25,11 +25,11 @@ const int BLOCK_DIMENSION = 8;
 
 
 // JPEG compression of source RGB image
-/* Mat3b */ void compress(const Mat3b &source) {
+void /* Mat3b */ compress(const Mat3b &source) {
     // Mat3b compressed = source.clone();
     
     // 1. convert RGB (CV_8UC3) to YUV (CV_8SC3)
-    Mat3s yuvImage = convert_RGB_YUV(source);
+    Mat3b yuvImage = convert_RGB_YUV(source);
     print(yuvImage);
     
     

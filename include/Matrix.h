@@ -13,6 +13,7 @@
 
 
 using cv::Mat;
+using cv::Vec;
 using cv::DataType;
 
 
@@ -42,6 +43,12 @@ Mat mul(const Mat &A, const Mat &B) {
     }
     
     return R;
+}
+
+
+template<typename _Tp, int cn>
+Mat mul(const Mat &A, const Vec<_Tp, cn> &vec) {
+    return mul(A, Mat(vec));
 }
 
 

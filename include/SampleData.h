@@ -105,9 +105,11 @@ void yuv_adjust(const YUV yuv) {
 
 /** Sample data **/
 
+const cv::Size2i BLOCK_SIZE = {8, 8};
+
 // samples/grayscale-values.txt
 const Mat1b grayscale_block = (
-    Mat_<unsigned char>(8, 8) <<
+    Mat_<unsigned char>(BLOCK_SIZE) <<
         200, 202, 189, 188, 189, 175, 175, 175,
         200, 203, 198, 188, 189, 182, 178, 175,
         203, 200, 200, 195, 200, 187, 185, 175,
@@ -121,7 +123,7 @@ const Mat1b grayscale_block = (
 
 // samples/rgb-values.txt
 const Mat3b rgb_block = (
-    Mat_<Vec3b>(8, 8) <<
+    Mat_<Vec3b>(BLOCK_SIZE) <<
         Vec3b(255, 0, 0), Vec3b(255, 0, 0), Vec3b(255, 0, 0), Vec3b(255, 0, 0),
         Vec3b(0, 255, 0), Vec3b(0, 255, 0), Vec3b(0, 255, 0), Vec3b(0, 255, 0),
         Vec3b(255, 0, 0), Vec3b(255, 0, 0), Vec3b(255, 0, 0), Vec3b(255, 0, 0),
@@ -142,9 +144,27 @@ const Mat3b rgb_block = (
 );
 
 
+// Block pattern of two random YUV colors
+const Vec3b a(100, 75, 50);
+const Vec3b b(200, 20, 25);
+const Mat3b yuv_block = (
+    Mat_<Vec3b>(BLOCK_SIZE) <<
+        a, a, a, a, a, a, a, a,
+        a, a, a, a, a, a, a, a,
+        b, b, b, b, b, b, b, b,
+        b, b, b, b, b, b, b, b,
+        a, a, a, a, a, a, a, a,
+        a, a, a, a, a, a, a, a,
+        b, b, b, b, b, b, b, b,
+        b, b, b, b, b, b, b, b
+);
+
+
+
+// Incorrect
 // samples/yuv-values.txt
-const Mat3s yuv_block = (
-    Mat_<Vec3s>(8, 8) <<
+const Mat3s yuv_block_incorrect = (
+    Mat_<Vec3s>(BLOCK_SIZE) <<
         Vec3s(76, -36, 157), Vec3s(76, -36, 157), Vec3s(76, -36, 157), Vec3s(76, -36, 157),
         Vec3s(150, -74, -131), Vec3s(150, -74, -131), Vec3s(150, -74, -131), Vec3s(150, -74, -131),
         Vec3s(76, -36, 157), Vec3s(76, -36, 157), Vec3s(76, -36, 157), Vec3s(76, -36, 157),
