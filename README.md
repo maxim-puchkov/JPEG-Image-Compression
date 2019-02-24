@@ -8,11 +8,11 @@
     * [ ] [Quantization](#quantization)
 * References
     * [Class lectures](http://www.cs.sfu.ca/CourseCentral/365/li/material/lectureslides/contents.html)
+    * OpenCV [cheat sheet](http://www.cheat-sheets.org/saved-copy/opencv_cheatsheet.pdf)
+    * OpenCV [matrix types](http://dovgalecs.com/blog/opencv-matrix-types/)
     * Example code
         * JPEG [compression for a smooth image block](http://www.cs.sfu.ca/CourseCentral/365/li/material/lectureslides/Chapter9.pdf) (Fig 9.2)
         * JPEG [encoding algorithm](https://en.wikipedia.org/wiki/JPEG#JPEG_codec_example) description
-        * OpenCV [cheat sheet](http://www.cheat-sheets.org/saved-copy/opencv_cheatsheet.pdf)
-        * OpenCV [matrix types](http://dovgalecs.com/blog/opencv-matrix-types/)
 * [Extra](#extra)
     * [Qt](#Qt)
     * [OpenCV and Qt](#opencv-with-qt)
@@ -39,7 +39,7 @@
 ## Encode
 * Preprocess original image
     1. Color conversion [RGB to YUV](#rgb-to-yuv)
-    2. Chroma subsampling [_4:2:0_](#420-pattern)
+    2. Chroma [subsampling _4:2:0_](#420-ratio)
 * Iterate over each __8×8__ block
     1. Apply [2D DCT](#2d-dct) transformation
     2. [Quantize](#quantization) DCT coefficients
@@ -49,8 +49,8 @@
 
 ## Decode 
 1. [2D IDCT](#2d-idct) on image blocks
-2. [Reverse](#420-reverse) _4:2:0_ subsampling
-3. Color Conversion [YUV to RGB](#yuv-to-rgb)
+2. [Reverse _4:2:0_](#420-reverse) subsampling
+3. Color conversion [YUV to RGB](#yuv-to-rgb)
 
 > __*Note:*__ The decoding process reverses Encoding steps, except the quantization because it is irreversible
 
@@ -116,7 +116,7 @@ for (row : rows) {
 
 ## Resources
 * [Color converter](https://convertingcolors.com/)
-* [YUV dara range](http://discoverybiz.net/enu0/faq/faq_yuvdatarangebybreeze.html)
+* [YUV data range](http://discoverybiz.net/enu0/faq/faq_yuvdatarangebybreeze.html)
 * [YUV adjustment](https://stackoverflow.com/questions/8427786/how-to-adjust-image-saturation-in-yuv-color-space)
 
 
@@ -128,7 +128,7 @@ for (row : rows) {
 
 &nbsp;
 # Sampling
-* [_4:2:0_ pattern](#420-pattern)
+* [_4:2:0_ ratio](#420-ratio)
 * [_4:2:0_ reverse](#420-reverse)
 
 ### Input
@@ -142,7 +142,7 @@ for (row : rows) {
 
 
 
-## _4:2:0_ Pattern
+## _4:2:0_ Ratio
 1.  
 2. 
 
@@ -157,7 +157,7 @@ for (row : rows) {
 ## Resources
 * [Conversion with different sampling](https://www.codeproject.com/Articles/402391/RGB-to-YUV-conversion-with-different-chroma-sampli?fbclid=IwAR1r-hgcEminEt4WBuuohpu5snnwruVHr8WHiXz-a3EL6jp1kH1lduds9A8)
 * [YUV subsample](http://discoverybiz.net/enu0/faq/faq_YUVSubSampleByBreeze.html)
-* [Chroma subsampling](https://en.wikipedia.org/wiki/Chroma_subsampling) _Wikepedia_
+* [Chroma subsampling](https://en.wikipedia.org/wiki/Chroma_subsampling) _Wikipedia_
 
 
 
