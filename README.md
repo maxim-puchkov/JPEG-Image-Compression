@@ -118,6 +118,7 @@ for (row : rows) {
 * [Color converter](https://convertingcolors.com/)
 * [YUV data range](http://discoverybiz.net/enu0/faq/faq_yuvdatarangebybreeze.html)
 * [YUV adjustment](https://stackoverflow.com/questions/8427786/how-to-adjust-image-saturation-in-yuv-color-space)
+* [Scale](https://docs.microsoft.com/en-us/windows/desktop/medfound/about-yuv-video) _Step 4_
 
 
 
@@ -203,13 +204,39 @@ for (row : rows) {
 ```
 
 
-
 ### 2D DCT
 * 2D DCT is implemented by two consecutive 1D DCT matrix multiplications
 ```
     F(u, v) = T * f(i, j) * Transpose(T)
 ```
 
+
+
+### Code
+* Transform.h defines 2D DCT
+```c++
+    template<typename _Tp>
+    Mat1d Transform::dct2(const Mat_<_Tp> &matrix) {
+        return mul(mul(Transform::DCT, matrix), Transform::DCT_T);
+    }
+```
+* Codec.h applies transformation to each block
+```c++
+    using BlockDataType = short;
+    using BlockTransform = std::function<Mat_<double>(Mat_<BlockDataType>)>;
+     
+    BlockTransform dct2 = Transform::dct2<BlockDataType>;
+    block.transform(dct2);
+```
+* ImageBlock.h applies transformation to each channel within a block
+```c++
+template<typename _Tp, int cn>
+void ImageBlock<_Tp, cn>::transform(BlockTransform transformFunc) {
+    for (int c = 0; c < cn; c++) {
+        this->at(c) = transformFunc(this->at(c));
+    }
+}
+```
 
 
 
