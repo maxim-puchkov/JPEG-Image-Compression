@@ -138,6 +138,52 @@ void MainWindow::convertImage() {
     // Create an output image which has the same size (nWidth, nHeight) as the input image.
     // CV_8U means the output image has one channel, each channel has an unsigned byte.
     convertedImg.create(cvImg.size(), CV_16SC3);
+    
+    
+    /*********************************************
+     
+     Final convertedImg type: CV_8UC3,
+        values in range 0..255
+     
+     CV_16SC3 == 3 channels of short (0..65535)
+        can't be float
+     
+     http://dovgalecs.com/blog/opencv-matrix-types/
+     
+     *********************************************/
+    
+    
+    
+    
+    
+    
+    /*********************************************
+     
+     Matrix multiplication required for color
+    
+     Use functions in Color.h:
+     
+        include "Color.h"
+        yuvImage = convert_RGB_YUV(rgbImage)
+     
+     
+     
+     convert_RGB_YUV will be something like:
+     
+     for each row, for each col calculate vecYUV
+     and save in image convertedImage
+        vecYUV = mul(RGB_YUV, vecRGB)
+     
+     
+        maybe     mul<unsigned char>(RGB_YUV, vecRGB)
+        Include "Matrix.h" to use matrix mul
+     
+     
+     *********************************************/
+    
+    
+
+    
     int nWidth = convertedImg.cols;
     int nHeight = convertedImg.rows;
     std::cout << convertedImg;
@@ -146,6 +192,9 @@ void MainWindow::convertImage() {
         for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
             
             cv::Vec3b vRGB = cvImg.at<cv::Vec3b>(height, width);
+            
+
+
             
             // Compute weighted values
             float wR = WEIGHT_RED * vRGB[0];
@@ -163,16 +212,59 @@ void MainWindow::convertImage() {
             convertedImg.at<cv::Vec3b>(height, width)[1] = U;
             convertedImg.at<cv::Vec3b>(height, width)[2] = V;
             
+            /*********************************************
+             
+             Vec3b is vector of 3 small numbers
+                == Vec<unsigned char, 3>
+                ~ 3 numbers in range 0..255
+            
+             
+             Vec3b rgbRedColor(255, 0, 0);
+             
+             
+             Mat3b is a matrix of Vec3b like
+                 [(255, 0, 0), (1, 2, 3);
+                  (r, g, b),   (or y, u, v)]
+             
+             *********************************************/
+            
         }
     }
 
 
     // QImage is created with Grayscale values of Mat convertedImg.
 
-    QImage qImage = MatRGB2QImage(convertedImg);
-    img2->setPixmap(QPixmap::fromImage(qImage));
+    // QImage qImage = MatYUV2QImage(convertedImg);
+    // img2->setPixmap(QPixmap::fromImage(qImage));
     
 }
+
+
+
+
+
+
+
+
+
+/*******************************************************************************
+ Generate Image: Matrix of YUV-Vectors to a YUV Image
+ *******************************************************************************/
+
+// Values have to be 0..255 (Mat3b)
+//      https://doc.qt.io/qt-5/qcolor.html
+QImage MainWindow::MatYUV2QImage(const cv::Mat3b &src) {
+    QImage dest(src.cols, src.rows, QImage::Format_ARGB32);
+    for (int y = 0; y < src.rows; ++y) {
+        const cv::Vec3b *srcrow = src[y];
+        QRgb *destrow = (QRgb*)dest.scanLine(y);
+        for (int x = 0; x < src.cols; ++x) {
+            destrow[x] = qRgba(srcrow[x][2], srcrow[x][1], srcrow[x][0], 255);
+        }
+    }
+    return dest;
+}
+
 
 
 
@@ -195,6 +287,16 @@ QImage MainWindow::MatRGB2QImage(const cv::Mat3b &src) {
     }
     return dest;
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
