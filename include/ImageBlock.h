@@ -38,14 +38,26 @@ template<typename _Tp, int cn>
 class ImageBlock {
 public:
     
+    // Given a matrix of vectors with CN channels
+    // partition it into CN 1-channel matrices.
+    //
+    // Ex: Mat3b ---> Mat1b, Mat1b, Mat1b
     ImageBlock(const Mat_<Vec<_Tp, cn>> &source);
     
+    
+    // Channel count
     unsigned int channels();
     
+    
+    // Checked channel access
     Mat_<_Tp> at(unsigned int index);
     
+    
+    // Unchecked channel access
     Mat_<_Tp> operator[](unsigned int index);
     
+    
+    // Display channel number and data
     void display();
     
 private:
