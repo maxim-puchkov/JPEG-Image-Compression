@@ -111,25 +111,25 @@ ImageBlock<_Tp, cn>::ImageBlock(const Mat_<Vec<_Tp, cn>> &source) {
 
 
 template<typename _Tp, int cn>
-unsigned int ImageBlock<_Tp, cn>::channels() {
+unsigned int ImageBlock<_Tp, cn>::channels() const {
     return this->channelData.size();
 }
 
 
 template<typename _Tp, int cn>
-Mat_<_Tp> ImageBlock<_Tp, cn>::at(unsigned int index) {
+Mat_<_Tp> ImageBlock<_Tp, cn>::at(unsigned int index) const noexcept {
     return this->channelData[index < cn ? index : (index % cn)];
 }
 
 
 template<typename _Tp, int cn>
-Mat_<_Tp> ImageBlock<_Tp, cn>::operator[](unsigned int index) {
+Mat_<_Tp> ImageBlock<_Tp, cn>::operator[](unsigned int index) const {
     return this->channelData[index];
 }
 
 
 template<typename _Tp, int cn>
-void ImageBlock<_Tp, cn>::display() {
+void ImageBlock<_Tp, cn>::display() const {
     for (int c = 0; c < cn; c++) {
         print_spaced(3, "Channel #", (c + 1), " (out of ", cn, "):\n", this->channelData[c]);
     }
