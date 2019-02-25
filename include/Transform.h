@@ -34,10 +34,10 @@ public:
     static const int BLOCK_N = 8;
     
     // Matrix of DCT transformation for N = 8
-    static const Mat1d M_DCT;
+    static const Mat1d DCT;
     
     // Matrix transpose of DCT transformation for N = 8
-    static const Mat1d MT_DCT;
+    static const Mat1d DCT_T;
     
     
     
@@ -89,9 +89,9 @@ private:
 
 /* Static data memebers definitions */
 
-const Mat1d Transform::M_DCT = Transform::dct_matrix(Transform::BLOCK_N);
+const Mat1d Transform::DCT = Transform::dct_matrix(Transform::BLOCK_N);
 
-const Mat1d Transform::MT_DCT = transpose(M_DCT);
+const Mat1d Transform::DCT_T = transpose(DCT);
 
 
 
@@ -101,14 +101,14 @@ const Mat1d Transform::MT_DCT = transpose(M_DCT);
 template<typename _Tp, int cn>
 Mat Transform::dct2(const Mat_<Vec<_Tp, cn>> &f) {
     // Mat1d T = dct_matrix(f.rows);
-    return mul(mul(Transform::M_DCT, f), Transform::MT_DCT);
+    return mul(mul(Transform::DCT, f), Transform::DCT_T);
 }
 
 
 template<typename _Tp, int cn>
 Mat Transform::idct2(const Mat_<Vec<_Tp, cn>> &F) {
     // Mat1d T = dct_matrix(F.rows);
-    return mul(mul(Transform::MT_DCT, F), Transform::M_DCT);
+    return mul(mul(Transform::DCT_T, F), Transform::DCT);
 }
 
 
