@@ -154,6 +154,9 @@ Mat3b rgb_image(int width, int height) {
                                   Debug Data
  *******************************************************************************/
 
+
+
+
 namespace debug {
     
     const cv::Size2i BLOCK_SIZE = {8, 8};
@@ -240,6 +243,21 @@ namespace debug {
             Vec3s(29, 111, -26), Vec3s(29, 111, -26), Vec3s(29, 111, -26), Vec3s(29, 111, -26),
             Vec3s(255, 0, 0), Vec3s(255, 0, 0), Vec3s(255, 0, 0), Vec3s(255, 0, 0)
     );
+    
+    
+    Mat_<char> unsigned_grayscale_block(unsigned char val) {
+        Mat1b gray = grayscale_block;
+        Mat_<char> sGray(gray.rows, gray.cols, CV_8S);
+        
+        
+        for (int row = 0; row < gray.rows; row++) {
+            for (int col = 0; col < gray.cols; col++) {
+                sGray.at<char>(row, col) = gray.at<unsigned char>(row, col) - val;
+            }
+        }
+        
+        return sGray;
+    }
 
 }
 
