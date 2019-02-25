@@ -92,6 +92,8 @@ private:
  *******************************************************************************/
 
 
+const int DISPLAY_BREAK = 3;
+
 template<typename _Tp, int cn>
 ImageBlock<_Tp, cn>::ImageBlock(const Mat_<Vec<_Tp, cn>> &source) {
     
@@ -103,9 +105,7 @@ ImageBlock<_Tp, cn>::ImageBlock(const Mat_<Vec<_Tp, cn>> &source) {
     
     this->display();
     
-    print("CDSize: ", this->channelData.size());
-    print("Channels:\t", cn);
-    print_spaced(5, "Block", cn, " data:\n", source);
+    // print_spaced(5, "Block", cn, " data:\n", source);
 }
 
 
@@ -129,8 +129,12 @@ Mat_<_Tp> ImageBlock<_Tp, cn>::operator[](unsigned int index) const {
 
 template<typename _Tp, int cn>
 void ImageBlock<_Tp, cn>::display() const {
+    print("Displaying ImageBlock");
+    print("CDSize: ", this->channelData.size());
+    print("Supported channels: ", cn);
     for (int c = 0; c < cn; c++) {
-        print_spaced(3, "Channel #", (c + 1), " (out of ", cn, "):\n", this->channelData[c]);
+        print("Channel #", (c + 1), " (out of ", cn, "):");
+        print_spaced(DISPLAY_BREAK, this->channelData[c]);
     }
 }
 
