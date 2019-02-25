@@ -46,7 +46,6 @@ struct Transform {
     /* DCT Transformations */
     
     // DCT (type-II)
-    //      Transform one-channel matrices
     template<typename _Tp>
     static Mat dct(const Mat_<_Tp> &matrix);
     
@@ -54,15 +53,15 @@ struct Transform {
     // 2D DCT (type-II)
     //      Coefficients = DCT * Image Block * Transpose(DCT)
     //      F(u, v) = DCT * f(i, j) * DCT_T
-    template<typename _Tp, int cn>
-    Mat dct2(const Mat_<Vec<_Tp, cn>> &f);
+    template<typename _Tp>
+    static Mat dct2(const Mat_<_Tp> &matrix);
     
     
     // 2D IDCT (type-III)
     //      Image Block = Transpose(DCT) * Coefficients * DCT
     //      f(i, j) = DCT_T * F(u, v) * DCT
-    template<typename _Tp, int cn>
-    Mat idct2(const Mat_<Vec<_Tp, cn>> &F);
+    template<typename _Tp>
+    static Mat idct2(const Mat_<_Tp> &matrix);
     
 };
 
@@ -92,7 +91,6 @@ struct Transform {
 /* DCT Matrices */
 
 const Mat1d Transform::DCT = Transform::dct_matrix(Transform::N);
-
 const Mat1d Transform::DCT_T = transpose(DCT);
 
 
@@ -126,15 +124,15 @@ Mat Transform::dct(const Mat_<_Tp> &matrix) {
 }
 
 
-template<typename _Tp, int cn>
-Mat Transform::dct2(const Mat_<Vec<_Tp, cn>> &f) {
-    return mul(mul(Transform::DCT, f), Transform::DCT_T);
+template<typename _Tp>
+Mat Transform::dct2(const Mat_<_Tp> &matrix) {
+    return mul(mul(Transform::DCT, matrix), Transform::DCT_T);
 }
 
 
-template<typename _Tp, int cn>
-Mat Transform::idct2(const Mat_<Vec<_Tp, cn>> &F) {
-    return mul(mul(Transform::DCT_T, F), Transform::DCT);
+template<typename _Tp>
+Mat Transform::idct2(const Mat_<_Tp> &matrix) {
+    return mul(mul(Transform::DCT_T, matrix), Transform::DCT);
 }
 
 #endif /* Transform_h */
