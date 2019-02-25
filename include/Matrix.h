@@ -31,9 +31,9 @@ template<typename _Tp>
 Mat mul(const Mat &A, const Mat &B);
 
 
-// Matrix product[m×1] of matrix A[m×n] and vector vec[n×1]
-template<typename _Tp, int n>
-Mat mul(const Mat &A, const Vec<_Tp, n> &vec);
+// Matrix product[m×1] of matrix A[m×n] and vector vec[cn×1]
+template<typename _Tp, int cn>
+Mat mul(const Mat &A, const Vec<_Tp, cn> &vec);
 
 
 // Transpose[n×m] of matrix A[m×n]
@@ -89,8 +89,8 @@ Mat mul(const Mat &A, const Mat &B) {
 }
 
 
-template<typename _Tp, int n>
-Mat mul(const Mat &A, const Vec<_Tp, n> &vec) {
+template<typename _Tp, int cn>
+Mat mul(const Mat &A, const Vec<_Tp, cn> &vec) {
     return mul<_Tp>(A, Mat(vec));
 }
 
