@@ -408,4 +408,5 @@ void ImageBlock<_Tp, cn>::transform(BlockTransform transformFunc) {
 * Create a new branch 
 ```
     git checkout -b "Branch_Name"
+    git push --set-upstream origin "Branch_Name"
 ```
