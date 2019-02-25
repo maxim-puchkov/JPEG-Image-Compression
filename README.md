@@ -118,6 +118,7 @@ for (row : rows) {
 * [Color converter](https://convertingcolors.com/)
 * [YUV data range](http://discoverybiz.net/enu0/faq/faq_yuvdatarangebybreeze.html)
 * [YUV adjustment](https://stackoverflow.com/questions/8427786/how-to-adjust-image-saturation-in-yuv-color-space)
+* [Scale](https://docs.microsoft.com/en-us/windows/desktop/medfound/about-yuv-video) _Step 4_
 
 
 
