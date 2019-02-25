@@ -19,7 +19,7 @@ using cv::Vec;
 using cv::Scalar;
 
 
-
+struct Transform;
 
 
 /*******************************************************************************
@@ -27,8 +27,7 @@ using cv::Scalar;
  *******************************************************************************/
 
 
-class Transform {
-public:
+struct Transform {
     
     // Default block dimension
     static const int BLOCK_N = 8;
@@ -44,6 +43,7 @@ public:
     
     
     // DCT (type-II)
+    //      Transform one-channel matrices
     static Mat dct(const Mat1b &matrix);
     
     
@@ -133,8 +133,8 @@ Mat Transform::idct2(const Mat_<Vec<_Tp, cn>> &F) {
 
 Mat1d Transform::dct_matrix(int n) {
     // Initialize DCT matrix
-    double init = 1 / sqrt(n);
-    Mat T(n, n, CV_64F, Scalar::all(init));
+    double initialEntryValue = 1 / sqrt(n);
+    Mat T(n, n, CV_64F, Scalar::all(initialEntryValue));
     
     // Compute matrix entries
     for (int row = 1; row < n; row++) {
