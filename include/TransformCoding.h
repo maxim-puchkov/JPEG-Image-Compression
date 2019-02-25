@@ -26,13 +26,22 @@ using cv::Scalar;
  *******************************************************************************/
 
 
+// DCT (type-II)
+//      T[i, j]     = 1 / √(N)                              if i = 0
+//                  = √(2/N) * cos((2j+1) * iπ) / 2N)       if i > 0
 Mat1d dct_matrix(int n);
 
 
+// 2D DCT (type-II)
+//      Coefficients = 1D DCT * Image Block * Transpose(1D DCT)
+//      F(u, v) = T * f(i, j) * Transpose(T)
 template<typename _Tp, int cn>
 Mat dct2(const Mat_<Vec<_Tp, cn>> &f);
 
 
+// 2D IDCT (type-III)
+//      Image Block = Transpose(1D DCT) * Coefficients * 1D DCT
+//      f(i, j) = Transpose(T) * F(u, v) * T
 template<typename _Tp, int cn>
 Mat idct2(const Mat_<Vec<_Tp, cn>> &F);
 
@@ -61,18 +70,16 @@ Mat idct2(const Mat_<Vec<_Tp, cn>> &F);
 
 /* Discrete Cosine Transform */
 
-// T[i, j]     = 1 / √(N)                              if i = 0
-//             = √(2/N) * cos((2j+1) * iπ) / 2N)       if i > 0
 Mat1d dct_matrix(int n) {
+    // Initialize DCT matrix
     double init = 1 / sqrt(n);
     Mat T(n, n, CV_64F, Scalar::all(init));
     
+    // Compute matrix entries
     for (int row = 1; row < n; row++) {
         for (int col = 0; col < n; col++) {
-            
-            double value = sqrt(2.0 / n) * cos(((2 * col + 1) * (row * M_PI)) / (2 * n));
-            T.at<double>(row, col) = value;
-        
+            double entry = sqrt(2.0 / n) * cos(((2 * col + 1) * (row * M_PI)) / (2 * n));
+            T.at<double>(row, col) = entry;
         }
     }
     
@@ -80,8 +87,6 @@ Mat1d dct_matrix(int n) {
 }
 
 
-// Coefficients = 1D DCT * Image Block * Transpose(1D DCT)
-// F(u, v) = T * f(i, j) * Transpose(T)
 template<typename _Tp, int cn>
 Mat dct2(const Mat_<Vec<_Tp, cn>> &f) {
     Mat1d T = dct_matrix(f.rows);
@@ -93,8 +98,6 @@ Mat dct2(const Mat_<Vec<_Tp, cn>> &f) {
 
 /* Inverse Discrete Cosine Transform */
 
-// Image Block = Transpose(1D DCT) * Coefficients * 1D DCT
-// f(i, j) = Transpose(T) * F(u, v) * T
 template<typename _Tp, int cn>
 Mat idct2(const Mat_<Vec<_Tp, cn>> &F) {
     Mat1d T = dct_matrix(F.rows);

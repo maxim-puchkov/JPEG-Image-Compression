@@ -55,7 +55,4 @@ void print_spaced(int lines, T &&...ts) {
     }
 }
 
-
-
-
 #endif /* Print_h */
