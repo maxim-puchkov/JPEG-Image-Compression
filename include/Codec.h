@@ -30,6 +30,7 @@ class Codec;
 
 struct Limit;
 
+
 /*******************************************************************************
                                    JPEG Codec
  *******************************************************************************/
@@ -51,18 +52,13 @@ public:
     
 private:
     
-    Mat_<Vec<_Tp, cn>> source;
-    
     Limit partitionLimit();
     
     Rect blockArea(Point2i origin);
     
     ImageBlock<_Tp, cn> blockAt(Point2i origin);
     
-    
-    
-    // template<typename _Tp, int cn>
-    // void partition(const Mat_<Vec<_Tp, cn>> &source, Rect area);
+    Mat_<Vec<_Tp, cn>> source;
     
     // unsigned long inputSize;
     // unsigned long outputSize;
@@ -104,6 +100,12 @@ struct Limit {
 /*******************************************************************************
                                 Implementation
  *******************************************************************************/
+
+
+//template<typename _Tp, int cn>
+//Codec<_Tp, cn>::Codec(const Mat_<_Tp> &source)
+//: source(source)
+//{ }
 
 
 template<typename _Tp, int cn>

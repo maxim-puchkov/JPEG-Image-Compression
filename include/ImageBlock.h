@@ -44,6 +44,9 @@ public:
     ImageBlock(const Mat_<Vec<_Tp, cn>> &source);
     
     
+    void transformEach(std::function<Mat(Mat_<_Tp>)> transform);
+    
+    
     // Channel count
     unsigned int channels() const;
     
@@ -56,7 +59,7 @@ public:
     Mat_<_Tp> operator[](unsigned int index) const;
     
     
-    // Display channel number and data
+    // Display channel number and its underlying matrix
     void display() const;
     
 private:
