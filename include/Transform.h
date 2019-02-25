@@ -44,7 +44,7 @@ public:
     
     
     // DCT (type-II)
-    static Mat dct(const Mat &matrix);
+    static Mat dct(const Mat1b &matrix);
     
     
     // 2D DCT (type-II)
@@ -62,6 +62,7 @@ public:
     
     
 private:
+    
     
     // DCT (type-II)
     //      T[i, j]     = 1 / √(N)                              if i = 0
@@ -104,8 +105,8 @@ const Mat1d Transform::DCT_T = transpose(DCT);
 
 /* Discrete Cosine Transform */
 
-Mat Transform::dct(const Mat &matrix) {
-    return mul<double>(Transform::DCT, matrix);
+Mat Transform::dct(const Mat1b &matrix) {
+    return mul<double, unsigned char>(Transform::DCT, matrix);
 }
 
 
