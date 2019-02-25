@@ -137,7 +137,9 @@ void Codec::encode(const Mat_<_Tp> &source) {
             BlockTransform dct2 = Transform::dct2<BlockDataType>;
             block.transform(dct2);
             
-            // print("DCT coefficients: ", coefficients);
+            // Check
+            BlockTransform idct2 = Transform::idct2<BlockDataType>;
+            block.transform(idct2);
             
             
             // 6. Quantizing DCT coefficients
