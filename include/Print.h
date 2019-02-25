@@ -36,8 +36,6 @@ void print_spaced(int lines, T &&...ts);
 
 /* Implementation */
 
-const char NEW_LINE = '\n';
-
 
 template<typename ...T>
 void print(T &&...ts) {
@@ -48,8 +46,8 @@ void print(T &&...ts) {
 // Print any arguments, and add new lines
 template<typename ...T>
 void print_spaced(int lines, T &&...ts) {
+    const char NEW_LINE = '\n';
     print(std::forward<T>(ts)...);
-    
     for (int i = 0; i < lines; i ++) {
         print(NEW_LINE);
     }
