@@ -26,15 +26,28 @@ const Mat INVALID_MUL = Mat(0, 0, CV_8U);
  *******************************************************************************/
 
 
-// Matrix product[m×p] of matrices A[m×n] and B[n×p]
+/* Matrix Multiplication */
+
+// Matrix (type _Tp) product[m×p] of matrices A[m×n] and B[n×p]
+// Both matrices have the same type
 template<typename _Tp>
 Mat mul(const Mat &A, const Mat &B);
+
+
+// Matrix product[m×p] of matrices A[m×n] and B[n×p]
+// Result has the same type as A
+template<typename _ATp, typename _BTp>
+Mat_<_ATp> mul(const Mat_<_ATp> &A, const Mat_<_BTp> &B);
 
 
 // Matrix product[m×1] of matrix A[m×n] and vector vec[cn×1]
 template<typename _Tp, int cn>
 Mat mul(const Mat &A, const Vec<_Tp, cn> &vec);
 
+
+
+
+/* Transpose */
 
 // Transpose[n×m] of matrix A[m×n]
 template<class _Tp>
@@ -63,6 +76,8 @@ Mat transpose(const Mat_<_Tp> &A);
  *******************************************************************************/
 
 
+/* Matrix Multiplication */
+
 template<typename _Tp>
 Mat mul(const Mat &A, const Mat &B) {
     // Guard
@@ -89,11 +104,41 @@ Mat mul(const Mat &A, const Mat &B) {
 }
 
 
+template<typename _ATp, typename _BTp>
+Mat_<_ATp> mul(const Mat_<_ATp> &A, const Mat_<_BTp> &B) {
+    // Guard
+    if (A.cols != B.rows) {
+        return INVALID_MUL;
+    }
+    
+    Mat R(A.rows, B.cols, DataType<_ATp>::type);
+    
+    // Compute matrix product R
+    for (int rowA = 0; rowA < A.rows; rowA++) {
+        for (int colB = 0; colB < B.cols; colB++) {
+            
+            _ATp product = 0;
+            for (int colA = 0; colA < A.cols; colA++) {
+                product += A.template at<_ATp>(rowA, colA) * B.template at<_BTp>(colA, colB);
+            }
+            R.at<_ATp>(rowA, colB) = product;
+            
+        }
+    }
+    
+    return R;
+}
+
+
 template<typename _Tp, int cn>
 Mat mul(const Mat &A, const Vec<_Tp, cn> &vec) {
     return mul<_Tp>(A, Mat(vec));
 }
 
+
+
+
+/* Transpose */
 
 template<class _Tp>
 Mat transpose(const Mat_<_Tp> &A) {
