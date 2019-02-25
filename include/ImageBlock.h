@@ -37,8 +37,8 @@ template<typename _Tp, int cn>
 class ImageBlock {
 public:
     
-    // Given a matrix of vectors with CN channels
-    // partition it into CN 1-channel matrices.
+    // Given a matrix of vectors with (cn) channels
+    // partition it into (cn) 1-channel matrices.
     //
     // Ex: Mat3b ---> Mat1b, Mat1b, Mat1b
     ImageBlock(const Mat_<Vec<_Tp, cn>> &source);
@@ -165,7 +165,11 @@ void ImageBlock<_Tp, cn>::partition(const Mat_<Vec<_Tp, cn>> &source) {
             
             Vec<_Tp, cn> vec = source.template at<Vec<_Tp, cn>>(row, col);
             for (int c = 0; c < cn; c++) {
+                
+                // To center data range at 0 (-128..127) subtract 128 from vec[c]
+                // (and change allocation type)
                 this->channelData[c].template at<_Tp>(row, col) = vec[c];
+                
             }
             
         }

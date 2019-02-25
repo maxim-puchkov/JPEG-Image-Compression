@@ -84,9 +84,8 @@ Mat1d dct_matrix(int n) {
 // F(u, v) = T * f(i, j) * Transpose(T)
 template<typename _Tp, int cn>
 Mat dct2(const Mat_<Vec<_Tp, cn>> &f) {
-    //Mat1d T = dct_matrix(f.rows);
-    //return mul(mul(T, f), transpose(T));
-    return Mat(0,0,CV_8U);
+    Mat1d T = dct_matrix(f.rows);
+    return mul(mul(T, f), transpose(T));
 }
 
 
@@ -98,9 +97,8 @@ Mat dct2(const Mat_<Vec<_Tp, cn>> &f) {
 // f(i, j) = Transpose(T) * F(u, v) * T
 template<typename _Tp, int cn>
 Mat idct2(const Mat_<Vec<_Tp, cn>> &F) {
-    //Mat1d T = dct_matrix(F.rows);
-    //return mul(mul(transpose(T), F), T);
-    return Mat(0,0,CV_8U);
+    Mat1d T = dct_matrix(F.rows);
+    return mul(mul(transpose(T), F), T);
 }
 
 #endif /* TransformCoding_h */
