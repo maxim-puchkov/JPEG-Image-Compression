@@ -16,8 +16,6 @@ using cv::Mat_;
 using cv::Vec;
 using cv::DataType;
 
-const Mat INVALID_MUL = Mat(0, 0, CV_8U);
-
 
 
 
@@ -80,10 +78,7 @@ Mat transpose(const Mat_<_Tp> &A);
 
 template<typename _Tp>
 Mat mul(const Mat &A, const Mat &B) {
-    // Guard
-    if (A.cols != B.rows) {
-        return INVALID_MUL;
-    }
+    CV_Assert(A.cols == B.rows);
     
     Mat R(A.rows, B.cols, DataType<_Tp>::type);
     
@@ -106,10 +101,7 @@ Mat mul(const Mat &A, const Mat &B) {
 
 template<typename _ATp, typename _BTp>
 Mat_<_ATp> mul(const Mat_<_ATp> &A, const Mat_<_BTp> &B) {
-    // Guard
-    if (A.cols != B.rows) {
-        return INVALID_MUL;
-    }
+    CV_Assert(A.cols == B.rows);
     
     Mat R(A.rows, B.cols, DataType<_ATp>::type);
     
