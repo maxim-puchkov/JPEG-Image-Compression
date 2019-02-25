@@ -47,7 +47,8 @@ struct Transform {
     
     // DCT (type-II)
     //      Transform one-channel matrices
-    static Mat dct(const Mat1b &matrix);
+    template<typename _Tp>
+    static Mat dct(const Mat_<_Tp> &matrix);
     
     
     // 2D DCT (type-II)
@@ -119,8 +120,9 @@ Mat1d Transform::dct_matrix(int n) {
 
 /* DCT Transformations */
 
-Mat Transform::dct(const Mat1b &matrix) {
-    return mul<double, unsigned char>(Transform::DCT, matrix);
+template<typename _Tp>
+Mat Transform::dct(const Mat_<_Tp> &matrix) {
+    return mul<double, _Tp>(Transform::DCT, matrix);
 }
 
 
