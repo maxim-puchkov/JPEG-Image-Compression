@@ -16,7 +16,12 @@
 
 using cv::Mat_;
 using cv::Vec;
+using cv::Size2i;
 
+namespace block {
+    const int DIMENSION = 8;
+    const Size2i SIZE = {DIMENSION, DIMENSION};
+}
 
 /*******************************************************************************
                                    Image Block

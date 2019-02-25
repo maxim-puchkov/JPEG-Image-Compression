@@ -17,14 +17,13 @@
 #include "Color.h"
 #include "TransformCoding.h"
 
+using cv::Mat_;
 using cv::Mat3b;
-using cv::Vec3b;
+using cv::Vec;
 using cv::Rect;
 using cv::Point2i;
-using cv::Size2i;
 
-const int N = 8;
-const Size2i BLOCK_SIZE = {N, N};
+const int N = block::DIMENSION;
 
 
 template<typename _Tp, int cn>
@@ -115,7 +114,8 @@ Codec<_Tp, cn>::Codec(const Mat_<Vec<_Tp, cn>> &source)
 
 
 template<typename _Tp, int cn>
-Codec<_Tp, cn>::~Codec() { }
+Codec<_Tp, cn>::~Codec()
+{ }
 
 
 template<typename _Tp, int cn>
@@ -171,7 +171,7 @@ Limit Codec<_Tp, cn>::partitionLimit() {
 
 template<typename _Tp, int cn>
 Rect Codec<_Tp, cn>::blockArea(Point2i origin) {
-    return Rect(origin, BLOCK_SIZE);
+    return Rect(origin, block::SIZE);
 }
 
 
