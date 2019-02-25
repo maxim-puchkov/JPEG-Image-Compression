@@ -9,13 +9,12 @@
 #ifndef Codec_h
 #define Codec_h
 
-#include "DebugData.h"
-
 #include <vector>
 #include "Matrix.h"
 #include "ImageBlock.h"
 #include "Color.h"
 #include "TransformCoding.h"
+#include "Print.h"
 
 using cv::Mat_;
 using cv::Mat3b;
@@ -130,7 +129,8 @@ void Codec<_Tp, cn>::encode() {
     // 2. Chroma subsampling 4:2:0
     
     
-    // 3. Compute limits. Disregard incomplete blocks less than 8×8
+    // 3. Compute limits. Disregard incomplete
+    //    blocks less than block size.
     Limit limit = this->partitionLimit();
     
     

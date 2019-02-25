@@ -9,10 +9,9 @@
 #ifndef ImageBlock_h
 #define ImageBlock_h
 
-#include "DebugData.h"
-
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include "Print.h"
 
 using cv::Mat_;
 using cv::Vec;
@@ -104,7 +103,7 @@ ImageBlock<_Tp, cn>::ImageBlock(const Mat_<Vec<_Tp, cn>> &source) {
     
     this->display();
     
-    print("CSize: ", this->channelData.size());
+    print("CDSize: ", this->channelData.size());
     print("Channels:\t", cn);
     print_spaced(5, "Block", cn, " data:\n", source);
 }

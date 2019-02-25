@@ -11,6 +11,7 @@
 
 #include <opencv2/opencv.hpp>
 #include "Color.h"
+#include "Print.h"
 
 using cv::Mat;
 using cv::Mat1b;
@@ -31,14 +32,6 @@ using cv::Vec3s;
 void yuv_adjust(const Vec3b &yuv);
 
 Mat3b convert_repeat(const Mat3b &rgbImage, int times);
-
-
-
-template<typename ...T>
-void print(T &&...ts);
-
-template<typename ...T>
-void print_spaced(int lines, T &&...ts);
 
 
 
@@ -113,37 +106,6 @@ Mat3b convert_repeat(const Mat3b &rgbImage, int times) {
     }
     
     return output;
-}
-
-
-
-
-
-
-
-
-
-/*******************************************************************************
-                                      Output
- *******************************************************************************/
-
-
-// Print any arguments
-template<typename ...T>
-void print(T &&...ts) {
-    (std::cout << ... << std::forward<T>(ts)) << std::endl;
-}
-
-
-// Print any arguments, and add new lines
-template<typename ...T>
-void print_spaced(int lines, T &&...ts) {
-    print(std::forward<T>(ts)...);
-    
-    const char WS = '\n';
-    for (int i = 0; i < lines; i ++) {
-        print(WS);
-    }
 }
 
 
