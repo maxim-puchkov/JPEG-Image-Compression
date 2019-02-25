@@ -46,19 +46,19 @@ public:
     
     
     // Channel count
-    unsigned int channels();
+    unsigned int channels() const;
     
     
     // Checked channel access
-    Mat_<_Tp> at(unsigned int index);
+    Mat_<_Tp> at(unsigned int index) const noexcept;
     
     
     // Unchecked channel access
-    Mat_<_Tp> operator[](unsigned int index);
+    Mat_<_Tp> operator[](unsigned int index) const;
     
     
     // Display channel number and data
-    void display();
+    void display() const;
     
 private:
     
