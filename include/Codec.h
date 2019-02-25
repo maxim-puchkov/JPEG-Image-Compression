@@ -22,15 +22,12 @@ using cv::Vec;
 using cv::Rect;
 using cv::Point2i;
 
-//using BlockTransform = std::function<Mat_<double>(Mat_<char>)>;
-
 using block_t::BlockTransform;
-
 
 const int N = block_t::N;
 
 
-class Codec;
+struct Codec;
 
 struct Limit;
 
@@ -40,18 +37,12 @@ struct Limit;
  *******************************************************************************/
 
 
-class Codec {
-public:
+struct Codec {
     
     template<typename _Tp>
-    Codec(const Mat_<_Tp> &source);
+    static void encode(const Mat_<_Tp> &source);
     
-    template<typename _Tp>
-    void encode(const Mat_<_Tp> &source);
-    
-    void decode(); /* undefined */
-    
-private:
+    static void decode(); /* undefined */
     
 };
 
@@ -90,12 +81,6 @@ struct Limit {
 /*******************************************************************************
                                 Implementation
  *******************************************************************************/
-
-
-template<typename _Tp>
-Codec::Codec(const Mat_<_Tp> &source) {
-    this->encode(source);
-}
 
 
 template<typename _Tp>
