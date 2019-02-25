@@ -8,8 +8,6 @@
 
 #include "mainwindow.h"
 #include "Color.h"
-#include "Compression.h"
-#include "TransformCoding.h"
 #include "SampleData.h"
 #include <QApplication>
 

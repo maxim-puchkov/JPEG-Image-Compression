@@ -137,7 +137,7 @@ void MainWindow::convertImage() {
     
     // Create an output image which has the same size (nWidth, nHeight) as the input image.
     // CV_8U means the output image has one channel, each channel has an unsigned byte.
-    convertedImg.create(cvImg.size(), CV_16SC3);
+    convertedImg.create(cvImg.size(), cvImg.type());
     
     
     /*********************************************
@@ -239,9 +239,43 @@ void MainWindow::convertImage() {
     
 }
 
+/*******************************************************************************
+                                    YUV to RGB
+ *******************************************************************************/
+
+cv::Mat MainWindow::YUVTORGB(const cv::Mat3b &src) {
 
 
 
+    convertedImg.create(src.size(), src.type());
+    int nWidth = convertedImg.cols;
+    int nHeight = convertedImg.rows;
+    for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
+        for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
+
+            cv::Vec3b vYUV = cvImg.at<cv::Vec3b>(height, width);
+
+
+
+
+            // Compute weighted values
+
+
+            // Luminance is the sum of weighted RGB channels: wR, wG, and wB
+            float R = vYUV[0] + 1.13983*vYUV[2];
+            float G = vYUV[0] + -1*0.39465*vYUV[1] + -1*0.58060*vYUV[2];
+            float B = vYUV[0] + 2.03211*vYUV[1];
+
+            // Mat(height, width) convertedImg writes the determined luminance value
+            convertedImg.at<cv::Vec3b>(height, width)[0] = R;
+            convertedImg.at<cv::Vec3b>(height, width)[1] = G;
+            convertedImg.at<cv::Vec3b>(height, width)[2] = B;
+
+
+        }
+    }
+return convertedImg;
+}
 
 
 
