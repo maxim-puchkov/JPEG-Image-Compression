@@ -29,18 +29,24 @@ using cv::Vec3s;
  *******************************************************************************/
 
 
+// Adjust YUV image to unsigned char (0..255)
 void yuv_adjust(const Vec3b &yuv);
 
+// Repeat conversion multiple 'times'
 Mat3b convert_repeat(const Mat3b &rgbImage, int times);
 
 
 
+// Random 0..255
 unsigned char uchar_random();
 
+
+// Random RGB
 Mat3b rgb_image(int width, int height);
 
 
-
+// Three-channel gray image
+Mat3b channel_3x(const Mat1b &grayscale);
 
 
 
@@ -143,6 +149,19 @@ Mat3b rgb_image(int width, int height) {
 }
 
 
+Mat3b channel_3x(const Mat1b &grayscale) {
+    Mat3b image = Mat(grayscale.rows, grayscale.cols, CV_8UC3);
+    
+    for (int row = 0; row < grayscale.rows; row++) {
+        for (int col = 0; col < grayscale.cols; col++) {
+            unsigned char gray = grayscale.at<unsigned char>(row, col);
+            Vec3b entry(gray, gray, gray);
+            image.at<Vec3b>(row, col) = entry;
+        }
+    }
+    
+    return image;
+}
 
 
 
