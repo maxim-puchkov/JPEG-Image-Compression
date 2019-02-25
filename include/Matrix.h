@@ -11,15 +11,56 @@
 
 #include <opencv2/opencv.hpp>
 
-
 using cv::Mat;
+using cv::Mat_;
 using cv::Vec;
 using cv::DataType;
 
 
-/* Matrix operations */
+
+
+/*******************************************************************************
+                             Matrix Computations
+ *******************************************************************************/
+
 
 // Compute R[m×p] - matrix product of A[m×n] and B[n×p]
+template<typename _Tp>
+Mat mul(const Mat &A, const Mat &B);
+
+
+// Compute R[m×1] - matrix product of A[m×n] and vec[n×1]
+template<typename _Tp, int n>
+Mat mul(const Mat &A, const Vec<_Tp, n> &vec);
+
+
+// Compute AT[n×m] - transpose of A[m×n]
+template<class _Tp>
+Mat transpose(const Mat_<_Tp> &A);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*******************************************************************************
+                                Implementation
+ *******************************************************************************/
+
+
 template<typename _Tp>
 Mat mul(const Mat &A, const Mat &B) {
     if (A.cols != B.rows) {
@@ -44,14 +85,12 @@ Mat mul(const Mat &A, const Mat &B) {
 }
 
 
-// Compute R[m×p] - matrix product of A[m×n] and vec[n×1]
 template<typename _Tp, int n>
 Mat mul(const Mat &A, const Vec<_Tp, n> &vec) {
     return mul<_Tp>(A, Mat(vec));
 }
 
 
-// Compute AT[n×m] - transpose of A[m×n]
 template<class _Tp>
 Mat transpose(const Mat_<_Tp> &A) {
     int m = A.rows;

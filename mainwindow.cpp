@@ -2,33 +2,13 @@
 //  mainwindow.cpp
 //  JPEG-Image-Compression
 //
-//  Created for CMPT365, Programming Assignment 2 on 2019-02-04.
-//  Copyright © 2019 maximpuchkov. All rights reserved.
+//  Created on 2019-02-03.
 //
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-// Constructor of MainWindow  layouts the graphical
-// user interface and initalizes window's outlets
+
 MainWindow::MainWindow(QWidget *parent)
 :
 QMainWindow(parent),
@@ -97,8 +77,10 @@ MainWindow::~MainWindow() {
 
 
 /*******************************************************************************
-                            Step 1. Load a new image
+                            Step 1. Load a New Image
  *******************************************************************************/
+
+
 void MainWindow::loadImage() {
     
     // Open, read, convert to 3 channel BGR, and save as RGB values in Mat cvImg
@@ -118,9 +100,12 @@ void MainWindow::loadImage() {
 
 
 
+
 /*******************************************************************************
-                    Step 2. Color Space Conversion: RGB to YUV
+                                <<< Header >>>
  *******************************************************************************/
+
+
 void MainWindow::convertImage() {
     
     // Guard: stop if original image's Mat cvImg is empty
@@ -178,9 +163,12 @@ void MainWindow::convertImage() {
 
 
 
+
 /*******************************************************************************
-             Generate Image: Matrix of RGB-Vectors to an RGB Image
+                      Generate a 3-Channel RGB Image
  *******************************************************************************/
+
+
 QImage MainWindow::MatRGB2QImage(const cv::Mat3b &src) {
     QImage dest(src.cols, src.rows, QImage::Format_ARGB32);
     for (int y = 0; y < src.rows; ++y) {
@@ -200,9 +188,12 @@ QImage MainWindow::MatRGB2QImage(const cv::Mat3b &src) {
 
 
 
+
 /*******************************************************************************
-        Generate Image: Matrix of GRAYSCALE-intensities to a GRAYSCALE Image
+                   Generate a 1-Channel Grayscale Image
  *******************************************************************************/
+
+
 QImage MainWindow::MatGrayScale2QImage(const cv::Mat_<double> &src) {
     double scale = 255.0;
     QImage dest(src.cols, src.rows, QImage::Format_ARGB32);
@@ -216,45 +207,3 @@ QImage MainWindow::MatGrayScale2QImage(const cv::Mat_<double> &src) {
     }
     return dest;
 }
-
-
-
-
-/*******************************************************************************
-                         Step 3. Chroma Subsampling 4:2:0
- *******************************************************************************/
-void subsample() {
-    
-}
-
-/*******************************************************************************
-                        Step 4. 8x8 Block Partitioning
- *******************************************************************************/
-
-
-/*******************************************************************************
- Compute
- *******************************************************************************/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*******************************************************************************
- Empty Comment
- *******************************************************************************/

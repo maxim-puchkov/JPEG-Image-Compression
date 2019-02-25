@@ -12,17 +12,54 @@
 #include <opencv2/opencv.hpp>
 #include "Matrix.h"
 
-
 using cv::Mat;
 using cv::Mat1d;
 using cv::Mat_;
+using cv::Vec;
 using cv::Scalar;
 
 
-/* Transform Coding */
 
 
-/** Discrete Cosine Transform **/
+/*******************************************************************************
+                                Transform Coding
+ *******************************************************************************/
+
+
+Mat1d dct_matrix(int n);
+
+
+template<typename _Tp, int cn>
+Mat dct2(const Mat_<Vec<_Tp, cn>> &f);
+
+
+template<typename _Tp, int cn>
+Mat idct2(const Mat_<Vec<_Tp, cn>> &F);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*******************************************************************************
+                                Implementation
+ *******************************************************************************/
+
+
+/* Discrete Cosine Transform */
 
 // T[i, j]     = 1 / √(N)                              if i = 0
 //             = √(2/N) * cos((2j+1) * iπ) / 2N)       if i > 0
@@ -55,8 +92,7 @@ Mat dct2(const Mat_<Vec<_Tp, cn>> &f) {
 
 
 
-
-/** Inverse Discrete Cosine Transform **/
+/* Inverse Discrete Cosine Transform */
 
 // Image Block = Transpose(1D DCT) * Coefficients * 1D DCT
 // f(i, j) = Transpose(T) * F(u, v) * T
