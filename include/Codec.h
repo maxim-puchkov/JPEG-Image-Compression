@@ -89,7 +89,7 @@ struct PartitionLimit {
 
 template<typename _Tp>
 void Codec::encode(const Mat_<_Tp> &source) {
-    // Mat3b compressed = source.clone();
+    // Mat<_Tp> encoded = source.clone();
     
     // 1. Convert RGB (CV_8UC3) to YUV
     Mat_<_Tp> yuvImage = convert_RGB_YUV(source);
@@ -128,7 +128,7 @@ void Codec::encode(const Mat_<_Tp> &source) {
         }
     }
     
-    // return compressed;
+    // return encoded;
 }
 
 
@@ -138,6 +138,24 @@ void Codec::encode(const Mat_<_Tp> &source) {
 
 template<typename _Tp>
 void decode(const Mat_<_Tp> &source) {
+    // Mat<_Tp> decoded = source.clone();
+    
+    
+    // 1. 2D IDCT on source (quantized DCT coefficients)
+    
+    // 2. Reverse 4:2:0 subsample ratio
+    
+    // 3. Convert YUV color space back to RGB
+    
+    
+    
+    
+    // https://csil-git1.cs.surrey.sfu.ca/A2-365/JPEG-Image-Compression/tree/quantization#decode
+    
+    
+    
+    
+    // return decoded;
     
 }
 
