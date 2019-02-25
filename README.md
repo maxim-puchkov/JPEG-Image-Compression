@@ -66,7 +66,7 @@
 
 
 &nbsp;
-# Color Conversion
+# __Color Conversion__
 * [RGB YUV](#rgb-to-yuv)
 * [YUV RGB](#yuv-to-rgb)
 
@@ -128,7 +128,7 @@ for (row : rows) {
 
 
 &nbsp;
-# Sampling
+# __Sampling__
 * [_4:2:0_ ratio](#420-ratio)
 * [_4:2:0_ reverse](#420-reverse)
 
@@ -185,7 +185,7 @@ for (row : rows) {
 
 
 &nbsp;
-# Transform Coding
+# __Transform Coding__
 * [DCT](#discrete-cosine-transform)
 * [IDCT](#inverse-discrete-cosine-transform)
 
@@ -212,15 +212,15 @@ for (row : rows) {
 
 
 
-### Code
-* Transform.h defines 2D DCT
+## Code
+* __Transform.h__ defines 2D DCT
 ```c++
     template<typename _Tp>
     Mat1d Transform::dct2(const Mat_<_Tp> &matrix) {
         return mul(mul(Transform::DCT, matrix), Transform::DCT_T);
     }
 ```
-* Codec.h applies transformation to each block
+* __Codec.h__ applies transformation to each block
 ```c++
     using BlockDataType = short;
     using BlockTransform = std::function<Mat_<double>(Mat_<BlockDataType>)>;
@@ -228,7 +228,7 @@ for (row : rows) {
     BlockTransform dct2 = Transform::dct2<BlockDataType>;
     block.transform(dct2);
 ```
-* ImageBlock.h applies transformation to each channel within a block
+* __ImageBlock.h__ applies transformation to each channel within a block
 ```c++
 template<typename _Tp, int cn>
 void ImageBlock<_Tp, cn>::transform(BlockTransform transformFunc) {
@@ -264,7 +264,7 @@ void ImageBlock<_Tp, cn>::transform(BlockTransform transformFunc) {
 
 
 &nbsp;
-# Quantization
+# __Quantization__
 
 ### Input
 * _Description_: DCT coefficients __F(u, v)__
@@ -285,7 +285,7 @@ void ImageBlock<_Tp, cn>::transform(BlockTransform transformFunc) {
 
 
 ## Resources
-* [Standard JPEG quantization tables](http://www.cs.sfu.ca/CourseCentral/365/li/material/lectureslides/Chapter8-365.pdf) _p. 9; tables 9.1, 9.2_
+* [Standard JPEG quantization tables](http://www.cs.sfu.ca/CourseCentral/365/li/material/lectureslides/Chapter9.pdf) _p. 9; tables 9.1, 9.2_
 
 
 
