@@ -1,13 +1,13 @@
 //
-//  TransformCoding.h
+//  Transform.h
 //  JPEG-Image-Compression
 //
 //  Created by admin on 2019-02-19.
 //  Copyright © 2019 maximpuchkov. All rights reserved.
 //
 
-#ifndef TransformCoding_h
-#define TransformCoding_h
+#ifndef Transform_h
+#define Transform_h
 
 #include <opencv2/opencv.hpp>
 #include "Matrix.h"
@@ -21,29 +21,48 @@ using cv::Scalar;
 
 
 
+
 /*******************************************************************************
- Transform Coding
+                                   Transform
  *******************************************************************************/
 
 
-// DCT (type-II)
-//      T[i, j]     = 1 / √(N)                              if i = 0
-//                  = √(2/N) * cos((2j+1) * iπ) / 2N)       if i > 0
-Mat1d dct_matrix(int n);
-
-
-// 2D DCT (type-II)
-//      Coefficients = 1D DCT * Image Block * Transpose(1D DCT)
-//      F(u, v) = T * f(i, j) * Transpose(T)
-template<typename _Tp, int cn>
-Mat dct2(const Mat_<Vec<_Tp, cn>> &f);
-
-
-// 2D IDCT (type-III)
-//      Image Block = Transpose(1D DCT) * Coefficients * 1D DCT
-//      f(i, j) = Transpose(T) * F(u, v) * T
-template<typename _Tp, int cn>
-Mat idct2(const Mat_<Vec<_Tp, cn>> &F);
+class Transform {
+public:
+    
+    // Default block dimension
+    static const int BLOCK_N = 8;
+    
+    // Matrix of DCT transformation for N = 8
+    static const Mat1d M_DCT;
+    
+    // Matrix transpose of DCT transformation for N = 8
+    static const Mat1d MT_DCT;
+    
+    
+    
+    // 2D DCT (type-II)
+    //      Coefficients = 1D DCT * Image Block * Transpose(1D DCT)
+    //      F(u, v) = T * f(i, j) * Transpose(T)
+    template<typename _Tp, int cn>
+    Mat dct2(const Mat_<Vec<_Tp, cn>> &f);
+    
+    
+    // 2D IDCT (type-III)
+    //      Image Block = Transpose(1D DCT) * Coefficients * 1D DCT
+    //      f(i, j) = Transpose(T) * F(u, v) * T
+    template<typename _Tp, int cn>
+    Mat idct2(const Mat_<Vec<_Tp, cn>> &F);
+    
+    
+private:
+    
+    // DCT (type-II)
+    //      T[i, j]     = 1 / √(N)                              if i = 0
+    //                  = √(2/N) * cos((2j+1) * iπ) / 2N)       if i > 0
+    static Mat1d dct_matrix(int dimension);
+    
+};
 
 
 
@@ -64,13 +83,45 @@ Mat idct2(const Mat_<Vec<_Tp, cn>> &F);
 
 
 /*******************************************************************************
- Implementation
+                                Implementation
  *******************************************************************************/
+
+
+/* Static data memebers definitions */
+
+const Mat1d Transform::M_DCT = Transform::dct_matrix(Transform::BLOCK_N);
+
+const Mat1d Transform::MT_DCT = transpose(M_DCT);
+
+
 
 
 /* Discrete Cosine Transform */
 
-Mat1d dct_matrix(int n) {
+template<typename _Tp, int cn>
+Mat Transform::dct2(const Mat_<Vec<_Tp, cn>> &f) {
+    // Mat1d T = dct_matrix(f.rows);
+    return mul(mul(Transform::M_DCT, f), Transform::MT_DCT);
+}
+
+
+template<typename _Tp, int cn>
+Mat Transform::idct2(const Mat_<Vec<_Tp, cn>> &F) {
+    // Mat1d T = dct_matrix(F.rows);
+    return mul(mul(Transform::MT_DCT, F), Transform::M_DCT);
+}
+
+
+
+
+
+
+
+
+
+/* Private */
+
+Mat1d Transform::dct_matrix(int n) {
     // Initialize DCT matrix
     double init = 1 / sqrt(n);
     Mat T(n, n, CV_64F, Scalar::all(init));
@@ -86,22 +137,4 @@ Mat1d dct_matrix(int n) {
     return T;
 }
 
-
-template<typename _Tp, int cn>
-Mat dct2(const Mat_<Vec<_Tp, cn>> &f) {
-    Mat1d T = dct_matrix(f.rows);
-    return mul(mul(T, f), transpose(T));
-}
-
-
-
-
-/* Inverse Discrete Cosine Transform */
-
-template<typename _Tp, int cn>
-Mat idct2(const Mat_<Vec<_Tp, cn>> &F) {
-    Mat1d T = dct_matrix(F.rows);
-    return mul(mul(transpose(T), F), T);
-}
-
-#endif /* TransformCoding_h */
+#endif /* Transform_h */
