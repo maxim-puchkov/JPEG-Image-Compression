@@ -17,7 +17,6 @@
 #include "Print.h"
 
 using cv::Mat_;
-using cv::Mat3b;
 using cv::Vec;
 using cv::Rect;
 using cv::Point2i;
@@ -27,9 +26,11 @@ using block_t::BlockTransform;
 const int N = block_t::N;
 
 
+
+
 struct Codec;
 
-struct Limit;
+struct PartitionLimit;
 
 
 /*******************************************************************************
@@ -42,16 +43,17 @@ struct Codec {
     template<typename _Tp>
     static void encode(const Mat_<_Tp> &source);
     
-    static void decode(); /* undefined */
+    template<typename _Tp>
+    static void decode(const Mat_<_Tp> &source); /* undefined */
     
 };
 
 
 
 
-struct Limit {
+struct PartitionLimit {
     
-    Limit(int imageRows, int imageCols, int N);
+    PartitionLimit(int imageRows, int imageCols, int N);
     
     int rows;
     int cols;
@@ -83,6 +85,8 @@ struct Limit {
  *******************************************************************************/
 
 
+/* Encode */
+
 template<typename _Tp>
 void Codec::encode(const Mat_<_Tp> &source) {
     // Mat3b compressed = source.clone();
@@ -97,7 +101,7 @@ void Codec::encode(const Mat_<_Tp> &source) {
     
     // 3. Compute limits. Disregard incomplete
     //    blocks less than block size.
-    Limit limit(source.rows, source.cols, N);
+    PartitionLimit limit(source.rows, source.cols, N);
     
     
     for (int row = 0; row < limit.rows; row += N) {
@@ -106,7 +110,7 @@ void Codec::encode(const Mat_<_Tp> &source) {
             // 4. Partition each 8×8 3-channel block into
             //    three 8×8 1-channel blocks
             Point2i origin(row, col);
-            Rect area = Rect(origin, block_t::SIZE);
+            Rect area(origin, block_t::SIZE);
             ImageBlock block(source(area));
             
             
@@ -130,12 +134,19 @@ void Codec::encode(const Mat_<_Tp> &source) {
 
 
 
+/* Decode */
+
+template<typename _Tp>
+void decode(const Mat_<_Tp> &source) {
+    
+}
 
 
 
-/* Limit */
 
-Limit::Limit(int imageRows, int imageCols, int N) {
+/* Partition Limit */
+
+PartitionLimit::PartitionLimit(int imageRows, int imageCols, int N) {
     int rowCount = imageRows / N;
     int colCount = imageCols / N;
     
