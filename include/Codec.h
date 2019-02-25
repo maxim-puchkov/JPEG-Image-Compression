@@ -53,15 +53,6 @@ public:
     
 private:
     
-    Limit partitionLimit(int rows, int cols);
-    
-    Rect blockAt(int row, int col);
-    
-    
-    // Mat source;
-    // unsigned long inputSize;
-    // unsigned long outputSize;
-    
 };
 
 
@@ -121,7 +112,7 @@ void Codec::encode(const Mat_<_Tp> &source) {
     
     // 3. Compute limits. Disregard incomplete
     //    blocks less than block size.
-    Limit limit = this->partitionLimit(source.rows, source.cols);
+    Limit limit(source.rows, source.cols, N);
     
     
     for (int row = 0; row < limit.rows; row += N) {
@@ -129,7 +120,8 @@ void Codec::encode(const Mat_<_Tp> &source) {
             
             // 4. Partition each 8×8 3-channel block into
             //    three 8×8 1-channel blocks
-            Rect area = this->blockAt(row, col);
+            Point2i origin(row, col);
+            Rect area = Rect(origin, block_t::SIZE);
             ImageBlock block(source(area));
             
             
@@ -149,17 +141,6 @@ void Codec::encode(const Mat_<_Tp> &source) {
     
     // return compressed;
 }
-
-
-Limit Codec::partitionLimit(int rows, int cols) {
-    return Limit(rows, cols, N);
-}
-
-
-Rect Codec::blockAt(int row, int col) {
-    return Rect({row, col}, block_t::SIZE);
-}
-
 
 
 
