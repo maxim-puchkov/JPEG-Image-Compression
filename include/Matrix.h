@@ -19,15 +19,68 @@ using cv::DataType;
 
 /* Matrix operations */
 
-// Compute R[m×p] - matrix product of A[m×n] and B[n×p]
+/* Matrix Multiplication */
+
+// Matrix (type _Tp) product[m×p] of matrices A[m×n] and B[n×p]
+// Both matrices have the same type
 template<typename _Tp>
+<<<<<<< HEAD
+=======
+Mat mul(const Mat &A, const Mat &B);
+
+
+// Matrix product[m×p] of matrices A[m×n] and B[n×p]
+// Result has the same type as A
+template<typename _ATp, typename _BTp>
+Mat_<_ATp> mul(const Mat_<_ATp> &A, const Mat_<_BTp> &B);
+
+
+// Matrix product[m×1] of matrix A[m×n] and vector vec[cn×1]
+template<typename _Tp, int cn>
+Mat mul(const Mat &A, const Vec<_Tp, cn> &vec);
+
+
+
+
+/* Transpose */
+
+// Transpose[n×m] of matrix A[m×n]
+template<class _Tp>
+Mat transpose(const Mat_<_Tp> &A);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*******************************************************************************
+                                Implementation
+ *******************************************************************************/
+
+
+/* Matrix Multiplication */
+
+template<typename _Tp>
+>>>>>>> transform-coding
 Mat mul(const Mat &A, const Mat &B) {
-    if (A.cols != B.rows) {
-        return Mat(0, 0, CV_8U);
-    }
+    CV_Assert(A.cols == B.rows);
     
     Mat R(A.rows, B.cols, DataType<_Tp>::type);
     
+    // Compute matrix product R
     for (int rowA = 0; rowA < A.rows; rowA++) {
         for (int colB = 0; colB < B.cols; colB++) {
             
@@ -44,22 +97,56 @@ Mat mul(const Mat &A, const Mat &B) {
 }
 
 
+<<<<<<< HEAD
 // Compute R[m×p] - matrix product of A[m×n] and vec[n×1]
 template<typename _Tp, int n>
 Mat mul(const Mat &A, const Vec<_Tp, n> &vec) {
+=======
+template<typename _ATp, typename _BTp>
+Mat_<_ATp> mul(const Mat_<_ATp> &A, const Mat_<_BTp> &B) {
+    CV_Assert(A.cols == B.rows);
+    
+    Mat R(A.rows, B.cols, DataType<_ATp>::type);
+    
+    // Compute matrix product R
+    for (int rowA = 0; rowA < A.rows; rowA++) {
+        for (int colB = 0; colB < B.cols; colB++) {
+            
+            _ATp product = 0;
+            for (int colA = 0; colA < A.cols; colA++) {
+                product += A.template at<_ATp>(rowA, colA) * B.template at<_BTp>(colA, colB);
+            }
+            R.at<_ATp>(rowA, colB) = product;
+            
+        }
+    }
+    
+    return R;
+}
+
+
+template<typename _Tp, int cn>
+Mat mul(const Mat &A, const Vec<_Tp, cn> &vec) {
+>>>>>>> transform-coding
     return mul<_Tp>(A, Mat(vec));
 }
 
 
+<<<<<<< HEAD
 // Compute AT[n×m] - transpose of A[m×n]
+=======
+
+
+/* Transpose */
+
+>>>>>>> transform-coding
 template<class _Tp>
 Mat transpose(const Mat_<_Tp> &A) {
-    int m = A.rows;
-    int n = A.cols;
-    Mat AT(n, m, DataType<_Tp>::type);
+    Mat AT(A.cols, A.rows, DataType<_Tp>::type);
     
-    for (int row = 0; row < m; row++) {
-        for (int col = 0; col < n; col++) {
+    // Compute matrix tranpose AT
+    for (int row = 0; row < A.rows; row++) {
+        for (int col = 0; col < A.cols; col++) {
             AT.at<typename DataType<_Tp>::value_type>(col, row) = A.template at<typename DataType<_Tp>::value_type>(row, col);
         }
     }
