@@ -29,18 +29,21 @@ struct Transform;
 
 struct Transform {
     
-    // Default block dimension
-    static const int BLOCK_N = 8;
+    /* DCT Matrices */
     
-    // Matrix of DCT transformation for N = 8
+    static const int N = 8;
+    
+    // DCT matrix and its transpose for N = 8
     static const Mat1d DCT;
-    
-    // Matrix transpose of DCT transformation for N = 8
     static const Mat1d DCT_T;
     
+    // DCT n×n square matrix
+    static Mat1d dct_matrix(int n);
     
     
     
+    
+    /* DCT Transformations */
     
     // DCT (type-II)
     //      Transform one-channel matrices
@@ -59,15 +62,6 @@ struct Transform {
     //      f(i, j) = DCT_T * F(u, v) * DCT
     template<typename _Tp, int cn>
     Mat idct2(const Mat_<Vec<_Tp, cn>> &F);
-    
-    
-private:
-    
-    
-    // DCT (type-II)
-    //      T[i, j]     = 1 / √(N)                              if i = 0
-    //                  = √(2/N) * cos((2j+1) * iπ) / 2N)       if i > 0
-    static Mat1d dct_matrix(int dimension);
     
 };
 
@@ -94,16 +88,36 @@ private:
  *******************************************************************************/
 
 
-/* Static data memebers definitions */
+/* DCT Matrices */
 
-const Mat1d Transform::DCT = Transform::dct_matrix(Transform::BLOCK_N);
+const Mat1d Transform::DCT = Transform::dct_matrix(Transform::N);
 
 const Mat1d Transform::DCT_T = transpose(DCT);
 
 
+// T[i, j]     = 1 / √(N)                              if i = 0
+//             = √(2/N) * cos((2j+1) * iπ) / 2N)       if i > 0
+Mat1d Transform::dct_matrix(int n) {
+    double initialEntryValue = 1 / sqrt(n);
+    
+    // Fill new matrix with (1 / √(N)), value of row[0]
+    Mat T(n, n, CV_64F, Scalar::all(initialEntryValue));
+    
+    // Compute matrix entries for rows (1..n)
+    for (int row = 1; row < n; row++) {
+        for (int col = 0; col < n; col++) {
+            double entry = sqrt(2.0 / n) * cos(((2 * col + 1) * (row * M_PI)) / (2 * n));
+            T.at<double>(row, col) = entry;
+        }
+    }
+    
+    return T;
+}
 
 
-/* Discrete Cosine Transform */
+
+
+/* DCT Transformations */
 
 Mat Transform::dct(const Mat1b &matrix) {
     return mul<double, unsigned char>(Transform::DCT, matrix);
@@ -119,32 +133,6 @@ Mat Transform::dct2(const Mat_<Vec<_Tp, cn>> &f) {
 template<typename _Tp, int cn>
 Mat Transform::idct2(const Mat_<Vec<_Tp, cn>> &F) {
     return mul(mul(Transform::DCT_T, F), Transform::DCT);
-}
-
-
-
-
-
-
-
-
-
-/* Private */
-
-Mat1d Transform::dct_matrix(int n) {
-    // Initialize DCT matrix
-    double initialEntryValue = 1 / sqrt(n);
-    Mat T(n, n, CV_64F, Scalar::all(initialEntryValue));
-    
-    // Compute matrix entries
-    for (int row = 1; row < n; row++) {
-        for (int col = 0; col < n; col++) {
-            double entry = sqrt(2.0 / n) * cos(((2 * col + 1) * (row * M_PI)) / (2 * n));
-            T.at<double>(row, col) = entry;
-        }
-    }
-    
-    return T;
 }
 
 #endif /* Transform_h */
