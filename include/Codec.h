@@ -9,7 +9,7 @@
 #ifndef Codec_h
 #define Codec_h
 
-#include <vector>
+#include <functional>
 #include "Matrix.h"
 #include "ImageBlock.h"
 #include "Color.h"
@@ -22,10 +22,14 @@ using cv::Vec;
 using cv::Rect;
 using cv::Point2i;
 
-const int N = block::DIMENSION;
+//using BlockTransform = std::function<Mat_<double>(Mat_<char>)>;
+
+using block_t::BlockTransform;
 
 
-template<typename _Tp, int cn>
+const int N = block_t::N;
+
+
 class Codec;
 
 struct Limit;
@@ -36,30 +40,25 @@ struct Limit;
  *******************************************************************************/
 
 
-template<typename _Tp, int cn>
 class Codec {
 public:
     
-    Codec(const Mat_<Vec<_Tp, cn>> &source);
+    template<typename _Tp>
+    Codec(const Mat_<_Tp> &source);
     
-    ~Codec();
+    template<typename _Tp>
+    void encode(const Mat_<_Tp> &source);
     
-    void encode();
-    
-    Mat3b decode(); /* undefined */
-    
-    void setSource(const Mat_<Vec<_Tp, cn>> &source);
+    void decode(); /* undefined */
     
 private:
     
-    Limit partitionLimit();
+    Limit partitionLimit(int rows, int cols);
     
-    Rect blockArea(Point2i origin);
+    Rect blockAt(int row, int col);
     
-    ImageBlock<_Tp, cn> blockAt(Point2i origin);
     
-    Mat_<Vec<_Tp, cn>> source;
-    
+    // Mat source;
     // unsigned long inputSize;
     // unsigned long outputSize;
     
@@ -102,29 +101,18 @@ struct Limit {
  *******************************************************************************/
 
 
-//template<typename _Tp, int cn>
-//Codec<_Tp, cn>::Codec(const Mat_<_Tp> &source)
-//: source(source)
-//{ }
+template<typename _Tp>
+Codec::Codec(const Mat_<_Tp> &source) {
+    this->encode(source);
+}
 
 
-template<typename _Tp, int cn>
-Codec<_Tp, cn>::Codec(const Mat_<Vec<_Tp, cn>> &source)
-: source(source)
-{ }
-
-
-template<typename _Tp, int cn>
-Codec<_Tp, cn>::~Codec()
-{ }
-
-
-template<typename _Tp, int cn>
-void Codec<_Tp, cn>::encode() {
+template<typename _Tp>
+void Codec::encode(const Mat_<_Tp> &source) {
     // Mat3b compressed = source.clone();
     
     // 1. Convert RGB (CV_8UC3) to YUV
-    Mat3b yuvImage = convert_RGB_YUV(this->source);
+    Mat_<_Tp> yuvImage = convert_RGB_YUV(source);
     // print_spaced(10, yuvImage);
     
     
@@ -133,7 +121,7 @@ void Codec<_Tp, cn>::encode() {
     
     // 3. Compute limits. Disregard incomplete
     //    blocks less than block size.
-    Limit limit = this->partitionLimit();
+    Limit limit = this->partitionLimit(source.rows, source.cols);
     
     
     for (int row = 0; row < limit.rows; row += N) {
@@ -141,12 +129,14 @@ void Codec<_Tp, cn>::encode() {
             
             // 4. Partition each 8×8 3-channel block into
             //    three 8×8 1-channel blocks
-            Point2i position(row, col);
-            ImageBlock block = this->blockAt(position);
+            Rect area = this->blockAt(row, col);
+            ImageBlock block(source(area));
             
             
             // 5. DCT transformation of each image block channel
-            // Mat coefficients = dct_2d(block);
+            BlockTransform dct2 = Transform::dct2<BlockDataType>;
+            block.transform(dct2);
+            
             // print("DCT coefficients: ", coefficients);
             
             
@@ -159,30 +149,14 @@ void Codec<_Tp, cn>::encode() {
 }
 
 
-template<typename _Tp, int cn>
-void Codec<_Tp, cn>::setSource(const Mat_<Vec<_Tp, cn>> &source) {
-    this->source = source;
+Limit Codec::partitionLimit(int rows, int cols) {
+    return Limit(rows, cols, N);
 }
 
 
-template<typename _Tp, int cn>
-Limit Codec<_Tp, cn>::partitionLimit() {
-    return Limit(this->source.rows, this->source.cols, N);
+Rect Codec::blockAt(int row, int col) {
+    return Rect({row, col}, block_t::SIZE);
 }
-
-
-template<typename _Tp, int cn>
-Rect Codec<_Tp, cn>::blockArea(Point2i origin) {
-    return Rect(origin, block::SIZE);
-}
-
-
-template<typename _Tp, int cn>
-ImageBlock<_Tp, cn> Codec<_Tp, cn>::blockAt(Point2i origin) {
-    Rect area = this->blockArea(origin);
-    return ImageBlock(this->source(area));
-}
-
 
 
 
