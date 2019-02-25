@@ -13,7 +13,7 @@
 #include "Matrix.h"
 #include "ImageBlock.h"
 #include "Color.h"
-#include "TransformCoding.h"
+#include "Transform.h"
 #include "Print.h"
 
 using cv::Mat_;
