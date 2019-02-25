@@ -11,7 +11,6 @@
 
 #include "DebugData.h"
 
-
 #include "Matrix.h"
 #include "Color.h"
 #include "TransformCoding.h"
@@ -26,9 +25,10 @@ const int N = 8;
 const Size2i BLOCK_SIZE = {N, N};
 
 
-struct Limit;
-
+template<class V>
 class Codec;
+
+struct Limit;
 
 
 /*******************************************************************************
@@ -36,30 +36,40 @@ class Codec;
  *******************************************************************************/
 
 
+template<class V>
 class Codec {
 public:
     
-    Codec();
+    Codec(const Mat_<V> &source);
     
     ~Codec();
     
-    void /* Mat3b */ encode(const Mat3b &source);
+    void encode();
     
-    Mat3b decode(const Mat3b &source); /* undefined */
+    Mat3b decode(); /* undefined */
+    
+    void setSource(const Mat_<V> &source) {
+        this->source = source;
+    }
     
 private:
     
-    Limit partitionLimit(int rows, int cols);
+    Mat_<V> source;
     
-    template<typename _Tp, int cn>
-    void partition(const Mat_<Vec<_Tp, cn>> &source, Rect area);
+    Limit partitionLimit();
     
-    
+    // template<typename _Tp, int cn>
+    // void partition(const Mat_<Vec<_Tp, cn>> &source, Rect area);
     
     // unsigned long inputSize;
     // unsigned long outputSize;
     
 };
+
+
+
+
+
 
 
 struct Limit {
@@ -71,18 +81,6 @@ struct Limit {
     int blockCount;
     
 };
-
-
-template<typename _Tp, int cn>
-struct Channel {
-    
-    Channel(const Mat3b &source, Rect block) {
-        
-    }
-    
-};
-
-
 
 
 
@@ -97,17 +95,20 @@ struct Channel {
  *******************************************************************************/
 
 
-Codec::Codec() { }
+template<class V>
+Codec<V>::Codec(const Mat_<V> &source) { }
 
 
-Codec::~Codec() { }
+template<class V>
+Codec<V>::~Codec() { }
 
 
-void Codec::encode(const Mat3b &source) {
+template<class V>
+void Codec<V>::encode() {
     // Mat3b compressed = source.clone();
     
     // 1. Convert RGB (CV_8UC3) to YUV
-    Mat3b yuvImage = convert_RGB_YUV(source);
+    Mat3b yuvImage = convert_RGB_YUV(this->source);
     print_spaced(10, yuvImage);
     
     
@@ -115,7 +116,7 @@ void Codec::encode(const Mat3b &source) {
     
     
     // 3. Compute limits. Disregard incomplete blocks less than 8×8
-    Limit limit = this->partitionLimit(source.rows, source.cols);
+    Limit limit = this->partitionLimit();
     
     
     for (int row = 0; row < limit.rows; row += N) {
@@ -123,9 +124,10 @@ void Codec::encode(const Mat3b &source) {
             
             // 4. Partition each 8×8 3-channel block into
             //    three 8×8 1-channel blocks
-            Point2i blockOrigin(row, col);
-            Rect blockArea(blockOrigin, BLOCK_SIZE);
-            this->partition(source, blockArea);
+            
+            //Point2i blockOrigin(row, col);
+            //Rect blockArea(blockOrigin, BLOCK_SIZE);
+            //this->partition(source, blockArea);
             
             
             // 5. DCT transformation of each image block channel
@@ -142,20 +144,23 @@ void Codec::encode(const Mat3b &source) {
 }
 
 
-Limit Codec::partitionLimit(int rows, int cols) {
-    return Limit(rows, cols, N);
+template<class V>
+Limit Codec<V>::partitionLimit() {
+    return Limit(this->source.rows, this->source.cols, N);
 }
 
 
-template<typename _Tp, int cn>
-void Codec::partition(const Mat_<Vec<_Tp, cn>> &source, Rect area) {
-    
-    Mat_<Vec<_Tp, cn>> blockCN = source(area);
-    
-    print("Channels:\t", cn);
-    print("Image block", cn, " area:\t", area);
-    print_spaced(5, "Block", cn, " data:\n", blockCN);
-}
+//template<typename _Tp, int cn>
+//void Codec::partition(const Mat_<Vec<_Tp, cn>> &source, Rect area) {
+//
+//    // Segregate all channels of source image block
+//    Block<_Tp, cn> block(source(area));
+//
+//
+//    print("Channels:\t", cn);
+//    print("Image block", cn, " area:\t", area);
+//    print_spaced(5, "Block", cn, " data:\n", blockCN);
+//}
 
 
 
