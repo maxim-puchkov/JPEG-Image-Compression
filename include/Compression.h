@@ -12,6 +12,7 @@
 #include <opencv2/opencv.hpp>
 #include "Color.h"
 #include "TransformCoding.h"
+#include "SampleData.h"
 
 
 using cv::Mat3b;

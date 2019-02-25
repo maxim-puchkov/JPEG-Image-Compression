@@ -24,7 +24,7 @@
 
 
 
-#include "mainwindow.h"
+#include "include/mainwindow.h"
 #include "ui_mainwindow.h"
 
 // Constructor of MainWindow  layouts the graphical
@@ -137,7 +137,7 @@ void MainWindow::convertImage() {
     
     // Create an output image which has the same size (nWidth, nHeight) as the input image.
     // CV_8U means the output image has one channel, each channel has an unsigned byte.
-    convertedImg.create(cvImg.size(), CV_8U);
+    convertedImg.create(cvImg.size(), CV_16SC3);
     int nWidth = convertedImg.cols;
     int nHeight = convertedImg.rows;
     std::cout << convertedImg;
@@ -155,10 +155,13 @@ void MainWindow::convertImage() {
             
             // Luminance is the sum of weighted RGB channels: wR, wG, and wB
             float luminance = wR + wG + wB;
-            
+            float U = -1*WEIGHT_RED*vRGB[0] + -1*WEIGHT_GREEN*vRGB[1] + 0.886*vRGB[2];
+            float V = 0.701*vRGB[0] + -1*WEIGHT_GREEN*vRGB[1] + -1*WEIGHT_BLUE*vRGB[2];
             
             // Mat(height, width) convertedImg writes the determined luminance value
-            convertedImg.at<uchar>(height, width) = luminance;
+            convertedImg.at<cv::Vec3b>(height, width)[0] = luminance;
+            convertedImg.at<cv::Vec3b>(height, width)[1] = U;
+            convertedImg.at<cv::Vec3b>(height, width)[2] = V;
             
         }
     }
@@ -166,7 +169,7 @@ void MainWindow::convertImage() {
 
     // QImage is created with Grayscale values of Mat convertedImg.
 
-    QImage qImage = MatGrayScale2QImage(convertedImg);
+    QImage qImage = MatRGB2QImage(convertedImg);
     img2->setPixmap(QPixmap::fromImage(qImage));
     
 }
