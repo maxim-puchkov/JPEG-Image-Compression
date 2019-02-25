@@ -11,18 +11,55 @@
 
 #include <opencv2/opencv.hpp>
 
-
 using cv::Mat;
 using cv::Mat1d;
+using cv::Mat3b;
+
+const int CN = 3;
+const cv::Size2i CM_SIZE = {CN, CN};
 
 
-/* Color spaces */
 
 
-/** Conversion Matrices **/
+/*******************************************************************************
+                                    Color Space
+ *******************************************************************************/
 
-const int CM_CN = 3;
-const cv::Size2i CM_SIZE = {CM_CN, CM_CN};
+
+Mat3b convert_RGB_YUV(const Mat3b &source);
+
+Mat3b convert_YUV_RGB(const Mat3b &source);
+
+
+
+Mat3b sample(const Mat3b &source, int width, int chromSamples, int chromChange);
+
+Mat3b reverse_sample(const Mat3b &source);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*******************************************************************************
+                                Implementation
+ *******************************************************************************/
+
+
+/* Conversion Matrices */
 
 const Mat RGB_YUV = (Mat1d(CM_SIZE) <<
                      0.299,     0.587,      0.114,
@@ -37,8 +74,7 @@ const Mat YUV_RGB = (Mat1d(CM_SIZE) <<
 
 
 
-
-/** Conversion **/
+/* Conversion */
 
 Mat3b convert_RGB_YUV(const Mat3b &source) {
     Mat3b yuvImage = source.clone();
@@ -51,18 +87,17 @@ Mat3b convert_RGB_YUV(const Mat3b &source) {
 
 
 
+/* Sampling */
 
-
-/** Sampling **/
-
-Mat3b sample(const Mat3b &source, int width = 4, int chromSamples = 2, int chromChange = 0) {
+Mat3b sample(const Mat3b &source,
+             int width = 4,
+             int chromSamples = 2,
+             int chromChange = 0) {
     Mat3b sampled = source.clone();
     
     // Sample...
     
     return sampled;
 }
-
-
 
 #endif /* Color_h */
