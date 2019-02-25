@@ -16,6 +16,8 @@ using cv::Mat_;
 using cv::Vec;
 using cv::DataType;
 
+const Mat INVALID_MUL = Mat(0, 0, CV_8U);
+
 
 
 
@@ -24,17 +26,17 @@ using cv::DataType;
  *******************************************************************************/
 
 
-// Compute R[m×p] - matrix product of A[m×n] and B[n×p]
+// Matrix product[m×p] of matrices A[m×n] and B[n×p]
 template<typename _Tp>
 Mat mul(const Mat &A, const Mat &B);
 
 
-// Compute R[m×1] - matrix product of A[m×n] and vec[n×1]
+// Matrix product[m×1] of matrix A[m×n] and vector vec[n×1]
 template<typename _Tp, int n>
 Mat mul(const Mat &A, const Vec<_Tp, n> &vec);
 
 
-// Compute AT[n×m] - transpose of A[m×n]
+// Transpose[n×m] of matrix A[m×n]
 template<class _Tp>
 Mat transpose(const Mat_<_Tp> &A);
 
@@ -63,12 +65,14 @@ Mat transpose(const Mat_<_Tp> &A);
 
 template<typename _Tp>
 Mat mul(const Mat &A, const Mat &B) {
+    // Guard
     if (A.cols != B.rows) {
-        return Mat(0, 0, CV_8U);
+        return INVALID_MUL;
     }
     
     Mat R(A.rows, B.cols, DataType<_Tp>::type);
     
+    // Compute matrix product R
     for (int rowA = 0; rowA < A.rows; rowA++) {
         for (int colB = 0; colB < B.cols; colB++) {
             
@@ -93,12 +97,11 @@ Mat mul(const Mat &A, const Vec<_Tp, n> &vec) {
 
 template<class _Tp>
 Mat transpose(const Mat_<_Tp> &A) {
-    int m = A.rows;
-    int n = A.cols;
-    Mat AT(n, m, DataType<_Tp>::type);
+    Mat AT(A.cols, A.rows, DataType<_Tp>::type);
     
-    for (int row = 0; row < m; row++) {
-        for (int col = 0; col < n; col++) {
+    // Compute matrix tranpose AT
+    for (int row = 0; row < A.rows; row++) {
+        for (int col = 0; col < A.cols; col++) {
             AT.at<typename DataType<_Tp>::value_type>(col, row) = A.template at<typename DataType<_Tp>::value_type>(row, col);
         }
     }
