@@ -11,21 +11,24 @@
 
 #include <opencv2/opencv.hpp>
 
-
 using cv::Mat;
+using cv::Mat_;
 using cv::Vec;
 using cv::DataType;
 
 
-/* Matrix operations */
+
+
+/*******************************************************************************
+                             Matrix Computations
+ *******************************************************************************/
+
 
 /* Matrix Multiplication */
 
 // Matrix (type _Tp) product[m×p] of matrices A[m×n] and B[n×p]
 // Both matrices have the same type
 template<typename _Tp>
-<<<<<<< HEAD
-=======
 Mat mul(const Mat &A, const Mat &B);
 
 
@@ -74,7 +77,6 @@ Mat transpose(const Mat_<_Tp> &A);
 /* Matrix Multiplication */
 
 template<typename _Tp>
->>>>>>> transform-coding
 Mat mul(const Mat &A, const Mat &B) {
     CV_Assert(A.cols == B.rows);
     
@@ -97,11 +99,6 @@ Mat mul(const Mat &A, const Mat &B) {
 }
 
 
-<<<<<<< HEAD
-// Compute R[m×p] - matrix product of A[m×n] and vec[n×1]
-template<typename _Tp, int n>
-Mat mul(const Mat &A, const Vec<_Tp, n> &vec) {
-=======
 template<typename _ATp, typename _BTp>
 Mat_<_ATp> mul(const Mat_<_ATp> &A, const Mat_<_BTp> &B) {
     CV_Assert(A.cols == B.rows);
@@ -127,19 +124,14 @@ Mat_<_ATp> mul(const Mat_<_ATp> &A, const Mat_<_BTp> &B) {
 
 template<typename _Tp, int cn>
 Mat mul(const Mat &A, const Vec<_Tp, cn> &vec) {
->>>>>>> transform-coding
     return mul<_Tp>(A, Mat(vec));
 }
 
 
-<<<<<<< HEAD
-// Compute AT[n×m] - transpose of A[m×n]
-=======
 
 
 /* Transpose */
 
->>>>>>> transform-coding
 template<class _Tp>
 Mat transpose(const Mat_<_Tp> &A) {
     Mat AT(A.cols, A.rows, DataType<_Tp>::type);
