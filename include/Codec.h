@@ -13,6 +13,7 @@
 
 #include <vector>
 #include "Matrix.h"
+#include "ImageBlock.h"
 #include "Color.h"
 #include "TransformCoding.h"
 
@@ -29,11 +30,7 @@ const Size2i BLOCK_SIZE = {N, N};
 template<typename _Tp, int cn>
 class Codec;
 
-template<typename _Tp, int cn>
-class Block;
-
 struct Limit;
-
 
 /*******************************************************************************
                                    JPEG Codec
@@ -62,7 +59,7 @@ private:
     
     Rect blockArea(Point2i origin);
     
-    Block<_Tp, cn> blockAt(Point2i origin);
+    ImageBlock<_Tp, cn> blockAt(Point2i origin);
     
     
     
@@ -75,17 +72,6 @@ private:
 };
 
 
-template<typename _Tp, int cn>
-class Block {
-public:
-    
-    Block(const Mat_<Vec<_Tp, cn>> &blockSource);
-    
-private:
-    
-    std::vector<Mat_<_Tp>> channels;
-    
-};
 
 
 struct Limit {
@@ -97,6 +83,17 @@ struct Limit {
     int blockCount;
     
 };
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -143,7 +140,7 @@ void Codec<_Tp, cn>::encode() {
             // 4. Partition each 8×8 3-channel block into
             //    three 8×8 1-channel blocks
             Point2i position(row, col);
-            Block block = this->blockAt(position);
+            ImageBlock block = this->blockAt(position);
             
             
             // 5. DCT transformation of each image block channel
@@ -179,37 +176,20 @@ Rect Codec<_Tp, cn>::blockArea(Point2i origin) {
 
 
 template<typename _Tp, int cn>
-Block<_Tp, cn> Codec<_Tp, cn>::blockAt(Point2i origin) {
+ImageBlock<_Tp, cn> Codec<_Tp, cn>::blockAt(Point2i origin) {
     Rect area = this->blockArea(origin);
-    return Block(this->source(area));
+    return ImageBlock(this->source(area));
 }
 
 
 
 
 
-//template<typename _Tp, int cn>
-//void Codec::partition(const Mat_<Vec<_Tp, cn>> &source, Rect area) {
-//
-//    // Segregate all channels of source image block
-//    Block<_Tp, cn> block(source(area));
-//
-//
-//    print("Channels:\t", cn);
-//    print("Image block", cn, " area:\t", area);
-//    print_spaced(5, "Block", cn, " data:\n", blockCN);
-//}
 
 
 
 
-
-
-template<typename _Tp, int cn>
-Block<_Tp, cn>::Block(const Mat_<Vec<_Tp, cn>> &blockSource) {
-    
-}
-
+/* Limit */
 
 Limit::Limit(int imageRows, int imageCols, int N) {
     int rowCount = imageRows / N;
