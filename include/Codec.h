@@ -17,22 +17,20 @@
 #include "Print.h"
 
 using cv::Mat_;
-using cv::Mat3b;
 using cv::Vec;
 using cv::Rect;
 using cv::Point2i;
 
-//using BlockTransform = std::function<Mat_<double>(Mat_<char>)>;
-
 using block_t::BlockTransform;
-
 
 const int N = block_t::N;
 
 
-class Codec;
 
-struct Limit;
+
+struct Codec;
+
+struct PartitionLimit;
 
 
 /*******************************************************************************
@@ -40,36 +38,22 @@ struct Limit;
  *******************************************************************************/
 
 
-class Codec {
-public:
+struct Codec {
     
     template<typename _Tp>
-    Codec(const Mat_<_Tp> &source);
+    static void encode(const Mat_<_Tp> &source);
     
     template<typename _Tp>
-    void encode(const Mat_<_Tp> &source);
-    
-    void decode(); /* undefined */
-    
-private:
-    
-    Limit partitionLimit(int rows, int cols);
-    
-    Rect blockAt(int row, int col);
-    
-    
-    // Mat source;
-    // unsigned long inputSize;
-    // unsigned long outputSize;
+    static void decode(const Mat_<_Tp> &source); /* undefined */
     
 };
 
 
 
 
-struct Limit {
+struct PartitionLimit {
     
-    Limit(int imageRows, int imageCols, int N);
+    PartitionLimit(int imageRows, int imageCols, int N);
     
     int rows;
     int cols;
@@ -101,15 +85,11 @@ struct Limit {
  *******************************************************************************/
 
 
-template<typename _Tp>
-Codec::Codec(const Mat_<_Tp> &source) {
-    this->encode(source);
-}
-
+/* Encode */
 
 template<typename _Tp>
 void Codec::encode(const Mat_<_Tp> &source) {
-    // Mat3b compressed = source.clone();
+    // Mat<_Tp> encoded = source.clone();
     
     // 1. Convert RGB (CV_8UC3) to YUV
     Mat_<_Tp> yuvImage = convert_RGB_YUV(source);
@@ -121,7 +101,7 @@ void Codec::encode(const Mat_<_Tp> &source) {
     
     // 3. Compute limits. Disregard incomplete
     //    blocks less than block size.
-    Limit limit = this->partitionLimit(source.rows, source.cols);
+    PartitionLimit limit(source.rows, source.cols, N);
     
     
     for (int row = 0; row < limit.rows; row += N) {
@@ -129,7 +109,8 @@ void Codec::encode(const Mat_<_Tp> &source) {
             
             // 4. Partition each 8×8 3-channel block into
             //    three 8×8 1-channel blocks
-            Rect area = this->blockAt(row, col);
+            Point2i origin(row, col);
+            Rect area(origin, block_t::SIZE);
             ImageBlock block(source(area));
             
             
@@ -147,29 +128,43 @@ void Codec::encode(const Mat_<_Tp> &source) {
         }
     }
     
-    // return compressed;
-}
-
-
-Limit Codec::partitionLimit(int rows, int cols) {
-    return Limit(rows, cols, N);
-}
-
-
-Rect Codec::blockAt(int row, int col) {
-    return Rect({row, col}, block_t::SIZE);
+    // return encoded;
 }
 
 
 
 
+/* Decode */
+
+template<typename _Tp>
+void decode(const Mat_<_Tp> &source) {
+    // Mat<_Tp> decoded = source.clone();
+    
+    
+    // 1. 2D IDCT on source (quantized DCT coefficients)
+    
+    // 2. Reverse 4:2:0 subsample ratio
+    
+    // 3. Convert YUV color space back to RGB
+    
+    
+    
+    
+    // https://csil-git1.cs.surrey.sfu.ca/A2-365/JPEG-Image-Compression/tree/quantization#decode
+    
+    
+    
+    
+    // return decoded;
+    
+}
 
 
 
 
-/* Limit */
+/* Partition Limit */
 
-Limit::Limit(int imageRows, int imageCols, int N) {
+PartitionLimit::PartitionLimit(int imageRows, int imageCols, int N) {
     int rowCount = imageRows / N;
     int colCount = imageCols / N;
     
