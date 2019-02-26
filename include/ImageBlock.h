@@ -47,6 +47,11 @@ class ImageBlock;
 template<typename _Tp, int cn>
 class ImageBlock {
 public:
+    
+    const int rows = block_t::N;
+    
+    const int cols = block_t::N;
+    
 
 //    // One-channel source image
 //    ImageBlock(const Mat_<_Tp> &source);

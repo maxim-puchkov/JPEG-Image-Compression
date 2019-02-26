@@ -26,6 +26,9 @@ struct TableSet {
 };
 
 
+/*******************************************************************************
+                            Available Quantization Tables
+ *******************************************************************************/
 
 namespace qtables {
     
@@ -41,6 +44,19 @@ namespace qtables {
 
 
 
+
+
+
+
+
+struct QuantizationTable;
+
+
+/*******************************************************************************
+                                Quantization Tables
+ *******************************************************************************/
+
+
 struct QuantizationTable {
     
     
@@ -50,30 +66,23 @@ struct QuantizationTable {
     static const TableSet randomized;       // 1
     
     
+    // Index of default Luminance, Chrominance) tables to use for quantization
+    static unsigned int DEFAULT_INDEX;
     
     
     // Select a set of (Luminance, Chrominance) tables to quantize coefficients
     static TableSet select(unsigned int index);
     
     
-    // Index of default Luminance, Chrominance) tables to use for quantization
-    static unsigned int DEFAULT_INDEX;
-    
-    
-    
-
     
 
 private:
     
-    
     // Generate randomized table set (uchar range)
     static TableSet randomizedTableSet();
     
-    
     // All Quantization Tables stored here
     static std::vector<TableSet> tableSets;
-    
     
     // Random unsigned char
     static uchar uchar_random();
@@ -99,9 +108,11 @@ const TableSet QuantizationTable::jpeg_default{qtables::lum_jpeg_default, qtable
 const TableSet QuantizationTable::randomized = QuantizationTable::randomizedTableSet();
 
 
+
 /* JPEG default tables at index 0 */
 
 unsigned int QuantizationTable::DEFAULT_INDEX = 0;
+
 
 
 /* All Quantization Tables selected from tableSets vector */
@@ -163,9 +174,5 @@ uchar QuantizationTable::uchar_random() {
 
 
 // https://csil-git1.cs.surrey.sfu.ca/A2-365/JPEG-Image-Compression/blob/master/README.md#resources-3
-
-
-
-
 
 #endif /* QuantizationTables_h */
