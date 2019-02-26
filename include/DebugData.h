@@ -181,6 +181,7 @@ namespace debug {
     const cv::Size2i BLOCK_SIZE = {8, 8};
     
 
+    // Lena block 1 (Fig. 9.2)
     // samples/grayscale-values.txt
     const Mat1b grayscale_block = (
     Mat_<unsigned char>(BLOCK_SIZE) <<
@@ -195,6 +196,7 @@ namespace debug {
     );
     
     
+    // Lena block 2
     const Mat1b grayscale_block_2 = ( Mat_<unsigned char>(BLOCK_SIZE) << 70, 70, 100, 70, 87, 87, 150, 187, 85, 100, 96, 79, 87, 154, 87, 113, 100, 85, 116, 79, 70, 87, 86, 196, 136, 69, 87, 200, 79, 71, 117, 96, 161, 70, 87, 200, 103, 71, 96, 113, 161, 123, 147, 133, 113, 113, 85, 161, 146, 147, 175, 100, 103, 103, 163, 187, 156, 146, 189, 70, 113, 161, 163, 197 );
 
 

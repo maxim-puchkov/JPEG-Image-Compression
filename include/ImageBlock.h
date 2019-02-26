@@ -33,7 +33,7 @@ using block_t::BlockDataType;
 using block_t::BlockTransform;
 
 
-template<typename _Tp, int cn>
+template<typename, int = 1>
 class ImageBlock;
 
 
@@ -48,6 +48,9 @@ template<typename _Tp, int cn>
 class ImageBlock {
 public:
 
+//    // One-channel source image
+//    ImageBlock(const Mat_<_Tp> &source);
+    
     // Given a matrix of vectors with (cn) channels
     // partition it into (cn) 1-channel matrices.
     //
@@ -59,18 +62,15 @@ public:
     void transform(BlockTransform transformFunc);
     
     
-    // Checked channel access
-    Mat_<BlockDataType> at(unsigned int index) const noexcept;
-    Mat_<BlockDataType> &at(unsigned int index) noexcept;
-    
-    
-    // Unchecked channel access
-    Mat_<BlockDataType> operator[](unsigned int index) const;
-    Mat_<BlockDataType> &operator[](unsigned int index);
-    
-    
     // Display block debug
     void display() const;
+    
+    
+    // Checked and Unchecked channel access
+    Mat_<BlockDataType> at(unsigned int index) const noexcept;
+    Mat_<BlockDataType> &at(unsigned int index) noexcept;
+    Mat_<BlockDataType> operator[](unsigned int index) const;
+    Mat_<BlockDataType> &operator[](unsigned int index);
     
 private:
     
@@ -108,6 +108,12 @@ private:
  *******************************************************************************/
 
 
+//template<typename _Tp, int cn>
+//ImageBlock<_Tp, cn>::ImageBlock(const Mat_<_Tp> &source)
+//: ImageBlock(Mat_<Vec<_Tp, 1>>(source))
+//{ }
+
+
 template<typename _Tp, int cn>
 ImageBlock<_Tp, cn>::ImageBlock(const Mat_<Vec<_Tp, cn>> &source) {
     this->channelData.reserve(cn);
@@ -123,33 +129,6 @@ void ImageBlock<_Tp, cn>::transform(BlockTransform transformFunc) {
         this->at(c) = transformFunc(this->at(c));
     }
     this->display();
-}
-
-
-/* Element Access */
-
-template<typename _Tp, int cn>
-Mat_<BlockDataType> ImageBlock<_Tp, cn>::at(unsigned int index) const noexcept {
-    return this->channelData[index < cn ? index : (index % cn)];
-}
-
-
-template<typename _Tp, int cn>
-Mat_<BlockDataType> &ImageBlock<_Tp, cn>::at(unsigned int index) noexcept {
-    return this->channelData[index < cn ? index : (index % cn)];
-}
-
-
-
-template<typename _Tp, int cn>
-Mat_<BlockDataType> ImageBlock<_Tp, cn>::operator[](unsigned int index) const {
-    return this->channelData[index];
-}
-
-
-template<typename _Tp, int cn>
-Mat_<BlockDataType> &ImageBlock<_Tp, cn>::operator[](unsigned int index) {
-    return this->channelData[index];
 }
 
 
@@ -171,6 +150,31 @@ void ImageBlock<_Tp, cn>::display() const {
         print("Channel #", (c + 1), " (out of ", cn, "):");
         print_spaced(LINE_BREAK, this->channelData[c]);
     }
+}
+
+
+
+
+/* Element Access */
+
+template<typename _Tp, int cn>
+Mat_<BlockDataType> ImageBlock<_Tp, cn>::at(unsigned int index) const noexcept {
+    return this->channelData[index < cn ? index : (index % cn)];
+}
+
+template<typename _Tp, int cn>
+Mat_<BlockDataType> &ImageBlock<_Tp, cn>::at(unsigned int index) noexcept {
+    return this->channelData[index < cn ? index : (index % cn)];
+}
+
+template<typename _Tp, int cn>
+Mat_<BlockDataType> ImageBlock<_Tp, cn>::operator[](unsigned int index) const {
+    return this->channelData[index];
+}
+
+template<typename _Tp, int cn>
+Mat_<BlockDataType> &ImageBlock<_Tp, cn>::operator[](unsigned int index) {
+    return this->channelData[index];
 }
 
 

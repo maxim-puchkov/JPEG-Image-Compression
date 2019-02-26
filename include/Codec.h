@@ -14,6 +14,7 @@
 #include "ImageBlock.h"
 #include "Color.h"
 #include "Transform.h"
+#include "Quantization.h"
 #include "Print.h"
 
 using cv::Mat_;
@@ -44,7 +45,7 @@ struct Codec {
     static void encode(const Mat_<_Tp> &source);
     
     template<typename _Tp>
-    static void decode(const Mat_<_Tp> &source); /* undefined */
+    static void decode(const Mat_<_Tp> &source);
     
 };
 
@@ -92,7 +93,7 @@ void Codec::encode(const Mat_<_Tp> &source) {
     // Mat<_Tp> encoded = source.clone();
     
     // 1. Convert RGB (CV_8UC3) to YUV
-    Mat_<_Tp> yuvImage = convert_RGB_YUV(source);
+    // Mat_<_Tp> yuvImage = convert_RGB_YUV(source);
     // print_spaced(10, yuvImage);
     
     
@@ -100,7 +101,7 @@ void Codec::encode(const Mat_<_Tp> &source) {
     
     
     // 3. Compute limits. Disregard incomplete
-    //    blocks less than block size.
+    //    blocks less than block_t::SIZE.
     PartitionLimit limit(source.rows, source.cols, N);
     
     
