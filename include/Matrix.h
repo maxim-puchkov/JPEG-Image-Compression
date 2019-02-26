@@ -57,6 +57,8 @@ Mat transpose(const Mat_<_Tp> &A);
 
 /* Round */
 
+// All entries of a double presicion floating
+// point matrix A are rounded to integer type R
 template<class R>
 Mat_<R> round(const Mat1d &A);
 
@@ -173,6 +175,5 @@ Mat_<R> round(const Mat1d &A) {
     }
     return roundedA;
 }
-
 
 #endif /* Matrix_h */

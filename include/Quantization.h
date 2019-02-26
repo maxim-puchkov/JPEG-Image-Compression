@@ -28,11 +28,7 @@ struct ColorQuantization;
 
 struct ColorQuantization {
 
-    // Quantization formula:
-    //      F^(u, v) = round(F(u,v) / Q(u, v))
-    
-
-    // Select other avaiable tables
+    // Quantize DCT coefficients
     static Mat_<BlockDataType> quantization(const Mat_<BlockDataType> &dctCoefficients,
                                             QTable table);
 
@@ -56,17 +52,12 @@ struct ColorQuantization {
  *******************************************************************************/
 
 
+// Reduce high frequency DCT by quantizing coefficients.
+//      Quantization Formula:       F^(u, v) = round(F(u,v) / Q(u, v))
 Mat_<BlockDataType> ColorQuantization::quantization(const Mat_<BlockDataType> &dctCoefficients,
                                                     QTable table) {
     
-    
-    print("quant calculation");
-    print(dctCoefficients);
-    print(table);
-    
     Mat_<BlockDataType> quantizedCoefficients(dctCoefficients.size(), block_t::CHANNEL_TYPE);
-    
-    //TableSet set = QuantizationTable::select(tableSetIndex);
     
     for (int row = 0; row < dctCoefficients.rows; row++) {
         for (int col = 0; col < dctCoefficients.cols; col++) {
@@ -78,8 +69,5 @@ Mat_<BlockDataType> ColorQuantization::quantization(const Mat_<BlockDataType> &d
     return quantizedCoefficients;
     
 }
-
-
-
 
 #endif /* Quantization_h */
