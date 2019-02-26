@@ -59,17 +59,23 @@ struct ColorQuantization {
 Mat_<BlockDataType> ColorQuantization::quantization(const Mat_<BlockDataType> &dctCoefficients,
                                                     QTable table) {
     
-    Mat_<BlockDataType> res(dctCoefficients.size(), block_t::CHANNEL_TYPE);
+    
+    print("quant calculation");
+    print(dctCoefficients);
+    print(table);
+    
+    Mat_<BlockDataType> quantizedCoefficients(dctCoefficients.size(), block_t::CHANNEL_TYPE);
     
     //TableSet set = QuantizationTable::select(tableSetIndex);
     
     for (int row = 0; row < dctCoefficients.rows; row++) {
         for (int col = 0; col < dctCoefficients.cols; col++) {
-            
+            BlockDataType entry = round(dctCoefficients.at<BlockDataType>(row, col) / table.at<uchar>(row, col));
+            quantizedCoefficients.at<BlockDataType>(row, col) = entry;
         }
     }
     
-    return res;
+    return quantizedCoefficients;
     
 }
 

@@ -127,13 +127,10 @@ void Codec::encode(const Mat_<_Tp> &source) {
 
             // 6. Quantizing DCT coefficients
             BlockQuantization q = ColorQuantization::quantization;
-            //std::function<Mat_<BlockDataType>(Mat_<BlockDataType>, qtables::TableSet)> q = quantization;
-            
-            
             block.apply(q);
+
             
-            
-            
+            // Resulting block stores quantized DCT coefficients
             
         }
     }
