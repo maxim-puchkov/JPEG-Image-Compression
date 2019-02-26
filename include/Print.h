@@ -36,7 +36,6 @@ void print_spaced(int lines, T &&...ts);
 
 /* Implementation */
 
-
 template<typename ...T>
 void print(T &&...ts) {
     (std::cout << ... << std::forward<T>(ts)) << std::endl;
