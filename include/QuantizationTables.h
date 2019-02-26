@@ -50,6 +50,8 @@ struct QuantizationTable {
     static const TableSet randomized;       // 1
     
     
+    
+    
     // Select a set of (Luminance, Chrominance) tables to quantize coefficients
     static TableSet select(unsigned int index);
     

@@ -17,12 +17,16 @@
  *******************************************************************************/
 
 
-static void quantize(const Mat &dctCoefficients);
+struct Quantization {
+
+    // Default JPEG tables
+    static void quantize(const Mat &dctCoefficients);
 
 
-static void quantize(const Mat &dctCoefficients, unsigned int tableIndex);
+    // Select other avaiable tables
+    static void quantize(const Mat &dctCoefficients, unsigned int tableSetIndex);
 
-
+};
 
 
 
@@ -42,7 +46,16 @@ static void quantize(const Mat &dctCoefficients, unsigned int tableIndex);
  *******************************************************************************/
 
 
+void Quantization::quantize(const Mat &dctCoefficients) {
+    quantize(dctCoefficients, QuantizationTable::DEFAULT_INDEX);
+}
 
+
+void Quantization::quantize(const Mat &dctCoefficients, unsigned int tableSetIndex) {
+    TableSet set = QuantizationTable::select(tableSetIndex);
+    
+    // ...
+}
 
 
 
