@@ -62,8 +62,13 @@ struct PartitionLimit {
     
 };
 
-
-
+//
+//template<typename _Tp>
+//static ImageBlock blockAt(const Mat_<_Tp> &source, int row, int col) {
+//    Point2i origin(row, col);
+//    Rect area(origin, block_t::SIZE);
+//    return ImageBlock(source(area));
+//}
 
 
 
@@ -86,7 +91,7 @@ struct PartitionLimit {
  *******************************************************************************/
 
 
-/* Encode */
+/* JPEG Encode */
 
 template<typename _Tp>
 void Codec::encode(const Mat_<_Tp> &source) {
@@ -109,7 +114,7 @@ void Codec::encode(const Mat_<_Tp> &source) {
         for (int col = 0; col < limit.cols; col += N) {
             
             // 4. Partition each 8×8 3-channel block into
-            //    three 8×8 1-channel blocks
+            //    ImageBlock (three 8×8 1-channel blocks)
             Point2i origin(row, col);
             Rect area(origin, block_t::SIZE);
             ImageBlock block(source(area));
@@ -119,11 +124,7 @@ void Codec::encode(const Mat_<_Tp> &source) {
             BlockTransform dct2 = Transform::dct2<BlockDataType>;
             block.transform(dct2);
             
-            // Check
-            BlockTransform idct2 = Transform::idct2<BlockDataType>;
-            block.transform(idct2);
-            
-            
+
             // 6. Quantizing DCT coefficients
             
         }
@@ -135,19 +136,39 @@ void Codec::encode(const Mat_<_Tp> &source) {
 
 
 
-/* Decode */
+/* JPEG Decode */
 
 template<typename _Tp>
-void decode(const Mat_<_Tp> &source) {
-    // Mat<_Tp> decoded = source.clone();
+void Codec::decode(const Mat_<_Tp> &source) {
+    
+    // 1. Compute limits. Disregard incomplete
+    //    blocks less than block_t::SIZE.
+    PartitionLimit limit(source.rows, source.cols, N);
     
     
-    // 1. 2D IDCT on source (quantized DCT coefficients)
+    for (int row = 0; row < limit.rows; row += N) {
+        for (int col = 0; col < limit.cols; col += N) {
+            
+            // 2. Partition each 8×8 3-channel block into
+            //    ImageBlock (three 8×8 1-channel blocks)
+            Point2i origin(row, col);
+            Rect area(origin, block_t::SIZE);
+            ImageBlock block(source(area));
+
+            
+            // 3. 2D IDCT of each block (quantized DCT coefficients)
+            BlockTransform idct2 = Transform::idct2<BlockDataType>;
+            block.transform(idct2);
     
-    // 2. Reverse 4:2:0 subsample ratio
+            
+
+            
+        }
+    }
     
-    // 3. Convert YUV color space back to RGB
+    // 4. Reverse 4:2:0 subsample ratio
     
+    // 5. Convert YUV color space back to RGB
     
     
     
@@ -159,6 +180,17 @@ void decode(const Mat_<_Tp> &source) {
     // return decoded;
     
 }
+
+
+
+
+
+
+
+
+
+/* Block */
+
 
 
 

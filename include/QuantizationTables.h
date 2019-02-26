@@ -26,9 +26,13 @@ struct TableSet {
 };
 
 
+
+
+
 /*******************************************************************************
                             Available Quantization Tables
  *******************************************************************************/
+
 
 namespace qtables {
     
@@ -58,7 +62,6 @@ struct QuantizationTable;
 
 
 struct QuantizationTable {
-    
     
     /* Available tables */
                                             // Table index:
@@ -140,6 +143,7 @@ std::vector<TableSet> QuantizationTable::tableSets{jpeg_default, randomized};
 /*******************************************************************************
                                 Implementation
  *******************************************************************************/
+
 
 /* Select a set of (Luminance, Chrominance) tables to quantize coefficients */
 TableSet QuantizationTable::select(unsigned int index) {
