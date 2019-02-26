@@ -5,7 +5,7 @@
     * [ ] [Color Conversion](#color-conversion)
     * [ ] [Sampling](#sampling)
     * [x] [Transform Coding](#transform-coding)
-    * [ ] [Quantization](#quantization)
+    * [x] [Quantization](#quantization)
 * References
     * [Class lectures](http://www.cs.sfu.ca/CourseCentral/365/li/material/lectureslides/contents.html)
     * OpenCV [cheat sheet](http://www.cheat-sheets.org/saved-copy/opencv_cheatsheet.pdf)
@@ -268,11 +268,11 @@ void ImageBlock<_Tp, cn>::transform(BlockTransform transformFunc) {
 
 ### Input
 * _Description_: DCT coefficients __F(u, v)__
-* _Type_:  __Mat3d__ __8×8__ matrix
+* _Type_:  __ImageBlock__
 
 ### Output
 * _Description_: Quantized DCT coefficients __F^(u, v)__
-* _Type_: __Mat3b__ __8×8__ matrix
+* _Type_: __ImageBlock__
 
 
 
