@@ -33,8 +33,8 @@ struct ColorQuantization {
     
 
     // Select other avaiable tables
-    static Mat_<BlockDataType> quantization(const Mat1d &dctCoefficients,
-                                            unsigned int tableSetIndex);
+    static Mat_<BlockDataType> quantization(const Mat_<BlockDataType> &dctCoefficients,
+                                            QTable table);
 
 };
 
@@ -56,12 +56,12 @@ struct ColorQuantization {
  *******************************************************************************/
 
 
-Mat_<BlockDataType> ColorQuantization::quantization(const Mat1d &dctCoefficients,
-                                                    unsigned int tableSetIndex) {
+Mat_<BlockDataType> ColorQuantization::quantization(const Mat_<BlockDataType> &dctCoefficients,
+                                                    QTable table) {
     
     Mat_<BlockDataType> res(dctCoefficients.size(), block_t::CHANNEL_TYPE);
     
-    TableSet set = QuantizationTable::select(tableSetIndex);
+    //TableSet set = QuantizationTable::select(tableSetIndex);
     
     for (int row = 0; row < dctCoefficients.rows; row++) {
         for (int col = 0; col < dctCoefficients.cols; col++) {

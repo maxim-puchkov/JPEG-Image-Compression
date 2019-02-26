@@ -26,7 +26,7 @@ using cv::Size2i;
 namespace block_t {
     using BlockDataType = short;
     using BlockTransform = std::function<Mat_<double>(Mat_<BlockDataType>)>;
-    using BlockQuantization = std::function<Mat_<BlockDataType>(Mat_<BlockDataType>, qtables::TableSet)>;
+    using BlockQuantization = std::function<Mat_<BlockDataType>(Mat_<BlockDataType>, QTable)>;
     
     static const int N = 8;
     static const Size2i SIZE = {N, N};
@@ -148,16 +148,23 @@ void ImageBlock<_Tp, cn>::apply(BlockTransform transform) {
         Mat1d transformed = transform(this->at(c));
         this->at(c) = round<BlockDataType>(transformed);
     }
+    
+    
+    
     this->display();
 }
 
 
 template<typename _Tp, int cn>
 void ImageBlock<_Tp, cn>::apply(BlockQuantization quantization) {
-    for (int c = 0; c < cn; c++) {
-        //Mat quantized = quantization(this->at(c));
-        this->at(c) = quantization(this->at(c));
+    qtables::TableSet tables = QuantizationTable::standard();
+    this->at(0) = quantization(this->at(0), tables.luminance);
+    for (int c = 1; c < cn; c++) {
+        this->at(c) = quantization(this->at(c), tables.chrominance);
     }
+    
+    
+    this->display();
 }
 
 
