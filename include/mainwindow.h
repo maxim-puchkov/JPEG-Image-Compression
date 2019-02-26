@@ -33,17 +33,19 @@ class MainWindow : public QMainWindow {
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    cv::Mat YUVTORGB(const cv::Mat3b &src);
 
 private slots:
     void loadImage();
     void convertImage();
-    cv::Mat YUVTORGB(const cv::Mat3b &src);
+    
 
 private:
     
     // Convert an RGB Matrix to an Qt image
     QImage MatRGB2QImage(const cv::Mat3b &src);
     QImage MatYUV2QImage(const cv::Mat3b &src);
+    
     
     // Convert Grayscale matrix to Qt image
     QImage MatGrayScale2QImage(const cv::Mat_<double> &src);

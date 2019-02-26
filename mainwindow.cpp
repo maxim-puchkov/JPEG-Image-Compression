@@ -30,7 +30,7 @@
 // Constructor of MainWindow  layouts the graphical
 // user interface and initalizes window's outlets
 MainWindow::MainWindow(QWidget *parent)
-:
+    :
 QMainWindow(parent),
 ui(new Ui::MainWindow),
 container(new QWidget),
@@ -43,51 +43,50 @@ mainLayout(new QHBoxLayout),
 buttonLayout(new QVBoxLayout),
 openButton(new QPushButton),
 convertButton(new QPushButton) {
-    
-    // Main window size is always fixed to 700 columns, 300 rows
-    ui->setupUi(this);
-    this->setFixedSize(700, 300);
-    
-    
-    // two QLabels to display images
-    img1->setScaledContents(true);
-    img2->setScaledContents(true);
-    
-    
-    // two buttons and a layout containing the buttons
-    openButton->setText("Open");
-    convertButton->setText("Convert");
-    buttonLayout->addWidget(openButton);
-    buttonLayout->addWidget(convertButton);
-    
-    
-    // main layout and its container
-    setCentralWidget(container);
-    container->setLayout(mainLayout);
-    buttonContainer->setLayout(buttonLayout);
-    mainLayout->addWidget(img1);
-    mainLayout->addWidget(buttonContainer);
-    mainLayout->addWidget(img2);
-    
-    
-    // title
-    setWindowTitle(tr("Image Converter"));
-    
-    
-    // connect functions to connect buttons and slots
-    connect(openButton, SIGNAL(clicked()),
-            this, SLOT (loadImage()));
-    connect(convertButton, SIGNAL(clicked()),
-            this, SLOT (convertImage()));
-    
-}
+
+      // Main window size is always fixed to 700 columns, 300 rows
+      ui->setupUi(this);
+      this->setFixedSize(700, 300);
 
 
-// Destructor
-MainWindow::~MainWindow() {
-    delete ui;
-}
+      // two QLabels to display images
+      img1->setScaledContents(true);
+      img2->setScaledContents(true);
 
+
+      // two buttons and a layout containing the buttons
+      openButton->setText("Open");
+      convertButton->setText("Convert");
+      buttonLayout->addWidget(openButton);
+      buttonLayout->addWidget(convertButton);
+
+
+      // main layout and its container
+      setCentralWidget(container);
+      container->setLayout(mainLayout);
+      buttonContainer->setLayout(buttonLayout);
+      mainLayout->addWidget(img1);
+      mainLayout->addWidget(buttonContainer);
+      mainLayout->addWidget(img2);
+
+
+      // title
+      setWindowTitle(tr("Image Converter"));
+
+
+      // connect functions to connect buttons and slots
+      connect(openButton, SIGNAL(clicked()),
+              this, SLOT (loadImage()));
+      connect(convertButton, SIGNAL(clicked()),
+              this, SLOT (convertImage()));
+
+  }
+
+
+  // Destructor
+  MainWindow::~MainWindow() {
+      delete ui;
+  }
 
 
 
