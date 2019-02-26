@@ -19,7 +19,7 @@
 void quantize(const Mat &dctCoefficients);
 
 
-
+void quantize(const Mat &dctCoefficients, unsigned int tableIndex);
 
 
 
