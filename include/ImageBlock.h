@@ -66,7 +66,7 @@ public:
     
     
     // Transform each channel
-    void apply(BlockTransform transformFunc);
+    void apply(BlockTransform transform);
     
     
     // Quantize each channel
@@ -134,12 +134,22 @@ ImageBlock<_Tp, cn>::ImageBlock(const Mat_<Vec<_Tp, cn>> &source) {
 }
 
 
+/* Apply to each channel */
+
 template<typename _Tp, int cn>
-void ImageBlock<_Tp, cn>::apply(BlockTransform transformFunc) {
+void ImageBlock<_Tp, cn>::apply(BlockTransform transform) {
     for (int c = 0; c < cn; c++) {
-        this->at(c) = transformFunc(this->at(c));
+        this->at(c) = transform(this->at(c));
     }
     this->display();
+}
+
+
+template<typename _Tp, int cn>
+void ImageBlock<_Tp, cn>::apply(BlockQuantization quantization) {
+    for (int c = 0; c < cn; c++) {
+        this->at(c) = quantization(this->at(c));
+    }
 }
 
 
