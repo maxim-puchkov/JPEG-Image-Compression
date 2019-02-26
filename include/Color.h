@@ -10,7 +10,7 @@
 #define Color_h
 
 #include <opencv2/opencv.hpp>
-
+#include "Matrix.h"
 using cv::Mat;
 using cv::Mat1d;
 using cv::Mat3b;
@@ -78,13 +78,55 @@ const Mat YUV_RGB = (Mat1d(CM_SIZE) <<
 
 Mat3b convert_RGB_YUV(const Mat3b &source) {
     Mat3b yuvImage = source.clone();
-    
+    const float WEIGHT_RED      = 0.299;
+    const float WEIGHT_BLUE     = 0.114;
+    const float WEIGHT_GREEN    = 0.587;
+    int nWidth = yuvImage.cols;
+    int nHeight = yuvImage.rows;
     // Convert...
-    
+        for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
+            for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
+                cv::Vec3b vRGB = yuvImage.at<cv::Vec3b>(height, width);
+                float wR = WEIGHT_RED * vRGB[0];
+                float wG = WEIGHT_GREEN * vRGB[1];
+                float wB = WEIGHT_BLUE * vRGB[2];
+                float luminance = wR + wG + wB;
+                float U = -1*0.14713*vRGB[0] - 0.28886*vRGB[1] + 0.436*vRGB[2];
+                float V = 0.615*vRGB[0] - 0.51499*vRGB[1] - 0.10001*vRGB[2];
+                std::cout << "(" << round(luminance) << ", " << round(U) << ", " << round(V) << ") ";
+                yuvImage.at<cv::Vec3b>(height, width)[0] = (int)round(luminance);
+                yuvImage.at<cv::Vec3b>(height, width)[1] = (int)round(U);
+                yuvImage.at<cv::Vec3b>(height, width)[2] = (int)round(V);
+            }
+        }
     return yuvImage;
 }
 
-
+Mat3b convert_YUB_RGB(const Mat3b &source) {
+    Mat3b yuvImage = source.clone();
+    const float WEIGHT_RED      = 1;
+    const float WEIGHT_BLUE     = 1.13983;
+    const float WEIGHT_GREEN    = 0;
+    int nWidth = yuvImage.cols;
+    int nHeight = yuvImage.rows;
+    // Convert...
+        for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
+            for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
+                cv::Vec3b vRGB = yuvImage.at<cv::Vec3b>(height, width);
+                float wR = WEIGHT_RED * vRGB[0];
+                float wG = WEIGHT_GREEN * vRGB[1];
+                float wB = WEIGHT_BLUE * vRGB[2];
+                float luminance = wR + wG + wB;
+                float U = vRGB[0] - 0.39465*vRGB[1] - 0.58060*vRGB[2];
+                float V = vRGB[0] + 2.03211*vRGB[1];
+                std::cout << "(" << round(luminance) << ", " << round(U) << ", " << round(V) << ") ";
+                yuvImage.at<cv::Vec3b>(height, width)[0] = (int)round(luminance);
+                yuvImage.at<cv::Vec3b>(height, width)[1] = (int)round(U);
+                yuvImage.at<cv::Vec3b>(height, width)[2] = (int)round(V);
+            }
+        }
+    return yuvImage;
+}
 
 
 /* Sampling */
