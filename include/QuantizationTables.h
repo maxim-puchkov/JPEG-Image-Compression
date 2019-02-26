@@ -20,10 +20,6 @@ using QtableChrominance = Mat1b;
 using uchar = unsigned char;
 
 
-struct TableSet {
-    QTableLuminance lum;
-    QtableChrominance chrom;
-};
 
 
 
@@ -35,6 +31,14 @@ struct TableSet {
 
 
 namespace qtables {
+    
+    struct TableSet {
+        
+        QTableLuminance lum;
+        QtableChrominance chrom;
+        
+    };
+
     
     const int DIM = 8;
     const Size2i SIZE = {DIM, DIM};
@@ -51,6 +55,7 @@ namespace qtables {
 
 
 
+using qtables::TableSet;
 
 
 struct QuantizationTable;

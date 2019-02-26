@@ -12,16 +12,21 @@
 #include <opencv2/opencv.hpp>
 #include <functional>
 #include <vector>
+
+#include "Transform.h"
+#include "QuantizationTables.h"
 #include "Print.h"
 
+using cv::Mat1d;
 using cv::Mat_;
 using cv::Vec;
 using cv::Size2i;
 
+
 namespace block_t {
     using BlockDataType = short;
     using BlockTransform = std::function<Mat_<double>(Mat_<BlockDataType>)>;
-    using BlockQuantization = std::function<Mat_<BlockDataType>(Mat_<double>)>;
+    using BlockQuantization = std::function<Mat_<BlockDataType>(Mat_<BlockDataType>, qtables::TableSet)>;
     
     static const int N = 8;
     static const Size2i SIZE = {N, N};
@@ -29,6 +34,7 @@ namespace block_t {
     static const int CHANNEL_TYPE = CV_32SC1;
     static const BlockDataType DATA_OFFSET = 128;
 }
+
 
 using block_t::BlockDataType;
 using block_t::BlockTransform;
@@ -139,7 +145,8 @@ ImageBlock<_Tp, cn>::ImageBlock(const Mat_<Vec<_Tp, cn>> &source) {
 template<typename _Tp, int cn>
 void ImageBlock<_Tp, cn>::apply(BlockTransform transform) {
     for (int c = 0; c < cn; c++) {
-        this->at(c) = transform(this->at(c));
+        Mat1d transformed = transform(this->at(c));
+        this->at(c) = round<BlockDataType>(transformed);
     }
     this->display();
 }
@@ -148,6 +155,7 @@ void ImageBlock<_Tp, cn>::apply(BlockTransform transform) {
 template<typename _Tp, int cn>
 void ImageBlock<_Tp, cn>::apply(BlockQuantization quantization) {
     for (int c = 0; c < cn; c++) {
+        //Mat quantized = quantization(this->at(c));
         this->at(c) = quantization(this->at(c));
     }
 }

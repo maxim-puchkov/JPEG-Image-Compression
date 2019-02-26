@@ -90,7 +90,7 @@ struct Transform {
 
 /* DCT Matrices */
 
-const Mat1d Transform::DCT = Transform::dct_matrix(Transform::N);
+const Mat1d Transform::DCT   = Transform::dct_matrix(Transform::N);
 const Mat1d Transform::DCT_T = transpose(DCT);
 
 

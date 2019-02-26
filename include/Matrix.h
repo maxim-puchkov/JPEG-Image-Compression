@@ -10,6 +10,7 @@
 #define Matrix_h
 
 #include <opencv2/opencv.hpp>
+#include <math.h>
 
 using cv::Mat;
 using cv::Mat_;
@@ -50,6 +51,15 @@ Mat mul(const Mat &A, const Vec<_Tp, cn> &vec);
 // Transpose[n×m] of matrix A[m×n]
 template<class _Tp>
 Mat transpose(const Mat_<_Tp> &A);
+
+
+
+
+/* Round */
+
+template<class R>
+Mat_<R> round(const Mat1d &A);
+
 
 
 
@@ -145,5 +155,24 @@ Mat transpose(const Mat_<_Tp> &A) {
     
     return AT;
 }
+
+
+
+
+/* Round */
+
+template<class R>
+Mat_<R> round(const Mat1d &A) {
+    Mat_<R> roundedA(A.size(), DataType<R>::type);
+    for(int i = 0; i < A.rows; i++) {
+        const double* Ai = A.ptr<double>(i);
+        for(int j = 0; j < A.cols; j++) {
+            R entry = round(Ai[j]);
+            roundedA.template at<R>(i, j) = entry;
+        }
+    }
+    return roundedA;
+}
+
 
 #endif /* Matrix_h */
