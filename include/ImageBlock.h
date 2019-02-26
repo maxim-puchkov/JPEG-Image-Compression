@@ -32,6 +32,7 @@ namespace block_t {
 
 using block_t::BlockDataType;
 using block_t::BlockTransform;
+using block_t::BlockQuantization;
 
 
 template<typename, int = 1>
@@ -50,12 +51,12 @@ class ImageBlock {
 public:
     
     const int rows = block_t::N;
-    
     const int cols = block_t::N;
     
 
 //    // One-channel source image
 //    ImageBlock(const Mat_<_Tp> &source);
+    
     
     // Given a matrix of vectors with (cn) channels
     // partition it into (cn) 1-channel matrices.
@@ -64,8 +65,12 @@ public:
     ImageBlock(const Mat_<Vec<_Tp, cn>> &source);
     
     
-    // Apply transformation to each channel
+    // Transform each channel
     void apply(BlockTransform transformFunc);
+    
+    
+    // Quantize each channel
+    void apply(BlockQuantization quantization);
     
     
     // Display block debug
