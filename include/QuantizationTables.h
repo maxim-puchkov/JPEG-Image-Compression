@@ -54,7 +54,8 @@ struct QuantizationTable {
     static TableSet select(unsigned int index);
     
     
-    
+    // Index of default Luminance, Chrominance) tables to use for quantization
+    static unsigned int DEFAULT_INDEX;
     
     
     
@@ -94,6 +95,11 @@ private:
 
 const TableSet QuantizationTable::jpeg_default{qtables::lum_jpeg_default, qtables::chrom_jpeg_default};
 const TableSet QuantizationTable::randomized = QuantizationTable::randomizedTableSet();
+
+
+/* JPEG default tables at index 0 */
+
+unsigned int QuantizationTable::DEFAULT_INDEX = 0;
 
 
 /* All Quantization Tables selected from tableSets vector */

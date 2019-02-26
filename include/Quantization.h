@@ -16,10 +16,11 @@
                                    Quantization
  *******************************************************************************/
 
-void quantize(const Mat &dctCoefficients);
+
+static void quantize(const Mat &dctCoefficients);
 
 
-void quantize(const Mat &dctCoefficients, unsigned int tableIndex);
+static void quantize(const Mat &dctCoefficients, unsigned int tableIndex);
 
 
 
@@ -39,6 +40,9 @@ void quantize(const Mat &dctCoefficients, unsigned int tableIndex);
 /*******************************************************************************
                                 Implementation
  *******************************************************************************/
+
+
+
 
 
 
