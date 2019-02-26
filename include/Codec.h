@@ -122,10 +122,14 @@ void Codec::encode(const Mat_<_Tp> &source) {
             
             // 5. DCT transformation of each image block channel
             BlockTransform dct2 = Transform::dct2<BlockDataType>;
-            block.transform(dct2);
+            block.apply(dct2);
             
 
             // 6. Quantizing DCT coefficients
+            // Quantization::quantize(block);
+            
+            
+            
             
         }
     }
@@ -158,7 +162,7 @@ void Codec::decode(const Mat_<_Tp> &source) {
             
             // 3. 2D IDCT of each block (quantized DCT coefficients)
             BlockTransform idct2 = Transform::idct2<BlockDataType>;
-            block.transform(idct2);
+            block.apply(idct2);
     
             
 

@@ -15,27 +15,26 @@
 using block_t::BlockDataType;
 
 
+struct ColorQuantization;
 
-struct Quantization;
+
+
+
 
 /*******************************************************************************
                                    Quantization
  *******************************************************************************/
 
 
-struct Quantization {
+struct ColorQuantization {
 
     // Quantization formula:
     //      F^(u, v) = round(F(u,v) / Q(u, v))
     
-    
-    // Use default JPEG tables
-    static void quantize(const ImageBlock<BlockDataType> &block);
-
 
     // Select other avaiable tables
-    static void quantize(const ImageBlock<BlockDataType> &block,
-                         unsigned int tableSetIndex);
+    static Mat_<BlockDataType> quantization(const Mat1d &dctCoefficients,
+                                            unsigned int tableSetIndex);
 
 };
 
@@ -57,21 +56,20 @@ struct Quantization {
  *******************************************************************************/
 
 
-void Quantization::quantize(const ImageBlock<BlockDataType> &block) {
-    quantize(block, QuantizationTable::DEFAULT_INDEX);
-}
-
-
-void Quantization::quantize(const ImageBlock<BlockDataType> &block,
-                            unsigned int tableSetIndex) {
+Mat_<BlockDataType> ColorQuantization::quantization(const Mat1d &dctCoefficients,
+                                                    unsigned int tableSetIndex) {
+    
+    Mat_<BlockDataType> res(dctCoefficients.size(), block_t::CHANNEL_TYPE);
     
     TableSet set = QuantizationTable::select(tableSetIndex);
     
-    for (int row = 0; row < block.rows; row++) {
-        for (int col = 0; col < block.cols; col++) {
+    for (int row = 0; row < dctCoefficients.rows; row++) {
+        for (int col = 0; col < dctCoefficients.cols; col++) {
             
         }
     }
+    
+    return res;
     
 }
 

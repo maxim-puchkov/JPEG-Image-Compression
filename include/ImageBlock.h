@@ -21,6 +21,7 @@ using cv::Size2i;
 namespace block_t {
     using BlockDataType = short;
     using BlockTransform = std::function<Mat_<double>(Mat_<BlockDataType>)>;
+    using BlockQuantization = std::function<Mat_<BlockDataType>(Mat_<double>)>;
     
     static const int N = 8;
     static const Size2i SIZE = {N, N};
@@ -64,7 +65,7 @@ public:
     
     
     // Apply transformation to each channel
-    void transform(BlockTransform transformFunc);
+    void apply(BlockTransform transformFunc);
     
     
     // Display block debug
@@ -129,7 +130,7 @@ ImageBlock<_Tp, cn>::ImageBlock(const Mat_<Vec<_Tp, cn>> &source) {
 
 
 template<typename _Tp, int cn>
-void ImageBlock<_Tp, cn>::transform(BlockTransform transformFunc) {
+void ImageBlock<_Tp, cn>::apply(BlockTransform transformFunc) {
     for (int c = 0; c < cn; c++) {
         this->at(c) = transformFunc(this->at(c));
     }
