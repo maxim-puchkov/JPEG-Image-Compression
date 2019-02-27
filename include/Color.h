@@ -33,6 +33,7 @@ Mat3b convert_YUV_RGB(const Mat3b &source);
 
 
 Mat3b sample(const Mat3b &source, int width, int chromSamples, int chromChange);
+Mat3b desample(const Mat3b &source);
 
 Mat3b reverse_sample(const Mat3b &source);
 
@@ -87,45 +88,55 @@ Mat3b convert_RGB_YUV(const Mat3b &source) {
         for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
             for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
                 cv::Vec3b vRGB = yuvImage.at<cv::Vec3b>(height, width);
-                float wR = WEIGHT_RED * vRGB[0];
-                float wG = WEIGHT_GREEN * vRGB[1];
-                float wB = WEIGHT_BLUE * vRGB[2];
+                float red = vRGB[0]/255;
+                float green = vRGB[1]/255;
+                float blue = vRGB[2]/255;
+                float wR = WEIGHT_RED * red;
+                float wG = WEIGHT_GREEN * green;
+                float wB = WEIGHT_BLUE * blue;
                 float luminance = wR + wG + wB;
-                float U = -1*0.14713*vRGB[0] - 0.28886*vRGB[1] + 0.436*vRGB[2];
-                float V = 0.615*vRGB[0] - 0.51499*vRGB[1] - 0.10001*vRGB[2];
-                std::cout << "(" << round(luminance) << ", " << round(U) << ", " << round(V) << ") ";
+                float Pb = (0.5/(1-0.114))*(blue-luminance);
+                float Pr = (0.5/(1-0.299))*(red-luminance);
+                float Cb = 128+224*Pb;
+                float Cr = 128+224*Pr;
+                luminance = 16+219*luminance;
+//                std::cout << "(" << round(luminance) << ", " << round(Cb) << ", " << round(Cr) << ") ";
                 yuvImage.at<cv::Vec3b>(height, width)[0] = (int)round(luminance);
-                yuvImage.at<cv::Vec3b>(height, width)[1] = (int)round(U);
-                yuvImage.at<cv::Vec3b>(height, width)[2] = (int)round(V);
+                yuvImage.at<cv::Vec3b>(height, width)[1] = (int)round(Cb);
+                yuvImage.at<cv::Vec3b>(height, width)[2] = (int)round(Cr);
             }
         }
     return yuvImage;
 }
 
-Mat3b convert_YUB_RGB(const Mat3b &source) {
-    Mat3b yuvImage = source.clone();
-    const float WEIGHT_RED      = 1;
-    const float WEIGHT_BLUE     = 1.13983;
-    const float WEIGHT_GREEN    = 0;
-    int nWidth = yuvImage.cols;
-    int nHeight = yuvImage.rows;
+Mat3b convert_YUV_RGB(const Mat3b &source) {
+    Mat3b rgbImage = source.clone();
+
+    int nWidth = rgbImage.cols;
+    int nHeight = rgbImage.rows;
     // Convert...
         for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
             for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
-                cv::Vec3b vRGB = yuvImage.at<cv::Vec3b>(height, width);
-                float wR = WEIGHT_RED * vRGB[0];
-                float wG = WEIGHT_GREEN * vRGB[1];
-                float wB = WEIGHT_BLUE * vRGB[2];
-                float luminance = wR + wG + wB;
-                float U = vRGB[0] - 0.39465*vRGB[1] - 0.58060*vRGB[2];
-                float V = vRGB[0] + 2.03211*vRGB[1];
-                std::cout << "(" << round(luminance) << ", " << round(U) << ", " << round(V) << ") ";
-                yuvImage.at<cv::Vec3b>(height, width)[0] = (int)round(luminance);
-                yuvImage.at<cv::Vec3b>(height, width)[1] = (int)round(U);
-                yuvImage.at<cv::Vec3b>(height, width)[2] = (int)round(V);
+                cv::Vec3b vYUV = rgbImage.at<cv::Vec3b>(height, width);
+                float Pb = ((float)vYUV[1]-128)/224;
+                float Pr = ((float)vYUV[2]-128)/224;
+                float luminance = ((float)vYUV[0]-16)/219;
+                float blue = Pb/(0.5/(1-0.114))+luminance;
+                float red = Pr/(0.5/(1-0.299))+luminance;
+                float green = (luminance - 0.299*red - 0.114*blue)/0.587;
+                red = abs((int)(red*255));
+                green = abs((int)green*255);
+                blue = abs((int)blue*255);
+                if(red > 255){red--;}
+                if(blue > 255){blue --;}
+                if(green > 255){green--;}
+                std::cout << "(" << red << ", " << green << ", " << blue << ") ";
+                rgbImage.at<cv::Vec3b>(height, width)[0] = red;
+                rgbImage.at<cv::Vec3b>(height, width)[1] = green;
+                rgbImage.at<cv::Vec3b>(height, width)[2] = blue;
             }
         }
-    return yuvImage;
+    return rgbImage;
 }
 
 
@@ -136,9 +147,84 @@ Mat3b sample(const Mat3b &source,
              int chromSamples = 2,
              int chromChange = 0) {
     Mat3b sampled = source.clone();
-    
+    int nWidth = sampled.cols;
+    int nHeight = sampled.rows;
+    // Convert...
+        for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
+            for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
+                cv::Vec3b vYUV = sampled.at<cv::Vec3b>(height, width);
+                if(width % 2 == 1){
+                     vYUV[1] = 0;
+                     vYUV[2] = 0;
+                }
+                if(height % 2 == 0){
+                    vYUV[2] = 0;
+                } else {
+                    vYUV[1] = 0;
+                }
+
+                sampled.at<cv::Vec3b>(height, width)[0] = vYUV[0];
+                sampled.at<cv::Vec3b>(height, width)[1] = vYUV[1];
+                sampled.at<cv::Vec3b>(height, width)[2] = vYUV[2];
+            }
+        }
     // Sample...
     
+    return sampled;
+}
+
+Mat3b desample(const Mat3b &source) {
+    Mat3b sampled = source.clone();
+    int nWidth = sampled.cols;
+    int nHeight = sampled.rows;
+    float sum = 0;
+    // Convert...
+        for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
+            for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
+                cv::Vec3b vYUV = sampled.at<cv::Vec3b>(height, width);
+                if(vYUV[1] == 0 && (width % 2 == 1 || height % 2 == 1)){
+
+                    if(width > 0){
+                        if(height > 0 && height < nHeight-1){
+                            sum += sampled.at<cv::Vec3b>(height-1, width-1)[1];
+                            sum += sampled.at<cv::Vec3b>(height-1, width)[1];
+                            sum += sampled.at<cv::Vec3b>(height, width-1)[1];
+                            sum += sampled.at<cv::Vec3b>(height-1, width+1)[1];
+                            sum += sampled.at<cv::Vec3b>(height, width+1)[1];
+                            sum += sampled.at<cv::Vec3b>(height+1, width)[1];
+                            sum += sampled.at<cv::Vec3b>(height+1, width-1)[1];
+                            sum += sampled.at<cv::Vec3b>(height, width+1)[1];
+                            sum /= 8;
+                            vYUV[1] = sum;
+
+                        }
+                    }
+                }
+                if(vYUV[2] == 0 && (width % 2 == 1 || height % 2 == 0)){
+
+                    if(width > 0){
+                        if(height > 0 && height < nHeight-1){
+                            sum += sampled.at<cv::Vec3b>(height-1, width-1)[2];
+                            sum += sampled.at<cv::Vec3b>(height-1, width)[2];
+                            sum += sampled.at<cv::Vec3b>(height, width-1)[2];
+                            sum += sampled.at<cv::Vec3b>(height-1, width+1)[2];
+                            sum += sampled.at<cv::Vec3b>(height, width+1)[2];
+                            sum += sampled.at<cv::Vec3b>(height+1, width)[2];
+                            sum += sampled.at<cv::Vec3b>(height+1, width-1)[2];
+                            sum += sampled.at<cv::Vec3b>(height, width+1)[2];
+                            sum /= 8;
+                            vYUV[2] = sum;
+
+                        }
+                    }
+                }
+                sampled.at<cv::Vec3b>(height, width)[0] = vYUV[0];
+                sampled.at<cv::Vec3b>(height, width)[1] = vYUV[1];
+                sampled.at<cv::Vec3b>(height, width)[2] = vYUV[2];
+            }
+        }
+    // Sample...
+
     return sampled;
 }
 
