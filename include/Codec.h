@@ -43,10 +43,10 @@ struct PartitionLimit;
 struct Codec {
     
     template<typename _Tp>
-    static void encode(const Mat_<Vec<_Tp, 3>> &source);
+    static void encode(const Mat_<_Tp> &source);
     
     template<typename _Tp>
-    static void decode(const Mat_<Vec<_Tp, 3>> &source);
+    static void decode(const Mat_<_Tp> &source);
     
 };
 
@@ -95,7 +95,7 @@ struct PartitionLimit {
 /* JPEG Encode */
 
 template<typename _Tp>
-void Codec::encode(const Mat_<Vec<_Tp,3>> &source) {
+void Codec::encode(const Mat_<_Tp> &source) {
     Mat_<_Tp> encoded = source.clone();
     
     // 1. Convert RGB (CV_8UC3) to YUV
@@ -147,7 +147,7 @@ void Codec::encode(const Mat_<Vec<_Tp,3>> &source) {
 /* JPEG Decode */
 
 template<typename _Tp>
-void Codec::decode(const Mat_<Vec<_Tp, 3>> &source) {
+void Codec::decode(const Mat_<_Tp> &source) {
     
     // 1. Compute limits. Disregard incomplete
     //    blocks less than block_t::SIZE.
