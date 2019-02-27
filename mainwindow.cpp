@@ -10,6 +10,7 @@
 
 #include "include/DebugData.h"
 #include "include/Codec.h"
+#include "include/Color.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -213,14 +214,17 @@ void MainWindow::convertImage() {
 //                 [(255, 0, 0), (1, 2, 3);
 //                  (r, g, b),   (or y, u, v)]
              
-//             *********************************************/
-
+//             ********************************************
             
 //        }
 //        const Mat_<Vec<unsigned char,3>> newimg = cvImg;
 //        const Mat_<Vec<unsigned char,3>> newimg = cvImg;
 
-        Codec::encode(rgb_image(11,300));
+//        Codec::encode(rgb_image(11,300));
+           Mat3b newimage = rgb_image(10,10);
+        //   std::cout << newimage;
+           Mat3b yuvimage = convert_RGB_YUV(newimage);
+           std::cout << yuvimage;
     }
 
 
