@@ -17,10 +17,13 @@
 #include "QuantizationTables.h"
 #include "Print.h"
 
-using cv::Mat1d;
-using cv::Mat_;
-using cv::Vec;
-using cv::Size2i;
+using namespace cv;
+
+//
+//using cv::Mat1d;
+//using cv::Mat_;
+//using cv::Vec;
+//using cv::Size2i;
 
 
 namespace block_t {
@@ -88,6 +91,26 @@ public:
     Mat_<BlockDataType> &at(unsigned int index) noexcept;
     Mat_<BlockDataType> operator[](unsigned int index) const;
     Mat_<BlockDataType> &operator[](unsigned int index);
+
+    
+    Mat_<Vec3b> combine() {
+        Mat_<Vec<_Tp, cn>> output;
+
+        for (int row = 0; row < block_t::N; row++) {
+            for (int col = 0; col < block_t::N; col++) {
+                
+                Vec3b v;
+                for (int c = 0; c < cn; c++) {
+                    v[c] = this->channels[c].at(row, col);
+                }
+                
+                
+                output.template at<Vec3b>(row, col) = v;
+            }
+        }
+        
+        return output;
+    }
     
 private:
     
@@ -96,7 +119,30 @@ private:
     
     void alloc();
     
-    void partition(const Mat_<Vec<_Tp, cn>> &source);
+    void partition(const Mat3b &source) {
+        
+        for (int row = 0; row < source.rows; row++) {
+            for (int col = 0; col < source.cols; col++) {
+                
+                //Vec<uchar, cn> vec = source.template at<Vec<_Tp, cn>>(row, col);
+                
+                
+                Vec3b vec = source.at<unsigned char>(row, col);
+                for (int c = 0; c < cn; c++) {
+                    BlockDataType data;
+                    
+                    data = vec[c];
+                
+                    data -= block_t::DATA_OFFSET;
+                    
+                    this->channelData[c].template at<BlockDataType>(row, col) = data;
+                }
+                
+            }
+        }
+        
+    }
+
     
     std::vector<Mat_<BlockDataType>> channelData;
     
@@ -214,10 +260,7 @@ Mat_<BlockDataType> &ImageBlock<_Tp, cn>::operator[](unsigned int index) {
 }
 
 
-template<typename _Tp, int cn>
-void ImageBlock<_Tp, cn>::combine() {
-    
-}
+
 
 
 
@@ -230,28 +273,16 @@ void ImageBlock<_Tp, cn>::combine() {
 
 template<typename _Tp, int cn>
 void ImageBlock<_Tp, cn>::alloc() {
+    
     for (int c = 0; c < cn; c++) {
+        
         Mat_<BlockDataType> channel(block_t::SIZE, block_t::CHANNEL_TYPE);
+        
         this->channelData.push_back(channel);
     }
 }
 
 
-template<typename _Tp, int cn>
-void ImageBlock<_Tp, cn>::partition(const Mat_<Vec<_Tp, cn>> &source) {
-    
-    for (int row = 0; row < source.rows; row++) {
-        for (int col = 0; col < source.cols; col++) {
-            
-            Vec<_Tp, cn> vec = source.template at<Vec<_Tp, cn>>(row, col);
-            for (int c = 0; c < cn; c++) {
-                this->channelData[c].template at<BlockDataType>(row, col) = vec[c];
-            }
-
-        }
-    }
-    
-}
 
 
 #endif /* ImageBlock_h */
