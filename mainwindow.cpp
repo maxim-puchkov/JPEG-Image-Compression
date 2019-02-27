@@ -10,7 +10,7 @@
 
 
 #include "include/Codec.h"
-#include "include/mainwindow.h"
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 // Constructor of MainWindow  layouts the graphical
