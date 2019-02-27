@@ -97,6 +97,7 @@ struct PartitionLimit {
 template<typename _Tp>
 void Codec::encode(const Mat_<Vec<_Tp,3>> &source) {
     Mat_<_Tp> encoded = source.clone();
+    std::cout << encoded;
     
     // 1. Convert RGB (CV_8UC3) to YUV
     Mat_<_Tp> yuvImage = convert_RGB_YUV(source);
@@ -108,33 +109,33 @@ void Codec::encode(const Mat_<Vec<_Tp,3>> &source) {
     
     // 3. Compute limits. Disregard incomplete
     //    blocks less than block_t::SIZE.
-    PartitionLimit limit(source.rows, source.cols, N);
-    
-    
-    for (int row = 0; row < limit.rows; row += N) {
-        for (int col = 0; col < limit.cols; col += N) {
-            
+    PartitionLimit limit(source.cols, source.rows, N);
+    for(int col = 0; col < limit.cols; col += N){
+        for (int row = 0; row < limit.rows; row += N) {
+
+            std::cout << row << col << "\n";
             // 4. Partition each 8×8 3-channel block into
             //    ImageBlock (three 8×8 1-channel blocks)
             Point2i origin(row, col);
             Rect area(origin, block_t::SIZE);
             ImageBlock<Vec<_Tp, 3>> block(source(area));
             
-            
+
             // 5. DCT transformation of each image block channel
-            BlockTransform dct2 = Transform::dct2<BlockDataType>;
-            block.apply(dct2);
+//            BlockTransform dct2 = Transform::dct2<BlockDataType>;
+//            block.apply(dct2);
             
 
-            // 6. Quantizing DCT coefficients
-            BlockQuantization q = ColorQuantization::quantization;
-            block.apply(q);
+//            // 6. Quantizing DCT coefficients
+//            BlockQuantization q = ColorQuantization::quantization;
+//            block.apply(q);
 
             
             // Resulting block stores quantized DCT coefficients
             
         }
     }
+
     
     
     

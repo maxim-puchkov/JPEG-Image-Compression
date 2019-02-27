@@ -8,7 +8,7 @@
 
 
 
-
+#include "include/DebugData.h"
 #include "include/Codec.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -218,8 +218,9 @@ void MainWindow::convertImage() {
             
 //        }
 //        const Mat_<Vec<unsigned char,3>> newimg = cvImg;
-        const Mat_<Vec<unsigned char,3>> newimg = cvImg;
-        Codec::encode(newimg);
+//        const Mat_<Vec<unsigned char,3>> newimg = cvImg;
+
+        Codec::encode(rgb_image(11,300));
     }
 
 
