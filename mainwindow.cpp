@@ -9,21 +9,7 @@
 
 
 
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
+#include "include/Codec.h"
 #include "include/mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -184,51 +170,55 @@ void MainWindow::convertImage() {
     
 
     
-    int nWidth = convertedImg.cols;
-    int nHeight = convertedImg.rows;
-    std::cout << convertedImg;
+//    int nWidth = convertedImg.cols;
+//    int nHeight = convertedImg.rows;
+//    std::cout << convertedImg;
     
-    for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
-        for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
+//    for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
+//        for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
             
-            cv::Vec3b vRGB = cvImg.at<cv::Vec3b>(height, width);
+//            cv::Vec3b vRGB = cvImg.at<cv::Vec3b>(height, width);
             
 
 
             
-            // Compute weighted values
-            float wR = WEIGHT_RED * vRGB[0];
-            float wG = WEIGHT_GREEN * vRGB[1];
-            float wB = WEIGHT_BLUE * vRGB[2];
+//            // Compute weighted values
+//            float wR = WEIGHT_RED * vRGB[0];
+//            float wG = WEIGHT_GREEN * vRGB[1];
+//            float wB = WEIGHT_BLUE * vRGB[2];
             
             
-            // Luminance is the sum of weighted RGB channels: wR, wG, and wB
-            float luminance = wR + wG + wB;
-            float U = -1*WEIGHT_RED*vRGB[0] + -1*WEIGHT_GREEN*vRGB[1] + 0.886*vRGB[2];
-            float V = 0.701*vRGB[0] + -1*WEIGHT_GREEN*vRGB[1] + -1*WEIGHT_BLUE*vRGB[2];
+//            // Luminance is the sum of weighted RGB channels: wR, wG, and wB
+//            float luminance = wR + wG + wB;
+//            float U = -1*WEIGHT_RED*vRGB[0] + -1*WEIGHT_GREEN*vRGB[1] + 0.886*vRGB[2];
+//            float V = 0.701*vRGB[0] + -1*WEIGHT_GREEN*vRGB[1] + -1*WEIGHT_BLUE*vRGB[2];
             
-            // Mat(height, width) convertedImg writes the determined luminance value
-            convertedImg.at<cv::Vec3b>(height, width)[0] = luminance;
-            convertedImg.at<cv::Vec3b>(height, width)[1] = U;
-            convertedImg.at<cv::Vec3b>(height, width)[2] = V;
+//            // Mat(height, width) convertedImg writes the determined luminance value
+//            convertedImg.at<cv::Vec3b>(height, width)[0] = luminance;
+//            convertedImg.at<cv::Vec3b>(height, width)[1] = U;
+//            convertedImg.at<cv::Vec3b>(height, width)[2] = V;
             
-            /*********************************************
+//            /*********************************************
              
-             Vec3b is vector of 3 small numbers
-                == Vec<unsigned char, 3>
-                ~ 3 numbers in range 0..255
+//             Vec3b is vector of 3 small numbers
+//                == Vec<unsigned char, 3>
+//                ~ 3 numbers in range 0..255
             
              
-             Vec3b rgbRedColor(255, 0, 0);
+//             Vec3b rgbRedColor(255, 0, 0);
              
              
-             Mat3b is a matrix of Vec3b like
-                 [(255, 0, 0), (1, 2, 3);
-                  (r, g, b),   (or y, u, v)]
+//             Mat3b is a matrix of Vec3b like
+//                 [(255, 0, 0), (1, 2, 3);
+//                  (r, g, b),   (or y, u, v)]
              
-             *********************************************/
+//             *********************************************/
+
             
-        }
+//        }
+//        const Mat_<Vec<unsigned char,3>> newimg = cvImg;
+        const Mat_<Vec<unsigned char,3>> newimg = cvImg;
+        Codec::encode(newimg);
     }
 
 
@@ -237,7 +227,7 @@ void MainWindow::convertImage() {
     // QImage qImage = MatYUV2QImage(convertedImg);
     // img2->setPixmap(QPixmap::fromImage(qImage));
     
-}
+
 
 /*******************************************************************************
                                     YUV to RGB
