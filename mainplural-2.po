@@ -1,0 +1,88 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-FooBar: yup\n"
+"X-Language: de_DE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "singular one 0"
+msgid_plural "plural one 0"
+msgstr[0] "translated one 0 0"
+msgstr[1] "translated one 0 1"
+
+msgid "singular one 1"
+msgid_plural "plural one 1"
+msgstr[0] ""
+msgstr[1] "translated one 1 1"
+
+msgid "singular one 2"
+msgid_plural "plural one 2"
+msgstr[0] "translated one 2 0"
+msgstr[1] ""
+
+msgid "singular one 3"
+msgid_plural "plural one 3"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "singular two 0"
+msgid_plural "plural two 0"
+msgstr[0] "translated two 0 0"
+msgstr[1] "translated two 0 1"
+
+msgid "singular two 1"
+msgid_plural "plural two 1"
+msgstr[0] ""
+msgstr[1] "translated two 1 1"
+
+msgid "singular two 2"
+msgid_plural "plural two 2"
+msgstr[0] "translated two 2 0"
+msgstr[1] ""
+
+msgid "singular two 3"
+msgid_plural "plural two 3"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "singular three 0"
+msgid_plural "plural three 0"
+msgstr[0] "translated three 0 0"
+msgstr[1] "translated three 0 1"
+
+msgid "singular three 1"
+msgid_plural "plural three 1"
+msgstr[0] ""
+msgstr[1] "translated three 1 1"
+
+msgid "singular three 2"
+msgid_plural "plural three 2"
+msgstr[0] "translated three 2 0"
+msgstr[1] ""
+
+msgid "singular three 3"
+msgid_plural "plural three 3"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "singular four 0"
+msgid_plural "plural four 0"
+msgstr[0] "translated four 0 0"
+msgstr[1] "translated four 0 1"
+
+msgid "singular four 1"
+msgid_plural "plural four 1"
+msgstr[0] ""
+msgstr[1] "translated four 1 1"
+
+msgid "singular four 2"
+msgid_plural "plural four 2"
+msgstr[0] "translated four 2 0"
+msgstr[1] ""
+
+msgid "singular four 3"
+msgid_plural "plural four 3"
+msgstr[0] ""
+msgstr[1] ""

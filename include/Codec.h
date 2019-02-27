@@ -95,16 +95,16 @@ struct PartitionLimit {
 /* JPEG Encode */
 
 template<typename _Tp>
-void Codec::encode(const Mat_<Vec<_Tp, 3>> &source) {
-    // Mat<_Tp> encoded = source.clone();
+void Codec::encode(const Mat_<Vec<_Tp,3>> &source) {
+    Mat_<_Tp> encoded = source.clone();
     
     // 1. Convert RGB (CV_8UC3) to YUV
-    // Mat_<_Tp> yuvImage = convert_RGB_YUV(source);
+    Mat_<_Tp> yuvImage = convert_RGB_YUV(source);
     // print_spaced(10, yuvImage);
     
     
     // 2. Chroma subsampling 4:2:0
-    
+    Mat_<_Tp> sampled = sample(encoded);
     
     // 3. Compute limits. Disregard incomplete
     //    blocks less than block_t::SIZE.
@@ -161,7 +161,7 @@ void Codec::decode(const Mat_<Vec<_Tp, 3>> &source) {
             //    ImageBlock (three 8×8 1-channel blocks)
             Point2i origin(row, col);
             Rect area(origin, block_t::SIZE);
-            ImageBlock block(source(area));
+            ImageBlock<_Tp> block(source(area));
 
             
             // 3. 2D IDCT of each block (quantized DCT coefficients)

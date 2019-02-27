@@ -245,10 +245,9 @@ void ImageBlock<_Tp, cn>::partition(const Mat_<Vec<_Tp, cn>> &source) {
             
             Vec<_Tp, cn> vec = source.template at<Vec<_Tp, cn>>(row, col);
             for (int c = 0; c < cn; c++) {
-                BlockDataType data = vec[c] - block_t::DATA_OFFSET;
-                this->channelData[c].template at<BlockDataType>(row, col) = data;
+                this->channelData[c].template at<BlockDataType>(row, col) = vec[c];
             }
-            
+
         }
     }
     
