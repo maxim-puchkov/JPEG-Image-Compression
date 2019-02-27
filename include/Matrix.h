@@ -60,7 +60,7 @@ Mat transpose(const Mat_<_Tp> &A);
 // All entries of a double presicion floating
 // point matrix A are rounded to integer type R
 template<class R>
-Mat_<R> round(const Mat1d &A);
+Mat_<R> round(const Mat_<double> &A);
 
 
 
@@ -164,7 +164,7 @@ Mat transpose(const Mat_<_Tp> &A) {
 /* Round */
 
 template<class R>
-Mat_<R> round(const Mat1d &A) {
+Mat_<R> round(const Mat_<double> &A) {
     Mat_<R> roundedA(A.size(), DataType<R>::type);
     for(int i = 0; i < A.rows; i++) {
         const double* Ai = A.ptr<double>(i);

@@ -18,6 +18,7 @@
 #include "Print.h"
 
 using cv::Mat_;
+using cv::Mat1d;
 using cv::Vec;
 using cv::Rect;
 using cv::Point2i;
@@ -42,10 +43,10 @@ struct PartitionLimit;
 struct Codec {
     
     template<typename _Tp>
-    static void encode(const Mat_<_Tp> &source);
+    static void encode(const Mat_<Vec<_Tp, 3>> &source);
     
     template<typename _Tp>
-    static void decode(const Mat_<_Tp> &source);
+    static void decode(const Mat_<Vec<_Tp, 3>> &source);
     
 };
 
@@ -94,7 +95,7 @@ struct PartitionLimit {
 /* JPEG Encode */
 
 template<typename _Tp>
-void Codec::encode(const Mat_<_Tp> &source) {
+void Codec::encode(const Mat_<Vec<_Tp, 3>> &source) {
     // Mat<_Tp> encoded = source.clone();
     
     // 1. Convert RGB (CV_8UC3) to YUV
@@ -117,7 +118,7 @@ void Codec::encode(const Mat_<_Tp> &source) {
             //    ImageBlock (three 8×8 1-channel blocks)
             Point2i origin(row, col);
             Rect area(origin, block_t::SIZE);
-            ImageBlock block(source(area));
+            ImageBlock<Vec<_Tp, 3>> block(source(area));
             
             
             // 5. DCT transformation of each image block channel
@@ -135,6 +136,8 @@ void Codec::encode(const Mat_<_Tp> &source) {
         }
     }
     
+    
+    
     // return encoded;
 }
 
@@ -144,7 +147,7 @@ void Codec::encode(const Mat_<_Tp> &source) {
 /* JPEG Decode */
 
 template<typename _Tp>
-void Codec::decode(const Mat_<_Tp> &source) {
+void Codec::decode(const Mat_<Vec<_Tp, 3>> &source) {
     
     // 1. Compute limits. Disregard incomplete
     //    blocks less than block_t::SIZE.

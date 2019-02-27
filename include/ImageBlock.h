@@ -214,6 +214,11 @@ Mat_<BlockDataType> &ImageBlock<_Tp, cn>::operator[](unsigned int index) {
 }
 
 
+template<typename _Tp, int cn>
+void ImageBlock<_Tp, cn>::combine() {
+    
+}
+
 
 
 
@@ -248,5 +253,6 @@ void ImageBlock<_Tp, cn>::partition(const Mat_<Vec<_Tp, cn>> &source) {
     }
     
 }
+
 
 #endif /* ImageBlock_h */

@@ -105,6 +105,7 @@ void MainWindow::loadImage() {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load Image"), "", tr("All Files (*)"));
     cvImg = cv::imread(fileName.toStdString(), IMREAD_COLOR);
     
+    
     // QImage is created from the RGB Matrix of Mat cvImg
     QImage qImage = MatRGB2QImage(cvImg);
     img1->setPixmap(QPixmap::fromImage(qImage));
