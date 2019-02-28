@@ -93,19 +93,19 @@ public:
     Mat_<BlockDataType> &operator[](unsigned int index);
 
     
-    Mat_<Vec3b> combine() {
-        Mat_<Vec<_Tp, cn>> output;
+    Mat3b combine() {
+        Mat3b output;
 
         for (int row = 0; row < block_t::N; row++) {
             for (int col = 0; col < block_t::N; col++) {
                 
-                Vec3b v;
+                Vec<uchar, 3> v;
                 for (int c = 0; c < cn; c++) {
-                    v[c] = this->channels[c].at(row, col);
+                    v[c] = this->channelData[c].template at<uchar>(row, col) + block_t::DATA_OFFSET;
                 }
                 
                 
-                output.template at<Vec3b>(row, col) = v;
+                output.template at<Vec<BlockDataType, 3>>(row, col) = v;
             }
         }
         

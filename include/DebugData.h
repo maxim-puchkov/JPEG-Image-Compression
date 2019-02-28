@@ -45,6 +45,10 @@ unsigned char uchar_random();
 Mat3b rgb_image(int width, int height);
 
 
+// Numbered block image
+Mat3b block_image(int width, int height);
+
+
 // Three-channel gray image
 Mat3b channel_3x(const Mat1b &grayscale);
 
@@ -143,6 +147,40 @@ Mat3b rgb_image(int width, int height) {
             image.at<Vec3b>(row, col) = entry;
             
         }
+    }
+    
+    return image;
+}
+
+
+// Numbered block image
+Mat3b block_image(int width, int height) {
+    Mat3b image = Mat(height, width, CV_8UC3);
+    
+    unsigned char bnum = 0;
+    int counter = 8;
+    
+    for (int col = 0; col < width; col++) {
+        for (int row = 0; row < height; row++) {
+            
+            
+            
+            //Vec3b entry(uchar_random(), uchar_random(), uchar_random());
+            
+            Vec3b entry(bnum, bnum, bnum);
+            image.at<Vec3b>(row, col) = entry;
+
+            
+        }
+        
+        
+        counter--;
+        if (counter <= 0) {
+            counter = 8;
+            bnum++;
+            bnum %= 255;
+        }
+        
     }
     
     return image;

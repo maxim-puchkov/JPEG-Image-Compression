@@ -19,11 +19,14 @@
 
 using cv::Mat_;
 using cv::Mat1d;
+using cv::Mat3b;
 using cv::Vec;
 using cv::Rect;
 using cv::Point2i;
+using cv::DataType;
 
 using block_t::BlockTransform;
+
 
 const int N = block_t::N;
 
@@ -42,11 +45,9 @@ struct PartitionLimit;
 
 struct Codec {
     
-    template<typename _Tp>
-    static void encode(const Mat_<_Tp> &source);
+    static void encode(const Mat3b &source);
     
-    template<typename _Tp>
-    static void decode(const Mat_<_Tp> &source);
+    static void decode(const Mat3b &source);
     
 };
 
@@ -94,31 +95,35 @@ struct PartitionLimit {
 
 /* JPEG Encode */
 
-template<typename _Tp>
-void Codec::encode(const Mat_<_Tp> &source) {
-    Mat_<_Tp> encoded = source.clone();
+void Codec::encode(const Mat3b &source) {
     
     // 1. Convert RGB (CV_8UC3) to YUV
-    Mat_<_Tp> yuvImage = convert_RGB_YUV(source);
+    Mat3b yuvImage = convert_RGB_YUV(source);
     // print_spaced(10, yuvImage);
     
     
     // 2. Chroma subsampling 4:2:0
-    Mat_<_Tp> sampled = sample(encoded);
+    Mat3b sampled = sample(yuvImage);
     
     // 3. Compute limits. Disregard incomplete
     //    blocks less than block_t::SIZE.
     PartitionLimit limit(source.rows, source.cols, N);
     
+    int counter = 0;
     
+    
+    Mat_<Vec<BlockDataType, 3>> encoded(source.size(), DataType<BlockDataType>::type);
     for (int row = 0; row < limit.rows; row += N) {
         for (int col = 0; col < limit.cols; col += N) {
+        
             
             // 4. Partition each 8×8 3-channel block into
             //    ImageBlock (three 8×8 1-channel blocks)
-            Point2i origin(row, col);
+            Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
-            ImageBlock<Vec<_Tp, 3>> block(source(area));
+            
+            print("Block area = ", area);
+            ImageBlock block(source(area));
             
             
             // 5. DCT transformation of each image block channel
@@ -132,7 +137,9 @@ void Codec::encode(const Mat_<_Tp> &source) {
 
             
             // Resulting block stores quantized DCT coefficients
+            encoded.at<Vec<BlockDataType, 3>>(col, row) = block.combine();
             
+            //counter++;
         }
     }
     
@@ -146,8 +153,7 @@ void Codec::encode(const Mat_<_Tp> &source) {
 
 /* JPEG Decode */
 
-template<typename _Tp>
-void Codec::decode(const Mat_<_Tp> &source) {
+void Codec::decode(const Mat3b &source) {
     
     // 1. Compute limits. Disregard incomplete
     //    blocks less than block_t::SIZE.
@@ -161,7 +167,7 @@ void Codec::decode(const Mat_<_Tp> &source) {
             //    ImageBlock (three 8×8 1-channel blocks)
             Point2i origin(row, col);
             Rect area(origin, block_t::SIZE);
-            ImageBlock<_Tp> block(source(area));
+            ImageBlock block(source(area));
 
             
             // 3. 2D IDCT of each block (quantized DCT coefficients)
