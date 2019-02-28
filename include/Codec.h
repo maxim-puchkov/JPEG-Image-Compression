@@ -125,17 +125,17 @@ CompressedImage Codec::encode(const DecodedImage &source) {
     // 1. Convert RGB (CV_8UC3) to YUV
     Mat3b yuvImage = convert_RGB_YUV(source);
     // print_spaced(10, yuvImage);
-    
+    print("1 . HI");
     
     // 2. Chroma subsampling 4:2:0
     Mat3b sampled = sample(yuvImage);
     
-    
+    print("2 HI");
     // 3. Compute limits. Disregard incomplete
     //    blocks less than block_t::SIZE.
     PartitionLimit limit(source.rows, source.cols, N);
     
-    
+    print("3 HI");
     for (int row = 0; row < limit.rows; row += N) {
         for (int col = 0; col < limit.cols; col += N) {
         
@@ -145,22 +145,23 @@ CompressedImage Codec::encode(const DecodedImage &source) {
             Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
             ImageBlock block(source(area));
-            
+            print("4 HI");
 
             // 5. DCT transformation of each image block channel
             BlockTransform dct2 = Transform::dct2<Block1s>;
             block.apply(dct2);
             
-
+print("5 HI");
             // 6. Quantizing DCT coefficients
             //    Resulting block stores quantized DCT coefficients in separate matrices.
             BlockQuantization quantizationFormula = Compression::quantization;
             block.apply(quantizationFormula);
-
+print("6 HI");
             
             // 7. Combine block into a single matrix of 3-channel vectors
             //    and save it to the output
             block.saveTo(output);
+            print("7 HI");
         }
     }
 

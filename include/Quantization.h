@@ -12,11 +12,12 @@
 #include "QuantizationTables.h"
 #include "ImageBlock.h"
 
+using cv::Vec;
+
 using block_t::BlockDataType;
 
-
-struct ColorQuantization;
-
+using block_t::Block1s;
+using block_t::Block3s;
 
 
 
@@ -57,7 +58,7 @@ struct Compression {
 Mat_<Block1s> Compression::quantization(const Mat_<Block1s> &dctCoefficients,
                                         QTable table) {
     
-    Mat_<Block1s> quantizedCoefficients(dctCoefficients.size(), block_t::CHANNEL_TYPE);
+    Mat_<Block1s> quantizedCoefficients(8, 8, block_t::CHANNEL_TYPE);
     
     for (int row = 0; row < dctCoefficients.rows; row++) {
         for (int col = 0; col < dctCoefficients.cols; col++) {

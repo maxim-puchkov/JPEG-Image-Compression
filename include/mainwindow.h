@@ -37,7 +37,7 @@ public:
 private slots:
     void loadImage();
     void convertImage();
-    cv::Mat YUVTORGB(const cv::Mat3b &src);
+    //cv::Mat YUVTORGB(const cv::Mat3b &src);
 
 private:
     

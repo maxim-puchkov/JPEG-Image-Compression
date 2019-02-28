@@ -192,7 +192,7 @@ template<typename _Tp, int cn>
 void ImageBlock<_Tp, cn>::apply(BlockQuantization quantization) {
     
     // Choose table sets
-    TableSet tables = select(QTableOption::preferred());
+    TableSet tables = QuantizationTable::select(0);
     //tables.scale(Q)
     
     
