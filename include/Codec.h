@@ -36,17 +36,26 @@ struct PartitionLimit;
 
 struct Codec {
     
-    template<typename _Tp>
-    static void encode(const Mat_<_Tp> &source);
+    //template<typename _Tp>
+    //static void encode(const Mat_<_Tp> &source);
+
     
-    template<typename _Tp>
-    static void decode(const Mat_<_Tp> &source);
+    //template<typename _Tp>
+    //static void decode(const Mat_<_Tp> &source);
+    
+    static CompressedImage encode(const SourceImage &source);
+    
+    
+    static DecodedImage decode(const CompressedImage &source);
+    
+    
+    static Mat3b compare(const SourceImage &source, const CompressedImage &compressedSource);
     
 };
 
 
 
-
+// Drop blocks if image is not multiple of 8
 struct PartitionLimit {
     
     PartitionLimit(int imageRows, int imageCols, int N);
@@ -88,9 +97,11 @@ struct PartitionLimit {
 
 /* JPEG Encode */
 
-template<typename _Tp>
-void Codec::encode(const Mat_<_Tp> &source) {
-    // Mat<_Tp> encoded = source.clone();
+//template<typename _Tp>
+//void Codec::encode(const Mat_<_Tp> &source) {
+CompressedImage Codec::encode(const SourceImage &source) {
+    
+    CompressedImage output(source.size(), CompressedChannelType);
     
     // 1. Convert RGB (CV_8UC3) to YUV
     // Mat_<_Tp> yuvImage = convert_RGB_YUV(source);
@@ -121,8 +132,8 @@ void Codec::encode(const Mat_<_Tp> &source) {
             
 
             // 6. Quantizing DCT coefficients
-            BlockQuantization q = Compression::quantization;
-            block.apply(q);
+            BlockQuantization quantizationFormula = Compression::quantization;
+            block.apply(quantizationFormula);
 
             
             // Resulting block stores quantized DCT coefficients
@@ -130,7 +141,8 @@ void Codec::encode(const Mat_<_Tp> &source) {
         }
     }
     
-    // return encoded;
+    return output;
+    
 }
 
 
@@ -138,8 +150,11 @@ void Codec::encode(const Mat_<_Tp> &source) {
 
 /* JPEG Decode */
 
-template<typename _Tp>
-void Codec::decode(const Mat_<_Tp> &source) {
+//template<typename _Tp>
+//void Codec::decode(const Mat_<_Tp> &source) {
+DecodedImage Codec::decode(const CompressedImage &source) {
+    
+    DecodedImage output(source.size(), DecodedChannelType);
     
     // 1. Compute limits. Disregard incomplete
     //    blocks less than block_t::SIZE.
@@ -177,12 +192,18 @@ void Codec::decode(const Mat_<_Tp> &source) {
     
     
     
-    // return decoded;
+    return output;
     
 }
 
 
-
+Mat3b Codec::compare(const SourceImage &source, const CompressedImage &compressedSource) {
+    
+    Mat3b output;
+    
+    return output;
+    
+}
 
 
 

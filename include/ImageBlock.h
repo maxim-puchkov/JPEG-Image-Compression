@@ -29,8 +29,13 @@ namespace block_t {
     using Block3s = Vec<BlockDataType, 3>;
     
     using CompressedImage = Mat_<Block3s>;
+    static const int CompressedChannelType = CV_16SC3;
+    
     using DecodedImage = Mat_<Vec3b>;
-    using Image = Mat;
+    static const int DecodedChannelType = CV_8UC3;
+    
+    using SourceImage = Mat_<Vec3b>;
+    static const int SourceChannelType = CV_8UC3;
     
     
     
