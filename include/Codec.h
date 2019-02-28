@@ -47,7 +47,7 @@ struct PartitionLimit;
 
 struct Codec {
     
-    static Mat_<Block3s> encode(const Mat3b &source);
+    static Mat_<Block3s> encode(const Mat_<Vec<uchar, 3>> &source);
     
     static void decode(const Mat3b &source);
     
@@ -96,10 +96,17 @@ struct PartitionLimit {
 
 /* JPEG Encode */
 
-Mat_<Block3s> Codec::encode(const Mat3b &source) {
+Mat_<Block3s> Codec::encode(const Mat_<Vec<uchar, 3>> &source) {
+    
+    print(source);
     
     // Matrix to store result of the conversion (quantized dct coefficients)
-    Mat_<Block3s> output(source.size(), DataType<Block1s>::type);
+    
+    //Vec<short, 3> init(0, 0, 0);
+    Mat_<Block3s> output = Mat(N, N, CV_16UC3, Block3s(0,0,0));
+    
+    print(output);
+    
     
     // 1. Convert RGB (CV_8UC3) to YUV
     Mat3b yuvImage = convert_RGB_YUV(source);
@@ -128,24 +135,24 @@ Mat_<Block3s> Codec::encode(const Mat3b &source) {
             Rect area(origin, block_t::SIZE);
             
             
-            print("Block area = ", area);
+            //print("Block area = ", area);
             ImageBlock block(source(area));
             
 
             // 5. DCT transformation of each image block channel
             BlockTransform dct2 = Transform::dct2<Block1s>;
-            block.apply(dct2);
+            //block.apply(dct2);
             
 
             // 6. Quantizing DCT coefficients
             //    Resulting block stores quantized DCT coefficients in separate matrices.
             BlockQuantization quantizationFormula = ColorQuantization::quantization;
-            block.apply(quantizationFormula);
+            //block.apply(quantizationFormula);
 
             
             // Combine block innto a single matrix of 3-channel vectors
             block.saveTo(output);
-            
+            print(output);
             
             
             

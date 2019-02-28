@@ -143,8 +143,8 @@ Mat3b rgb_image(int width, int height) {
     for (int col = 0; col < width; col++) {
         for (int row = 0; row < height; row++) {
             
-            Vec3b entry(uchar_random(), uchar_random(), uchar_random());
-            image.at<Vec3b>(row, col) = entry;
+            Vec<uchar, 3> entry(uchar_random(), uchar_random(), uchar_random());
+            image.at<Vec<uchar, 3>>(row, col) = entry;
             
         }
     }
@@ -154,8 +154,8 @@ Mat3b rgb_image(int width, int height) {
 
 
 // Numbered block image
-Mat3b block_image(int width, int height) {
-    Mat3b image = Mat(height, width, CV_8UC3);
+Mat_<Vec<uchar, 3>> block_image(int width, int height) {
+    Mat_<Vec<uchar, 3>> image(height, width, CV_8UC3);
     
     unsigned char bnum = 0;
     int counter = 8;
@@ -187,17 +187,20 @@ Mat3b block_image(int width, int height) {
 }
 
 
-Mat3b channel_3x(const Mat1b &grayscale) {
-    Mat3b image = Mat(grayscale.rows, grayscale.cols, CV_8UC3);
+Mat_<Vec<uchar, 3>> channel_3x(const Mat_<uchar> &grayscale) {
+    Mat_<Vec<uchar, 3>> image(grayscale.rows, grayscale.cols, CV_8UC3);
     
     for (int row = 0; row < grayscale.rows; row++) {
         for (int col = 0; col < grayscale.cols; col++) {
-            unsigned char gray = grayscale.at<unsigned char>(row, col);
-            Vec3b entry(gray, gray, gray);
-            image.at<Vec3b>(row, col) = entry;
+            uchar gray = grayscale.at<uchar>(row, col);
+            Vec<uchar, 3> entry(gray, gray, gray);
+            image.at<Vec<uchar, 3>>(row, col) = entry;
         }
     }
     
+    
+    
+    print(image);
     return image;
 }
 

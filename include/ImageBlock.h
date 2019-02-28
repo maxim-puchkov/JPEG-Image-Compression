@@ -38,7 +38,7 @@ namespace block_t {
     static const Size2i SIZE = {N, N};
     
     static const int CHANNEL_TYPE = CV_32SC1;
-    static const BlockDataType DATA_OFFSET = 128;
+    static const Block1s DATA_OFFSET = 128;
 }
 
 
@@ -92,10 +92,10 @@ public:
     
     
     // Checked and Unchecked channel access
-    Mat_<BlockDataType> at(unsigned int index) const noexcept;
-    Mat_<BlockDataType> &at(unsigned int index) noexcept;
-    Mat_<BlockDataType> operator[](unsigned int index) const;
-    Mat_<BlockDataType> &operator[](unsigned int index);
+    Mat_<Block1s> at(unsigned int index) const noexcept;
+    Mat_<Block1s> &at(unsigned int index) noexcept;
+    Mat_<Block1s> operator[](unsigned int index) const;
+    Mat_<Block1s> &operator[](unsigned int index);
 
     
     
@@ -111,6 +111,8 @@ public:
         }
     }
     
+    void partition(const Mat_<Vec<uchar, 3>> &source);
+    
 private:
     
     const int LINE_BREAK = 3;
@@ -118,32 +120,10 @@ private:
     
     void alloc();
     
-    void partition(const Mat3b &source) {
-        
-        for (int row = 0; row < source.rows; row++) {
-            for (int col = 0; col < source.cols; col++) {
-                
-                //Vec<uchar, cn> vec = source.template at<Vec<_Tp, cn>>(row, col);
-                
-                
-                Vec3b vec = source.at<unsigned char>(row, col);
-                for (int c = 0; c < cn; c++) {
-                    BlockDataType data;
-                    
-                    data = vec[c];
-                
-                    data -= block_t::DATA_OFFSET;
-                    
-                    this->channelData[c].template at<BlockDataType>(row, col) = data;
-                }
-                
-            }
-        }
-        
-    }
+    
 
     
-    std::vector<Mat_<BlockDataType>> channelData;
+    std::vector<Mat_<Block1s>> channelData;
     
 };
 
@@ -239,27 +219,47 @@ void ImageBlock<_Tp, cn>::display() const {
 /* Element Access */
 
 template<typename _Tp, int cn>
-Mat_<BlockDataType> ImageBlock<_Tp, cn>::at(unsigned int index) const noexcept {
+Mat_<Block1s> ImageBlock<_Tp, cn>::at(unsigned int index) const noexcept {
     return this->channelData[index < cn ? index : (index % cn)];
 }
 
 template<typename _Tp, int cn>
-Mat_<BlockDataType> &ImageBlock<_Tp, cn>::at(unsigned int index) noexcept {
+Mat_<Block1s> &ImageBlock<_Tp, cn>::at(unsigned int index) noexcept {
     return this->channelData[index < cn ? index : (index % cn)];
 }
 
 template<typename _Tp, int cn>
-Mat_<BlockDataType> ImageBlock<_Tp, cn>::operator[](unsigned int index) const {
+Mat_<Block1s> ImageBlock<_Tp, cn>::operator[](unsigned int index) const {
     return this->channelData[index];
 }
 
 template<typename _Tp, int cn>
-Mat_<BlockDataType> &ImageBlock<_Tp, cn>::operator[](unsigned int index) {
+Mat_<Block1s> &ImageBlock<_Tp, cn>::operator[](unsigned int index) {
     return this->channelData[index];
 }
 
 
+template<typename _Tp, int cn>
+void ImageBlock<_Tp, cn>::partition(const Mat_<Vec<uchar, 3>> &source) {
+    
+    for (int row = 0; row < source.rows; row++) {
+        for (int col = 0; col < source.cols; col++) {
 
+            Vec<uchar, 3> vec = source.at<Vec<uchar, 3>>(row, col);
+            
+            for (int c = 0; c < cn; c++) {
+                Block1s data = vec[c] - block_t::DATA_OFFSET;
+                this->channelData[c].template at<Block1s>(row, col) = data;
+            }
+            
+        }
+    }
+    
+    
+    
+    this->display();
+    
+}
 
 
 
@@ -275,7 +275,7 @@ void ImageBlock<_Tp, cn>::alloc() {
     
     for (int c = 0; c < cn; c++) {
         
-        Mat_<BlockDataType> channel(block_t::SIZE, block_t::CHANNEL_TYPE);
+        Mat_<Block1s> channel(block_t::SIZE, block_t::CHANNEL_TYPE);
         
         this->channelData.push_back(channel);
     }
