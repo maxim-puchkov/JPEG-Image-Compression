@@ -7,7 +7,7 @@
 //
 
 
-
+#include "include/Print.h"
 #include "include/DebugData.h"
 #include "include/Codec.h"
 #include "include/Color.h"
@@ -29,7 +29,11 @@ scrollArea2(new QScrollArea),
 mainLayout(new QHBoxLayout),
 buttonLayout(new QVBoxLayout),
 openButton(new QPushButton),
-convertButton(new QPushButton) {
+convertButton(new QPushButton),
+decodeButton(new QPushButton),
+firstSetting(new QRadioButton),
+secondSetting(new QRadioButton),
+thirdSetting(new QRadioButton){
     
     // Main window size is always fixed to 700 columns, 300 rows
     ui->setupUi(this);
@@ -43,10 +47,17 @@ convertButton(new QPushButton) {
     
     // two buttons and a layout containing the buttons
     openButton->setText("Open");
-    convertButton->setText("Convert");
+    convertButton->setText("Encode");
+    decodeButton->setText("Decode");
+    firstSetting->setText("First Setting");
+    secondSetting->setText("Second Setting");
+    thirdSetting->setText("Third Setting");
     buttonLayout->addWidget(openButton);
     buttonLayout->addWidget(convertButton);
-    
+    buttonLayout->addWidget(decodeButton);
+    buttonLayout->addWidget(firstSetting);
+    buttonLayout->addWidget(secondSetting);
+    buttonLayout->addWidget(thirdSetting);
     
     // main layout and its container
     setCentralWidget(container);
@@ -66,6 +77,12 @@ convertButton(new QPushButton) {
             this, SLOT (loadImage()));
     connect(convertButton, SIGNAL(clicked()),
             this, SLOT (convertImage()));
+    connect(firstSetting, SIGNAL(clicked()),
+            this, SLOT (first()));
+    connect(secondSetting, SIGNAL(clicked()),
+            this, SLOT (second()));
+    connect(thirdSetting, SIGNAL(clicked()),
+            this, SLOT (third()));
     
 }
 
@@ -75,11 +92,20 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
+int a = -1;
 
 
+void MainWindow::first(){
+    ::a = 0;
+}
 
+void MainWindow::second(){
+    ::a = 1;
+}
 
-
+void MainWindow::third(){
+    ::a = 2;
+}
 
 
 
@@ -110,13 +136,13 @@ void MainWindow::loadImage() {
                     Step 2. Color Space Conversion: RGB to YUV
  *******************************************************************************/
 void MainWindow::convertImage() {
-    
+    std::cout << ::a;
     // Guard: stop if original image's Mat cvImg is empty
     if (cvImg.empty()) {
         return;
     }
     
-    
+    std::cout << ::a;
     // Constant color weights of Red, Green, and Blue colors needed to calculate Y-Channel.
     const float WEIGHT_RED      = 0.299;
     const float WEIGHT_BLUE     = 0.114;
@@ -221,10 +247,18 @@ void MainWindow::convertImage() {
 //        const Mat_<Vec<unsigned char,3>> newimg = cvImg;
 
 //        Codec::encode(rgb_image(11,300));
-           Mat3b newimage = rgb_image(10,10);
-        //   std::cout << newimage;
+           Mat3b newimage = cvImg;
+           print(cvImg);
            Mat3b yuvimage = convert_RGB_YUV(newimage);
-           std::cout << yuvimage;
+           print(yuvimage);
+           Mat3b sampled = sample(yuvimage);
+           print(sampled);
+           Mat3b desampled = desample(sampled);
+           print(desampled);
+           Mat3b rgbimage = convert_YUV_RGB(desampled);
+           print(rgbimage);
+           QImage qImage = MatRGB2QImage(rgbimage);
+           img2->setPixmap(QPixmap::fromImage(qImage));
     }
 
 
