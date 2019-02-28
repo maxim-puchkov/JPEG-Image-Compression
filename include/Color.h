@@ -25,16 +25,18 @@ const cv::Size2i CM_SIZE = {CN, CN};
  *******************************************************************************/
 
 
-Mat3b convert_RGB_YUV(const Mat3b &source);
+static Mat3b convert_RGB_YUV(const Mat3b &source);
 
-Mat3b convert_YUV_RGB(const Mat3b &source);
+static Mat3b convert_YUV_RGB(const Mat3b &source);
 
 
 
-Mat3b sample(const Mat3b &source, int width, int chromSamples, int chromChange);
-Mat3b desample(const Mat3b &source);
 
-Mat3b reverse_sample(const Mat3b &source);
+static Mat3b sample(const Mat3b &source, int width, int chromSamples, int chromChange);
+
+static Mat3b desample(const Mat3b &source);
+
+static Mat3b reverse_sample(const Mat3b &source);
 
 
 
