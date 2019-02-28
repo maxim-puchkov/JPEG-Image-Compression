@@ -88,9 +88,9 @@ Mat3b convert_RGB_YUV(const Mat3b &source) {
         for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
             for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
                 cv::Vec3b vRGB = yuvImage.at<cv::Vec3b>(height, width);
-                float red = vRGB[0]/255;
-                float green = vRGB[1]/255;
-                float blue = vRGB[2]/255;
+                float red = (float)vRGB[0]/255;
+                float green = (float)vRGB[1]/255;
+                float blue = (float)vRGB[2]/255;
                 float wR = WEIGHT_RED * red;
                 float wG = WEIGHT_GREEN * green;
                 float wB = WEIGHT_BLUE * blue;

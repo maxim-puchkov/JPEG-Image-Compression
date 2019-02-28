@@ -131,7 +131,7 @@ Mat_<Block3s> Codec::encode(const Mat3b &source) {
             print("Block area = ", area);
             ImageBlock block(source(area));
             
-            
+
             // 5. DCT transformation of each image block channel
             BlockTransform dct2 = Transform::dct2<Block1s>;
             block.apply(dct2);
@@ -154,6 +154,7 @@ Mat_<Block3s> Codec::encode(const Mat3b &source) {
             
         }
     }
+
     
     return output;
     
