@@ -12,10 +12,7 @@
 #include <opencv2/opencv.hpp>
 #include <math.h>
 
-using cv::Mat;
-using cv::Mat_;
-using cv::Vec;
-using cv::DataType;
+using namespace cv;
 
 
 

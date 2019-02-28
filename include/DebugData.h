@@ -13,13 +13,8 @@
 #include "Color.h"
 #include "Print.h"
 
-using cv::Mat;
-using cv::Mat1b;
-using cv::Mat3b;
-using cv::Mat3s;
-using cv::Mat_;
-using cv::Vec3b;
-using cv::Vec3s;
+
+using namespace cv;
 
 
 
@@ -27,14 +22,6 @@ using cv::Vec3s;
 /*******************************************************************************
                                     Debug
  *******************************************************************************/
-
-
-// Adjust YUV image to unsigned char (0..255)
-void yuv_adjust(const Vec3b &yuv);
-
-
-// Repeat conversion multiple 'times'
-Mat3b convert_repeat(const Mat3b &rgbImage, int times);
 
 
 // Random 0..255
@@ -66,56 +53,6 @@ Mat3b channel_3x(const Mat1b &grayscale);
 /*******************************************************************************
                                YUV Range Adjustment
  *******************************************************************************/
-
-
-// Values after conversion (out of bounds)
-const Vec3b RED(76, -36, 157);
-const Vec3b GREEN(150, -74, -131);
-const Vec3b BLUE(29, 111, -26);
-const Vec3b WHITE(255, 0, 0);
-const Vec3b BLACK(0, 0, 0);
-
-
-// Range center point and shift
-const int RCP = 128;
-const int S = 8;
-
-
-// Incorrect
-void yuv_adjust(const Vec3b &yuv) {
-    int y = yuv[0];
-    int u = yuv[1];
-    int v = yuv[2];
-    print("Step 1. Converted YUV: ", y, ", ", u, ", ", v, '\n');
-    
-    // Step 2
-    int yt = (y - RCP) >> S;
-    int ut = (u - RCP) >> S;
-    int vt = (v - RCP) >> S;
-    print("Step 2. Scaled: ", yt, ", ", ut, ", ", vt, '\n');
-    
-    // Step 3
-    int yu = yt;
-    int uu = ut + RCP;
-    int vu = vt + RCP;
-    print("Step 3. Adjusted: ", yu, ", ", uu, ", ", vu, '\n');
-}
-
-
-// Repeat RGB -> YUV -> RGB conversion
-Mat3b convert_repeat(const Mat3b &rgbImage, int times) {
-    Mat3b output = rgbImage.clone();
-    
-    for (int i = 0; i < times; i++) {
-        // output = convert_RGB_YUV(output);
-        // output = convert_YUV_RGB(output);
-    }
-    
-    return output;
-}
-
-
-
 
 
 

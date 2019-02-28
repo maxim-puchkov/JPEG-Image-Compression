@@ -12,8 +12,9 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 
-using cv::Mat1b;
-using cv::Size2i;
+
+using namespace cv;
+
 
 using QTable = Mat1b;
 using QTableLuminance = Mat1b;

@@ -17,16 +17,20 @@
 #include "QuantizationTables.h"
 #include "Print.h"
 
-using cv::Mat1d;
-using cv::Mat_;
-using cv::Vec;
-using cv::Size2i;
+
+
+using namespace cv;
 
 
 namespace block_t {
     using BlockDataType = short;
+    
     using BlockTransform = std::function<Mat_<double>(Mat_<BlockDataType>)>;
     using BlockQuantization = std::function<Mat_<BlockDataType>(Mat_<BlockDataType>, QTable)>;
+    
+    using Block1s = BlockDataType;
+    using Block3s = Vec<BlockDataType, 3>;
+    
     
     static const int N = 8;
     static const Size2i SIZE = {N, N};
@@ -36,9 +40,7 @@ namespace block_t {
 }
 
 
-using block_t::BlockDataType;
-using block_t::BlockTransform;
-using block_t::BlockQuantization;
+using namespace block_t;
 
 
 template<typename, int = 1>

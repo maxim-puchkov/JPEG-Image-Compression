@@ -12,10 +12,12 @@
 #include "QuantizationTables.h"
 #include "ImageBlock.h"
 
+using namespace cv;
+using namespace block_t;
+
 using block_t::BlockDataType;
 
-
-struct ColorQuantization;
+struct Compression;
 
 
 
@@ -26,7 +28,7 @@ struct ColorQuantization;
  *******************************************************************************/
 
 
-struct ColorQuantization {
+struct Compression {
 
     // Quantize DCT coefficients
     static Mat_<BlockDataType> quantization(const Mat_<BlockDataType> &dctCoefficients,
@@ -54,7 +56,7 @@ struct ColorQuantization {
 
 // Reduce high frequency DCT by quantizing coefficients.
 //      Quantization Formula:       F^(u, v) = round(F(u,v) / Q(u, v))
-Mat_<BlockDataType> ColorQuantization::quantization(const Mat_<BlockDataType> &dctCoefficients,
+Mat_<BlockDataType> Compression::quantization(const Mat_<BlockDataType> &dctCoefficients,
                                                     QTable table) {
     
     Mat_<BlockDataType> quantizedCoefficients(dctCoefficients.size(), block_t::CHANNEL_TYPE);

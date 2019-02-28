@@ -11,9 +11,8 @@
 
 #include <opencv2/opencv.hpp>
 #include "Matrix.h"
-using cv::Mat;
-using cv::Mat1d;
-using cv::Mat3b;
+
+using namespace cv;
 
 const int CN = 3;
 const cv::Size2i CM_SIZE = {CN, CN};
