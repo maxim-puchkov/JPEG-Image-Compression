@@ -22,17 +22,91 @@ using QTableChrominance = Mat1b;
 using uchar = unsigned char;
 
 
-namespace qtables {
-    struct TableSet;
-    struct QTableOption;
-    struct QTableCollection;
-}
+
+
+const int DIM = 8;
+const Size2i SIZE = {DIM, DIM};
+
+class TableSet {
+public:
+    QTableLuminance luminance;
+    QTableChrominance chrominance;
+    
+    void qualityFactorScale();
+};
 
 
 
 
 
-namespace qtables {
+
+/* Available tables */
+// Table index:
+static const TableSet jpeg_standard;     // 0
+static const TableSet randomized;        // 1
+
+
+/* All Quantization Tables selected from tableSets vector */
+
+std::vector<TableSet> tableSets{jpeg_standard, randomized};
+
+const QTableLuminance lum_jpeg_standard = (Mat1b(SIZE) << 16, 11, 10, 16, 24, 40, 51, 61, 12, 12, 14, 19, 26, 58, 60, 55, 14, 13, 16, 24, 40, 57, 69, 56, 14, 17, 22, 29, 51, 87, 80, 62, 18, 22, 37, 56, 68, 109, 103, 77, 24, 35, 55, 64, 81, 104, 113, 92, 49, 64, 78, 87, 103, 121, 120, 101, 72, 92, 95, 98, 112, 100, 103, 99);
+
+const QTableChrominance chrom_jpeg_standard = (Mat1b(SIZE) << 16, 11, 10, 16, 24, 40, 51, 61, 12, 12, 14, 19, 26, 58, 60, 55, 14, 13, 16, 24, 40, 57, 69, 56, 14, 17, 22, 29, 51, 87, 80, 62, 18, 22, 37, 56, 68, 109, 103, 77, 24, 35, 55, 64, 81, 104, 113, 92, 49, 64, 78, 87, 103, 121, 120, 101, 72, 92, 95, 98, 112, 100, 103, 99);
+    
+    
+    
+    TableSet select(unsigned int index) {
+        unsigned long int qtableCount = tableSets.size();
+        if (index > qtableCount) {
+            index %= qtableCount;
+        }
+        return tableSets[index];
+    }
+    
+    
+
+    
+    
+
+    
+    
+    TableSet randomizedTableSet() {
+        QTableLuminance lum(SIZE, CV_8U);
+        QTableChrominance chrom(SIZE, CV_8U);
+        
+        for (int row = 0; row < DIM; row++) {
+            for (int col = 0; col < DIM; col++) {
+                lum.at<uchar>(row, col) = uchar_random();
+                chrom.at<uchar>(row, col) = uchar_random();
+            }
+        }
+        
+        return {lum, chrom};
+    }
+    
+    
+    
+    
+    void TableSet::qualityFactorScale() {
+        int cn = 8;
+        for (int row = 0; row < cn; row++) {
+            for (int col = 0; col < cn; col++) {
+                
+                this->luminance.at<uchar>(row, col) -= uchar_random();
+                
+                this->chrominance.at<uchar>(row, col) -= uchar_random();
+            }
+        }
+    }
+
+
+
+
+
+
+
+
 
 struct QTableOption {
     
@@ -60,15 +134,9 @@ struct QTableOption {
     // 0 - bad quality, 10 - good quality
     static unsigned int QUALITY_FACTOR;
     
-    
 };
     
-struct TableSet {
-    
-    QTableLuminance luminance;
-    QTableChrominance chrominance;
-    
-};
+
 
 unsigned int QTableOption::QUALITY_FACTOR = 0;
 
@@ -94,13 +162,11 @@ int QTableOption::USER_QTABLE_INDEX = -1;
     
 
 struct QTableCollection;
+    
 
-const int DIM = 8;
-const Size2i SIZE = {DIM, DIM};
-
-static const QTableLuminance lum_jpeg_standard = (Mat1b(SIZE) << 16, 11, 10, 16, 24, 40, 51, 61, 12, 12, 14, 19, 26, 58, 60, 55, 14, 13, 16, 24, 40, 57, 69, 56, 14, 17, 22, 29, 51, 87, 80, 62, 18, 22, 37, 56, 68, 109, 103, 77, 24, 35, 55, 64, 81, 104, 113, 92, 49, 64, 78, 87, 103, 121, 120, 101, 72, 92, 95, 98, 112, 100, 103, 99);
-
-static const QTableChrominance chrom_jpeg_standard = (Mat1b(SIZE) << 16, 11, 10, 16, 24, 40, 51, 61, 12, 12, 14, 19, 26, 58, 60, 55, 14, 13, 16, 24, 40, 57, 69, 56, 14, 17, 22, 29, 51, 87, 80, 62, 18, 22, 37, 56, 68, 109, 103, 77, 24, 35, 55, 64, 81, 104, 113, 92, 49, 64, 78, 87, 103, 121, 120, 101, 72, 92, 95, 98, 112, 100, 103, 99);
+    
+    
+ 
 
 
 
@@ -122,28 +188,13 @@ static const QTableChrominance chrom_jpeg_standard = (Mat1b(SIZE) << 16, 11, 10,
 
 struct QTableCollection {
     
-    /* Available tables */
-                                             // Table index:
-    static const TableSet jpeg_standard;     // 0
-    static const TableSet randomized;        // 1
-    
-    // Select a set of (Luminance, Chrominance) tables to quantize coefficients
-    static TableSet select(unsigned int index);
-    
-    // All Quantization Tables stored here
-    static std::vector<TableSet> tableSets;
+
     
 
 private:
     
     
-    // Generate randomized table set (uchar range)
-    static TableSet randomizedTableSet();
-    
 
-    
-    // Random unsigned char
-    static uchar uchar_random();
     
 };
 
@@ -160,19 +211,7 @@ private:
  *******************************************************************************/
 
 
-/* Available Tables */
 
-const TableSet QTableCollection::jpeg_standard{qtables::lum_jpeg_standard, qtables::chrom_jpeg_standard};
-const TableSet QTableCollection::randomized = QTableCollection::randomizedTableSet();
-
-
-
-
-
-
-/* All Quantization Tables selected from tableSets vector */
-
-std::vector<TableSet> QTableCollection::tableSets{jpeg_standard, randomized};
 
     
     
@@ -218,36 +257,9 @@ unsigned int QTableOption::quality() {
     
         
 /* Select a set of (Luminance, Chrominance) tables to quantize coefficients */
-TableSet QTableCollection::select(unsigned int index) {
-    unsigned long int qtableCount = tableSets.size();
-    if (index > qtableCount) {
-        index %= qtableCount;
-    }
-    return tableSets[index];
-}
 
 
-TableSet QTableCollection::randomizedTableSet() {
-    QTableLuminance lum(qtables::SIZE, CV_8U);
-    QTableChrominance chrom(qtables::SIZE, CV_8U);
-    
-    for (int row = 0; row < qtables::DIM; row++) {
-        for (int col = 0; col < qtables::DIM; col++) {
-            lum.at<uchar>(row, col) = uchar_random();
-            chrom.at<uchar>(row, col) = uchar_random();
-        }
-    }
-    
-    return {lum, chrom};
-}
 
-
-uchar QTableCollection::uchar_random() {
-    return rand() % 256;
-}
-
-    
-}
 
 // https://csil-git1.cs.surrey.sfu.ca/A2-365/JPEG-Image-Compression/blob/master/README.md#resources-3
 

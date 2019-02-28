@@ -205,6 +205,11 @@ DecodedImage Codec::decode(const CompressedImage &source) {
     }
     
     
+    
+    
+    Mat3b m(1,2);
+    return m;
+    
 }
     
     // 4. Reverse 4:2:0 subsample ratio

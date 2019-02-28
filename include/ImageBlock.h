@@ -48,8 +48,6 @@ using block_t::BlockQuantization;
 using block_t::Block1s;
 using block_t::Block3s;
 
-using qtables::QTableCollection;
-
 template<typename, int = 1>
 class ImageBlock;
 
@@ -189,15 +187,12 @@ void ImageBlock<_Tp, cn>::apply(BlockTransform transform) {
     this->display();
 }
 
-using qtables::TableSet;
-using qtables::QTableOption;
-
 
 template<typename _Tp, int cn>
 void ImageBlock<_Tp, cn>::apply(BlockQuantization quantization) {
     
     // Choose table sets
-    TableSet tables = QTableCollection::select(QTableOption::preferred());
+    TableSet tables = select(QTableOption::preferred());
     //tables.scale(Q)
     
     
