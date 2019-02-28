@@ -27,7 +27,9 @@ using cv::DataType;
 
 using block_t::BlockTransform;
 
-
+using CompressedImage = Mat_<Block3s>;
+using DecodedImage = Mat_<Vec3b>;
+using Image = Mat;
 
 
 const int N = block_t::N;
@@ -47,9 +49,16 @@ struct PartitionLimit;
 
 struct Codec {
     
-    static Mat_<Block3s> encode(const Mat_<Vec<uchar, 3>> &source);
+    // Encode JPEG Image and return a matrix of blocks of quantized DCT coefficients
+    static CompressedImage encode(const DecodedImage &source);
     
-    static void decode(const Mat3b &source);
+    
+    // Decode JPEG Image and return the original RGB image
+    static DecodedImage decode(const CompressedImage &source);
+    
+    
+    // Compare original input and output image and the produced output
+    static Mat3b compare(const CompressedImage &input, const DecodedImage &output);
     
 };
 
@@ -96,16 +105,11 @@ struct PartitionLimit {
 
 /* JPEG Encode */
 
-Mat_<Block3s> Codec::encode(const Mat_<Vec<uchar, 3>> &source) {
+CompressedImage Codec::encode(const DecodedImage &source) {
     
-    print(source);
+    // Matrix to store final output, quantized dct coefficients
+    CompressedImage output = Mat(N, N, CV_16UC3, Block3s(0, 0, 0));
     
-    // Matrix to store result of the conversion (quantized dct coefficients)
-    
-    //Vec<short, 3> init(0, 0, 0);
-    Mat_<Block3s> output = Mat(N, N, CV_16UC3, Block3s(0, 0, 0));
-    
-    print(output);
     
     
     // 1. Convert RGB (CV_8UC3) to YUV
@@ -120,9 +124,6 @@ Mat_<Block3s> Codec::encode(const Mat_<Vec<uchar, 3>> &source) {
     // 3. Compute limits. Disregard incomplete
     //    blocks less than block_t::SIZE.
     PartitionLimit limit(source.rows, source.cols, N);
-    
-    
-    
     
     
     for (int row = 0; row < limit.rows; row += N) {
@@ -146,26 +147,17 @@ Mat_<Block3s> Codec::encode(const Mat_<Vec<uchar, 3>> &source) {
 
             // 6. Quantizing DCT coefficients
             //    Resulting block stores quantized DCT coefficients in separate matrices.
-            BlockQuantization quantizationFormula = ColorQuantization::quantization;
+            BlockQuantization quantizationFormula = Compression::quantization;
             block.apply(quantizationFormula);
 
             
-            // Combine block innto a single matrix of 3-channel vectors
+            // 7. Combine block into a single matrix of 3-channel vectors
+            //    and save it to the output
             block.saveTo(output);
-            print(output);
-            
-            
-            
-            
-            
-            
         }
     }
 
-    
     return output;
-    
-    // return encoded;
 }
 
 
@@ -175,7 +167,7 @@ Mat_<Block3s> Codec::encode(const Mat_<Vec<uchar, 3>> &source) {
 
 /* JPEG Decode */
 
-void Codec::decode(const Mat3b &source) {
+DecodedImage Codec::decode(const CompressedImage &source) {
     
     // 1. Compute limits. Disregard incomplete
     //    blocks less than block_t::SIZE.
@@ -221,7 +213,22 @@ void Codec::decode(const Mat3b &source) {
 }
 
 
-
+Mat3b Codec::compare(const CompressedImage &input, const DecodedImage &output) {
+    CV_Assert(input.size() == output.size());
+    Mat3b result(input.size(), CV_8SC3);
+    
+    
+    for (int row = 0; row < input.rows; row++) {
+        for (int col = 0; col < output.cols; col++) {
+            Vec3b inputVec = input.template at<Vec3b>(row, col);
+            Vec3b outputVec = output.template at<Vec3b>(row, col);
+            
+            result.at<Vec3b>(row, col) = inputVec - outputVec;
+        }
+    }
+    
+    return result;
+}
 
 
 

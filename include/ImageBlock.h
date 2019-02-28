@@ -178,8 +178,14 @@ void ImageBlock<_Tp, cn>::apply(BlockTransform transform) {
 
 template<typename _Tp, int cn>
 void ImageBlock<_Tp, cn>::apply(BlockQuantization quantization) {
+    
+    // JPEG Standard
     qtables::TableSet tables = QuantizationTable::standard();
+    
+    // Luminance 
     this->at(0) = quantization(this->at(0), tables.luminance);
+    
+    // Chrom
     for (int c = 1; c < cn; c++) {
         this->at(c) = quantization(this->at(c), tables.chrominance);
     }
