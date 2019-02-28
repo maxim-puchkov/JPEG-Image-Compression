@@ -31,6 +31,9 @@ namespace block_t {
     using BlockTransform = std::function<Mat_<double>(Mat_<BlockDataType>)>;
     using BlockQuantization = std::function<Mat_<BlockDataType>(Mat_<BlockDataType>, QTable)>;
     
+    using Block1s = BlockDataType;
+    using Block3s = Vec<BlockDataType, 3>;
+    
     static const int N = 8;
     static const Size2i SIZE = {N, N};
     
@@ -42,6 +45,8 @@ namespace block_t {
 using block_t::BlockDataType;
 using block_t::BlockTransform;
 using block_t::BlockQuantization;
+using block_t::Block1s;
+using block_t::Block3s;
 
 
 template<typename, int = 1>
@@ -93,23 +98,17 @@ public:
     Mat_<BlockDataType> &operator[](unsigned int index);
 
     
-    Mat3b combine() {
-        Mat3b output;
-
+    
+    void saveTo(Mat_<Block3s> &output) {
         for (int row = 0; row < block_t::N; row++) {
             for (int col = 0; col < block_t::N; col++) {
-                
-                Vec<uchar, 3> v;
+                Block3s block;
                 for (int c = 0; c < cn; c++) {
-                    v[c] = this->channelData[c].template at<uchar>(row, col) + block_t::DATA_OFFSET;
+                    block[c] = this->at(c).template at<Block1s>(row, col);
                 }
-                
-                
-                output.template at<Vec<BlockDataType, 3>>(row, col) = v;
+                output.at<Block3s>(row, col) = block;
             }
         }
-        
-        return output;
     }
     
 private:

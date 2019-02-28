@@ -28,6 +28,8 @@ using cv::DataType;
 using block_t::BlockTransform;
 
 
+
+
 const int N = block_t::N;
 
 
@@ -45,7 +47,7 @@ struct PartitionLimit;
 
 struct Codec {
     
-    static void encode(const Mat3b &source);
+    static Mat_<Block3s> encode(const Mat3b &source);
     
     static void decode(const Mat3b &source);
     
@@ -87,7 +89,6 @@ struct PartitionLimit {
 
 
 
-
 /*******************************************************************************
                                 Implementation
  *******************************************************************************/
@@ -95,7 +96,10 @@ struct PartitionLimit {
 
 /* JPEG Encode */
 
-void Codec::encode(const Mat3b &source) {
+Mat_<Block3s> Codec::encode(const Mat3b &source) {
+    
+    // Matrix to store result of the conversion (quantized dct coefficients)
+    Mat_<Block3s> output(source.size(), DataType<Block1s>::type);
     
     // 1. Convert RGB (CV_8UC3) to YUV
     Mat3b yuvImage = convert_RGB_YUV(source);
@@ -105,14 +109,15 @@ void Codec::encode(const Mat3b &source) {
     // 2. Chroma subsampling 4:2:0
     Mat3b sampled = sample(yuvImage);
     
+    
     // 3. Compute limits. Disregard incomplete
     //    blocks less than block_t::SIZE.
     PartitionLimit limit(source.rows, source.cols, N);
     
-    int counter = 0;
     
     
-    Mat_<Vec<BlockDataType, 3>> encoded(source.size(), DataType<BlockDataType>::type);
+    
+    
     for (int row = 0; row < limit.rows; row += N) {
         for (int col = 0; col < limit.cols; col += N) {
         
@@ -122,31 +127,40 @@ void Codec::encode(const Mat3b &source) {
             Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
             
+            
             print("Block area = ", area);
             ImageBlock block(source(area));
             
             
             // 5. DCT transformation of each image block channel
-            BlockTransform dct2 = Transform::dct2<BlockDataType>;
+            BlockTransform dct2 = Transform::dct2<Block1s>;
             block.apply(dct2);
             
 
             // 6. Quantizing DCT coefficients
-            BlockQuantization q = ColorQuantization::quantization;
-            block.apply(q);
+            //    Resulting block stores quantized DCT coefficients in separate matrices.
+            BlockQuantization quantizationFormula = ColorQuantization::quantization;
+            block.apply(quantizationFormula);
 
             
-            // Resulting block stores quantized DCT coefficients
-            encoded.at<Vec<BlockDataType, 3>>(col, row) = block.combine();
+            // Combine block innto a single matrix of 3-channel vectors
+            block.saveTo(output);
             
-            //counter++;
+            
+            
+            
+            
+            
+            
         }
     }
     
-    
+    return output;
     
     // return encoded;
 }
+
+
 
 
 
@@ -174,6 +188,9 @@ void Codec::decode(const Mat3b &source) {
             BlockTransform idct2 = Transform::idct2<BlockDataType>;
             block.apply(idct2);
     
+            
+            // Mat_<Vec<BlockDataType, 3>> combined = block.combine<BlockDataType>();
+            
             
 
             
