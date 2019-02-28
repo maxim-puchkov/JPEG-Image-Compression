@@ -59,16 +59,16 @@ struct Codec {
 
     
     // Encode JPEG Image and return a matrix of blocks of quantized DCT coefficients
-    static CompressedImage encode(const DecodedImage &source);
+    //static CompressedImage encode(const DecodedImage &source);
+    static  Mat_<Vec<short, 3>> encode(const  Mat_<Vec<unsigned char, 3>>  &source);
     
     
     // Decode JPEG Image and return the original RGB image
-    static DecodedImage decode(const CompressedImage &source);
+    static Mat_<Vec<unsigned char, 3>> decode(const Mat_<Vec<short, 3>> &source);
     
     
     // Compare original input and output image and the produced output
-    static Mat3b compare(const CompressedImage &input, const DecodedImage &output);
-   
+    static Mat_<Vec<unsigned char, 3>> compare(const Mat_<Vec<unsigned char, 3>> &input, const  Mat_<Vec<unsigned char, 3>> &output);
     
 };
 
@@ -84,6 +84,10 @@ struct PartitionLimit {
     int blockCount;
     
 };
+
+
+
+
 
 //
 //template<typename _Tp>
@@ -115,7 +119,7 @@ struct PartitionLimit {
 
 /* JPEG Encode */
 
-CompressedImage Codec::encode(const DecodedImage &source) {
+Mat_<Vec<short, 3>> Codec::encode(const Mat_<Vec<unsigned char, 3>> &source) {
     
     // Matrix to store final output, quantized dct coefficients
     CompressedImage output = Mat(N, N, CV_16UC3, Block3s(0, 0, 0));
@@ -175,7 +179,7 @@ print("6 HI");
 
 /* JPEG Decode */
 
-DecodedImage Codec::decode(const CompressedImage &source) {
+ Mat_<Vec<unsigned char, 3>> Codec::decode(const Mat_<Vec<short, 3>> &source)  {
     
     // 1. Compute limits. Disregard incomplete
     //    blocks less than block_t::SIZE.
@@ -229,7 +233,7 @@ DecodedImage Codec::decode(const CompressedImage &source) {
 //}
 
 
-Mat3b Codec::compare(const CompressedImage &input, const DecodedImage &output) {
+ Mat_<Vec<unsigned char, 3>> Codec::compare(const Mat_<Vec<unsigned char, 3>> &input, const  Mat_<Vec<unsigned char, 3>> &output) {
     CV_Assert(input.size() == output.size());
     Mat3b result(input.size(), CV_8SC3);
     
