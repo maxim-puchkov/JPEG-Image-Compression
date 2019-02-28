@@ -103,7 +103,7 @@ Mat_<Block3s> Codec::encode(const Mat_<Vec<uchar, 3>> &source) {
     // Matrix to store result of the conversion (quantized dct coefficients)
     
     //Vec<short, 3> init(0, 0, 0);
-    Mat_<Block3s> output = Mat(N, N, CV_16UC3, Block3s(0,0,0));
+    Mat_<Block3s> output = Mat(N, N, CV_16UC3, Block3s(0, 0, 0));
     
     print(output);
     
@@ -141,13 +141,13 @@ Mat_<Block3s> Codec::encode(const Mat_<Vec<uchar, 3>> &source) {
 
             // 5. DCT transformation of each image block channel
             BlockTransform dct2 = Transform::dct2<Block1s>;
-            //block.apply(dct2);
+            block.apply(dct2);
             
 
             // 6. Quantizing DCT coefficients
             //    Resulting block stores quantized DCT coefficients in separate matrices.
             BlockQuantization quantizationFormula = ColorQuantization::quantization;
-            //block.apply(quantizationFormula);
+            block.apply(quantizationFormula);
 
             
             // Combine block innto a single matrix of 3-channel vectors

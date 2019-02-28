@@ -117,11 +117,7 @@ private:
     
     const int LINE_BREAK = 3;
     
-    
     void alloc();
-    
-    
-
     
     std::vector<Mat_<Block1s>> channelData;
     
