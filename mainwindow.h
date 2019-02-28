@@ -8,6 +8,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QImageReader>
@@ -38,6 +39,9 @@ private slots:
     void loadImage();
     void convertImage();
     cv::Mat YUVTORGB(const cv::Mat3b &src);
+    void first();
+    void second();
+    void third();
 
 private:
     
@@ -53,7 +57,8 @@ private:
     QLabel *img1, *img2;
     QScrollArea *scrollArea1, *scrollArea2;
     QLayout *mainLayout, *buttonLayout;
-    QPushButton *openButton, *convertButton;
+    QPushButton *openButton, *convertButton, *decodeButton;
+    QRadioButton *firstSetting, *secondSetting, *thirdSetting;
     Mat cvImg, convertedImg;
 
 };
