@@ -22,32 +22,46 @@ using QTableChrominance = Mat1b;
 using uchar = unsigned char;
 
 
-
-
-namespace options {
-    
-    /* JPEG standard tables at index 0 */
-    const unsigned int JPEG_QTABLE_INDEX = 0;
-    
-    
-    
-    /* Quality Factor */
-    // 0 - bad quality, 10 - good quality
-    const unsigned int QUALITY_FACTOR = 0;
-    
+namespace qtables {
+    struct TableSet;
+    struct QTableOption;
+    struct QTableCollection;
 }
 
 
 
 
 
-
-/*******************************************************************************
-                            Available Quantization Tables
- *******************************************************************************/
-
-
 namespace qtables {
+
+struct QTableOption {
+    
+    
+    /* Get the standard JPEG Table set */
+    static int standard();
+    
+    /* Get the user preffered set */
+    static int preferred();
+    
+    
+    /* Compression quality */
+    static unsigned int quality();
+    
+    
+    /* JPEG standard tables at index 0 */
+    static int JPEG_QTABLE_INDEX;
+    
+    
+    /* User Selected Table set */
+    static int USER_QTABLE_INDEX;
+    
+    
+    /* Quality Factor */
+    // 0 - bad quality, 10 - good quality
+    static unsigned int QUALITY_FACTOR;
+    
+    
+};
     
 struct TableSet {
     
@@ -55,6 +69,29 @@ struct TableSet {
     QTableChrominance chrominance;
     
 };
+
+unsigned int QTableOption::QUALITY_FACTOR = 0;
+
+int QTableOption::JPEG_QTABLE_INDEX = 0;
+
+int QTableOption::USER_QTABLE_INDEX = -1;
+
+
+
+
+
+
+
+
+
+    
+    
+    
+
+/*******************************************************************************
+                            Available Quantization Tables
+ *******************************************************************************/
+    
 
 struct QTableCollection;
 
@@ -90,13 +127,11 @@ struct QTableCollection {
     static const TableSet jpeg_standard;     // 0
     static const TableSet randomized;        // 1
     
-    
-    // Select the standard sets
-    static TableSet standard();
-    
-    
     // Select a set of (Luminance, Chrominance) tables to quantize coefficients
     static TableSet select(unsigned int index);
+    
+    // All Quantization Tables stored here
+    static std::vector<TableSet> tableSets;
     
 
 private:
@@ -105,8 +140,7 @@ private:
     // Generate randomized table set (uchar range)
     static TableSet randomizedTableSet();
     
-    // All Quantization Tables stored here
-    static std::vector<TableSet> tableSets;
+
     
     // Random unsigned char
     static uchar uchar_random();
@@ -132,13 +166,6 @@ const TableSet QTableCollection::jpeg_standard{qtables::lum_jpeg_standard, qtabl
 const TableSet QTableCollection::randomized = QTableCollection::randomizedTableSet();
 
 
-// struct QuantizationTable {}
-
-TableSet QTableCollection::standard() {
-    return QTableCollection::tableSets[options::JPEG_QTABLE_INDEX];
-}
-
-
 
 
 
@@ -147,7 +174,27 @@ TableSet QTableCollection::standard() {
 
 std::vector<TableSet> QTableCollection::tableSets{jpeg_standard, randomized};
 
+    
+    
 
+int QTableOption::standard() {
+    return QTableOption::JPEG_QTABLE_INDEX;
+}
+
+    
+int QTableOption::preferred() {
+    int index;
+    int userDefined = QTableOption::USER_QTABLE_INDEX;
+    if (userDefined != -1) {
+        index = QTableOption::JPEG_QTABLE_INDEX;
+    }
+    return QTableOption::USER_QTABLE_INDEX;
+}
+    
+    
+unsigned int QTableOption::quality() {
+    return QTableOption::QUALITY_FACTOR;
+}
 
 
 
@@ -168,8 +215,8 @@ std::vector<TableSet> QTableCollection::tableSets{jpeg_standard, randomized};
 /*******************************************************************************
                                 Implementation
  *******************************************************************************/
-
-
+    
+        
 /* Select a set of (Luminance, Chrominance) tables to quantize coefficients */
 TableSet QTableCollection::select(unsigned int index) {
     unsigned long int qtableCount = tableSets.size();
@@ -199,7 +246,7 @@ uchar QTableCollection::uchar_random() {
     return rand() % 256;
 }
 
-
+    
 }
 
 // https://csil-git1.cs.surrey.sfu.ca/A2-365/JPEG-Image-Compression/blob/master/README.md#resources-3

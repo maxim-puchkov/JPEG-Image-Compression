@@ -189,12 +189,19 @@ void ImageBlock<_Tp, cn>::apply(BlockTransform transform) {
     this->display();
 }
 
+using qtables::TableSet;
+using qtables::QTableOption;
+
 
 template<typename _Tp, int cn>
 void ImageBlock<_Tp, cn>::apply(BlockQuantization quantization) {
     
-    // JPEG Standard
-    qtables::TableSet tables = QTableCollection::standard();
+    // Choose table sets
+    TableSet tables = QTableCollection::select(QTableOption::preferred());
+    //tables.scale(Q)
+    
+    
+    //qtables::TableSet tables = QTableCollection::standard();
     
     // Luminance 
     this->at(0) = quantization(this->at(0), tables.luminance);

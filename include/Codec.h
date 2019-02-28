@@ -56,7 +56,7 @@ struct PartitionLimit;
 
 
 struct Codec {
-    
+
     
     // Encode JPEG Image and return a matrix of blocks of quantized DCT coefficients
     static CompressedImage encode(const DecodedImage &source);
@@ -204,6 +204,9 @@ DecodedImage Codec::decode(const CompressedImage &source) {
         }
     }
     
+    
+}
+    
     // 4. Reverse 4:2:0 subsample ratio
     
     // 5. Convert YUV color space back to RGB
@@ -217,7 +220,7 @@ DecodedImage Codec::decode(const CompressedImage &source) {
     
     // return decoded;
     
-}
+//}
 
 
 Mat3b Codec::compare(const CompressedImage &input, const DecodedImage &output) {
