@@ -87,6 +87,8 @@ struct QuantizationTable {
     
     
     
+    
+    
 
 private:
     
@@ -116,14 +118,14 @@ private:
 
 /* Available Tables */
 
-const TableSet QuantizationTable::jpeg_standard{qtables::lum_jpeg_standard, qtables::chrom_jpeg_standard};
-const TableSet QuantizationTable::randomized = QuantizationTable::randomizedTableSet();
+// const TableSet Compression::jpeg_standard{qtables::lum_jpeg_standard, qtables::chrom_jpeg_standard};
+//const TableSet Compression::randomized = Compression::randomizedTableSet();
 
 
 
 
-TableSet QuantizationTable::standard() {
-    return QuantizationTable::tableSets[QuantizationTable::DEFAULT_INDEX];
+TableSet Compression::standard() {
+    return Compression::tableSets[QuantizationTable::DEFAULT_INDEX];
 }
 
 
