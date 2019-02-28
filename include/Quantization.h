@@ -27,7 +27,7 @@ struct ColorQuantization;
 
 
 struct Compression {
-
+    
     // Quantize DCT coefficients
     static Mat_<Block1s> quantization(const Mat_<Block1s> &dctCoefficients,
                                       QTable table);

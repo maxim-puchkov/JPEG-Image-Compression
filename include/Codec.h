@@ -31,8 +31,16 @@ using CompressedImage = Mat_<Block3s>;
 using DecodedImage = Mat_<Vec3b>;
 using Image = Mat;
 
-
 const int N = block_t::N;
+
+
+
+
+
+
+
+
+
 
 
 
@@ -49,6 +57,7 @@ struct PartitionLimit;
 
 struct Codec {
     
+    
     // Encode JPEG Image and return a matrix of blocks of quantized DCT coefficients
     static CompressedImage encode(const DecodedImage &source);
     
@@ -59,6 +68,7 @@ struct Codec {
     
     // Compare original input and output image and the produced output
     static Mat3b compare(const CompressedImage &input, const DecodedImage &output);
+   
     
 };
 

@@ -11,6 +11,7 @@
 
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include "Codec.h"
 
 using cv::Mat1b;
 using cv::Size2i;
@@ -22,14 +23,19 @@ using uchar = unsigned char;
 
 
 
+
 namespace options {
     
     /* JPEG standard tables at index 0 */
-    
     const unsigned int JPEG_QTABLE_INDEX = 0;
     
+    
+    
+    /* Quality Factor */
+    // 0 - bad quality, 10 - good quality
+    const unsigned int QUALITY_FACTOR = 0;
+    
 }
-
 
 
 
