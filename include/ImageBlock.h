@@ -18,11 +18,8 @@
 #include "Print.h"
 
 
-
-using namespace cv;
-
-
 namespace block_t {
+    
     using BlockDataType = short;
     
     using BlockTransform = std::function<Mat_<double>(Mat_<BlockDataType>)>;
@@ -31,22 +28,27 @@ namespace block_t {
     using Block1s = BlockDataType;
     using Block3s = Vec<BlockDataType, 3>;
     
+    using CompressedImage = Mat_<Block3s>;
+    using DecodedImage = Mat_<Vec3b>;
+    using Image = Mat;
+    
+    
     
     static const int N = 8;
     static const Size2i SIZE = {N, N};
     
     static const int CHANNEL_TYPE = CV_32SC1;
     static const BlockDataType DATA_OFFSET = 128;
+    
 }
 
 
+using namespace cv;
 using namespace block_t;
 
 
 template<typename, int = 1>
 class ImageBlock;
-
-
 
 
 /*******************************************************************************

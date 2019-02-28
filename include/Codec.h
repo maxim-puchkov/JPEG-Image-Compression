@@ -102,13 +102,11 @@ void Codec::encode(const Mat_<_Tp> &source) {
     
     // 3. Compute limits. Disregard incomplete
     //    blocks less than block_t::SIZE.
-    
-    int step = block_t::N;
-    PartitionLimit limit(source.rows, source.cols, step);
+    PartitionLimit limit(source.rows, source.cols, N);
     
     
-    for (int row = 0; row < limit.rows; row += step) {
-        for (int col = 0; col < limit.cols; col += step) {
+    for (int row = 0; row < limit.rows; row += N) {
+        for (int col = 0; col < limit.cols; col += N) {
             
             // 4. Partition each 8×8 3-channel block into
             //    ImageBlock (three 8×8 1-channel blocks)
