@@ -22,6 +22,16 @@ using uchar = unsigned char;
 
 
 
+namespace options {
+    
+    /* JPEG standard tables at index 0 */
+    
+    const unsigned int JPEG_QTABLE_INDEX = 0;
+    
+}
+
+
+
 
 
 
@@ -33,22 +43,25 @@ using uchar = unsigned char;
 
 namespace qtables {
     
-    struct TableSet {
-        
-        QTableLuminance luminance;
-        QTableChrominance chrominance;
-        
-    };
+struct TableSet {
+    
+    QTableLuminance luminance;
+    QTableChrominance chrominance;
+    
+};
+
+struct QTableCollection;
+
+const int DIM = 8;
+const Size2i SIZE = {DIM, DIM};
+
+static const QTableLuminance lum_jpeg_standard = (Mat1b(SIZE) << 16, 11, 10, 16, 24, 40, 51, 61, 12, 12, 14, 19, 26, 58, 60, 55, 14, 13, 16, 24, 40, 57, 69, 56, 14, 17, 22, 29, 51, 87, 80, 62, 18, 22, 37, 56, 68, 109, 103, 77, 24, 35, 55, 64, 81, 104, 113, 92, 49, 64, 78, 87, 103, 121, 120, 101, 72, 92, 95, 98, 112, 100, 103, 99);
+
+static const QTableChrominance chrom_jpeg_standard = (Mat1b(SIZE) << 16, 11, 10, 16, 24, 40, 51, 61, 12, 12, 14, 19, 26, 58, 60, 55, 14, 13, 16, 24, 40, 57, 69, 56, 14, 17, 22, 29, 51, 87, 80, 62, 18, 22, 37, 56, 68, 109, 103, 77, 24, 35, 55, 64, 81, 104, 113, 92, 49, 64, 78, 87, 103, 121, 120, 101, 72, 92, 95, 98, 112, 100, 103, 99);
+
+
 
     
-    const int DIM = 8;
-    const Size2i SIZE = {DIM, DIM};
-    
-    static const QTableLuminance lum_jpeg_standard = (Mat1b(SIZE) << 16, 11, 10, 16, 24, 40, 51, 61, 12, 12, 14, 19, 26, 58, 60, 55, 14, 13, 16, 24, 40, 57, 69, 56, 14, 17, 22, 29, 51, 87, 80, 62, 18, 22, 37, 56, 68, 109, 103, 77, 24, 35, 55, 64, 81, 104, 113, 92, 49, 64, 78, 87, 103, 121, 120, 101, 72, 92, 95, 98, 112, 100, 103, 99);
-    
-    static const QTableChrominance chrom_jpeg_standard = (Mat1b(SIZE) << 16, 11, 10, 16, 24, 40, 51, 61, 12, 12, 14, 19, 26, 58, 60, 55, 14, 13, 16, 24, 40, 57, 69, 56, 14, 17, 22, 29, 51, 87, 80, 62, 18, 22, 37, 56, 68, 109, 103, 77, 24, 35, 55, 64, 81, 104, 113, 92, 49, 64, 78, 87, 103, 121, 120, 101, 72, 92, 95, 98, 112, 100, 103, 99);
-    
-}
 
 
 
@@ -56,10 +69,7 @@ namespace qtables {
 
 
 
-using qtables::TableSet;
 
-
-struct QuantizationTable;
 
 
 /*******************************************************************************
@@ -67,7 +77,7 @@ struct QuantizationTable;
  *******************************************************************************/
 
 
-struct QuantizationTable {
+struct QTableCollection {
     
     /* Available tables */
                                              // Table index:
@@ -75,22 +85,16 @@ struct QuantizationTable {
     static const TableSet randomized;        // 1
     
     
-    // Index of default Luminance, Chrominance) tables to use for quantization
-    static unsigned int DEFAULT_INDEX;
-    
-    
+    // Select the standard sets
     static TableSet standard();
     
     
     // Select a set of (Luminance, Chrominance) tables to quantize coefficients
     static TableSet select(unsigned int index);
     
-    
-    
-    
-    
 
 private:
+    
     
     // Generate randomized table set (uchar range)
     static TableSet randomizedTableSet();
@@ -118,26 +122,24 @@ private:
 
 /* Available Tables */
 
-// const TableSet Compression::jpeg_standard{qtables::lum_jpeg_standard, qtables::chrom_jpeg_standard};
-//const TableSet Compression::randomized = Compression::randomizedTableSet();
+const TableSet QTableCollection::jpeg_standard{qtables::lum_jpeg_standard, qtables::chrom_jpeg_standard};
+const TableSet QTableCollection::randomized = QTableCollection::randomizedTableSet();
 
 
+// struct QuantizationTable {}
 
-
-TableSet Compression::standard() {
-    return Compression::tableSets[QuantizationTable::DEFAULT_INDEX];
+TableSet QTableCollection::standard() {
+    return QTableCollection::tableSets[options::JPEG_QTABLE_INDEX];
 }
 
 
-/* JPEG standard tables at index 0 */
 
-unsigned int QuantizationTable::DEFAULT_INDEX = 0;
 
 
 
 /* All Quantization Tables selected from tableSets vector */
 
-std::vector<TableSet> QuantizationTable::tableSets{jpeg_standard, randomized};
+std::vector<TableSet> QTableCollection::tableSets{jpeg_standard, randomized};
 
 
 
@@ -163,16 +165,16 @@ std::vector<TableSet> QuantizationTable::tableSets{jpeg_standard, randomized};
 
 
 /* Select a set of (Luminance, Chrominance) tables to quantize coefficients */
-TableSet QuantizationTable::select(unsigned int index) {
-    unsigned long int qtableCount = QuantizationTable::tableSets.size();
+TableSet QTableCollection::select(unsigned int index) {
+    unsigned long int qtableCount = tableSets.size();
     if (index > qtableCount) {
         index %= qtableCount;
     }
-    return QuantizationTable::tableSets[index];
+    return tableSets[index];
 }
 
 
-TableSet QuantizationTable::randomizedTableSet() {
+TableSet QTableCollection::randomizedTableSet() {
     QTableLuminance lum(qtables::SIZE, CV_8U);
     QTableChrominance chrom(qtables::SIZE, CV_8U);
     
@@ -187,12 +189,12 @@ TableSet QuantizationTable::randomizedTableSet() {
 }
 
 
-uchar QuantizationTable::uchar_random() {
+uchar QTableCollection::uchar_random() {
     return rand() % 256;
 }
 
 
-
+}
 
 // https://csil-git1.cs.surrey.sfu.ca/A2-365/JPEG-Image-Compression/blob/master/README.md#resources-3
 

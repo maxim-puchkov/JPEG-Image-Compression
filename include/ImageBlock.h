@@ -48,6 +48,7 @@ using block_t::BlockQuantization;
 using block_t::Block1s;
 using block_t::Block3s;
 
+using qtables::QTableCollection;
 
 template<typename, int = 1>
 class ImageBlock;
@@ -97,6 +98,19 @@ public:
     Mat_<Block1s> operator[](unsigned int index) const;
     Mat_<Block1s> &operator[](unsigned int index);
 
+    
+    void saveTo(Mat_<Vec3b> &output) {
+        for (int row = 0; row < block_t::N; row++) {
+            for (int col = 0; col < block_t::N; col++) {
+                Vec3b block;
+                for (int c = 0; c < cn; c++) {
+                    block[c] = this->at(c).template at<uchar>(row, col);
+                }
+                output.at<Vec3b>(row, col) = block;
+            }
+        }
+    }
+    
     
     
     void saveTo(Mat_<Block3s> &output) {
@@ -180,7 +194,7 @@ template<typename _Tp, int cn>
 void ImageBlock<_Tp, cn>::apply(BlockQuantization quantization) {
     
     // JPEG Standard
-    qtables::TableSet tables = QuantizationTable::standard();
+    qtables::TableSet tables = QTableCollection::standard();
     
     // Luminance 
     this->at(0) = quantization(this->at(0), tables.luminance);
@@ -189,7 +203,6 @@ void ImageBlock<_Tp, cn>::apply(BlockQuantization quantization) {
     for (int c = 1; c < cn; c++) {
         this->at(c) = quantization(this->at(c), tables.chrominance);
     }
-    
     
     this->display();
 }

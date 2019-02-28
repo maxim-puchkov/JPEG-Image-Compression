@@ -134,9 +134,6 @@ CompressedImage Codec::encode(const DecodedImage &source) {
             //    ImageBlock (three 8×8 1-channel blocks)
             Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
-            
-            
-            //print("Block area = ", area);
             ImageBlock block(source(area));
             
 
