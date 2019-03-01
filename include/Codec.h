@@ -70,7 +70,7 @@ public:
     
     
     
-    // Codec configuration: encode, decode, and compare with source  (verbose)
+    // Codec configuration: encode, decode, and compare with source (verbose)
     static void configureCompression(const SourceImage &source);
     
     
@@ -112,7 +112,7 @@ struct PartitionLimit {
 
 
 /*******************************************************************************
-                                Implementation
+                                    Encode
  *******************************************************************************/
 
 
@@ -159,19 +159,17 @@ EncodedImage Codec::encode(const SourceImage &source) {
     
     
     for (int row = 0; (row + N) < (height); row += N) {
-        print("DEB nxt row");
-        
         for (int col = 0; (col + N) < (width); col += N) {
             
             // Block of Y, U, and V color intensities
             ImageBlock block(nChannels);
+            
             
             // Partition each 8×8 channel
             Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
             block.partition<SourceImageType>(sampledImage(area));
             print("DEB part rc", row, col);
-            
             
             
             // DCT transformation of each image block channel
@@ -223,13 +221,16 @@ EncodedImage Codec::encode(const SourceImage &source) {
 
 
 
-/* JPEG Decode */
+/*******************************************************************************
+                                    Decode
+ *******************************************************************************/
 
 DecodedImage Codec::decode(const EncodedImage &source) {
     
     print("DEB d");
     dbg(source, 100); // debug 100 blocks
     print("DEB dbg complete");
+    
     
     // Number of channels
     int nChannels = source.channels();
@@ -254,8 +255,6 @@ DecodedImage Codec::decode(const EncodedImage &source) {
     
 
     for (int row = 0; (row + N) < (height); row += N) {
-        
-        print("DEB nxt row");
         for (int col = 0; (col + N) < (width); col += N) {
             
             // Block of Y, U, and V quantized DCT coefficients
@@ -308,7 +307,28 @@ DecodedImage Codec::decode(const EncodedImage &source) {
 
 
 
-/* Codec compare */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*******************************************************************************
+                                Implementation
+ *******************************************************************************/
 
 Mat Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
     

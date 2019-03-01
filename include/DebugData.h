@@ -24,33 +24,35 @@ using std::vector;
  *******************************************************************************/
 
 
+// Test variables:
+//     gray3, gray3_2, rgb3, rand3, rand3sq, complex
 
 
-// Random 0..255
-unsigned char uchar_random();
-
+// Compare 10 points on the images:
+//      test(img, img2, 10)
+static bool test(Mat3b&, Mat3b&);
+static bool test(Mat3b&, Mat3b&, int);
+static bool test(Mat3b&, Mat3b&, vector<Point2i>);
 
 // Random RGB
 Mat3b rgb_image(int width);
 Mat3b rgb_image(int width, int height);
 
+// Debug codec
+template<typename T>
+void dbg(const Mat_<T> &src, int limit);
 
-// Three-channel gray image
+
+
+
+
+
+
+
 Mat3b channel_3x(const Mat1b &grayscale);
 
-
-static void dbg(const Mat3b &src, int limit);
-
-
-
-// Compare 10 points on the images:
-//      test(img, img2, 10)
-static vector<Point2i> points(int, int, int);
-static void test(Mat3b&, Mat3b&);
-static void test(Mat3b&, Mat3b&, int);
-static void test(Mat3b&, Mat3b&, vector<Point2i>);
-
-
+// Random 0..255
+unsigned char uchar_random();
 
 
 
@@ -132,38 +134,54 @@ Mat3b channel_3x(const Mat1b &grayscale) {
     return image;
 }
 
-vector<Point2i> points(int count, int rows, int cols) {
+static vector<Point2i> points(int, int, int);
+vector<Point2i> points(int count, int cols, int rows) {
     vector<Point2i> pts;
     for (int i = 0; i < count; i++) {
-        Point2i p(rand() % rows, rand() % cols);
+        Point2i p(rand() % rows - 8, rand() % cols - 8);
         pts.push_back(p);
     }
     return pts;
 }
 
-static void test(Mat3b& _in, Mat3b& _out, int n) {
-    auto pts = points(n, _in.rows, _in.cols);
+bool test(Mat3b& _in, Mat3b& _out, int n) {
+    return test(_in, _out, points(n, _in.rows, _in.cols));
 }
 
-void test(Mat3b& _in, Mat3b& _out) {
-    auto pts = points(10, _in.rows, _in.cols);
-    test(_in, _out, pts);
+bool test(Mat3b& _in, Mat3b& _out) {
+    return test(_in, _out, 10);
 }
 
-void test(Mat3b& _in, Mat3b& _out, vector<Point2i> pts) {
+bool test(Mat3b& _in, Mat3b& _out, vector<Point2i> pts) {
+    CV_Assert(_in.size() == _out.size());
     for (int i = 0; i < pts.size(); i++) {
-        print("Checking Vec3b at ", pts[i]);
+        print((i+1), ". Checking Vec3b at ", pts[i]);
         
+        print("Row/Y check");
+        CV_Assert(_in.rows > pts[i].y);
+        
+        print("Col/X check");
+        CV_Assert(_in.cols > pts[i].x);
+            
         Vec3b ov = _out.at<Vec3b>(pts[i]);
         Vec3b iv = _in.at<Vec3b>(pts[i]);
+        print("\t", ov, " == ", iv, " ?");
         
-        print((ov == iv) ? "OK" : "<< ERROR >>");
+    
+        if (ov != iv) { print("Error at ", pts[i]); return false; }
+        
+        print("\tOK");
     }
+    
+    return true;
+
+
 }
 
 
 const int dN = 8;
-void dbg(const Mat3b &src, int limit) {
+template<typename T>
+void dbg(const Mat_<T> &src, int limit) {
     int _or = src.rows;
     int _oc = src.cols;
     print("Debugging...");
