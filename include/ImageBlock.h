@@ -29,9 +29,6 @@ namespace block_t {
     using Block1s = BlockDataType;
     using Block3s = Vec<BlockDataType, 3>;
     
-    using EncodedImageType = uchar;
-    using UnEncodedImageType = BlockDataType;
-    
     using IBDecoded3 = Vec<BlockDataType, 3>;
     using IBEncoded3 = Vec<unsigned char, 3>;
     
@@ -257,9 +254,9 @@ Mat_<BlockDataType> &ImageBlock::at(unsigned int index) noexcept {
 template<typename RType, int Tc>
 Vec<RType, Tc> ImageBlock::data(int row, int col) const {
     Vec<RType, Tc> data;
+    
     for (int c = 0; c < cn; c++) {
         RType channelEntry = static_cast<RType>(this->at(c).at<BlockDataType>(row, col));
-        channelEntry += DATA_OFFSET;
         data[c] = channelEntry;
     }
     
