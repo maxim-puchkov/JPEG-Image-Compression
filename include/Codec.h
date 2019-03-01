@@ -53,12 +53,7 @@ struct PartitionLimit;
 
 
 struct Codec {
-
-
-    
-    
- public:
-    
+public:
     
     // Encode
     static EncodedImage encode(const SourceImage &source);
@@ -70,7 +65,20 @@ struct Codec {
     
     // Compare result (original - decompressed)
     static Mat3b compare(const SourceImage &input, const DecodedImage &decoded);
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /* Codec configuration (verbose) */
+    
+    // Encode, decode, and compare with source
+    static void configureCompression(const SourceImage &input);
+    
     
 private:
     
@@ -144,46 +152,31 @@ EncodedImage Codec::encode(const SourceImage &source) {
     for (int row = 0; row < limit.rows; row += N) {
         for (int col = 0; col < limit.cols; col += N) {
             
-            
             // Block of Y, U, and V color intensities
             ImageBlock block(nChannels);
             
-            
             // Partition each 8×8 channel
-            Point2i origin(row, col);
+            Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
             block.partition<EncodedImageType>(source(area));
             
         
-            
-            
             // DCT transformation of each image block channel
             BlockTransform dct2 = Transform::dct2<BlockDataType>;
             block.apply(dct2);
             
             
-            
-
             // Quantizing DCT coefficients
             BlockQuantization quantizationFormula = Compression::quantization;
             block.apply(quantizationFormula);
             
             
-            
-            
             // Each DCT coefficients block is written to the output
             Codec::write(EncodedImage, block);
             
-            
         }
     }
-    
-    
-    
-    
-    // print_spaced(3, "(E) Original\n", source);
-    // print_spaced(3, "Output\n", EncodedImage);
-    
+
     
     return EncodedImage;
     
@@ -220,17 +213,14 @@ DecodedImage Codec::decode(const EncodedImage &source) {
     for (int row = 0; row < limit.rows; row += N) {
         for (int col = 0; col < limit.cols; col += N) {
             
-            
             // Block of Y, U, and V quantized DCT coefficients
             ImageBlock block(nChannels);
             
             
             // Partition each 8×8 channel
-            Point2i origin(row, col);
+            Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
             block.partition<UnEncodedImageType>(source(area));
-            
-            
             
             
             // 2D-IDCT of each channel
@@ -238,10 +228,8 @@ DecodedImage Codec::decode(const EncodedImage &source) {
             block.apply(idct2);
             
             
-            
-            
+            // Write transformed block to image
             Codec::write(decodedImage, block);
-            
             
         }
     }
@@ -253,16 +241,8 @@ DecodedImage Codec::decode(const EncodedImage &source) {
     Mat3b desampledImage = ImageSampling::desample(decodedImage);
     
     
-    
-    
     // Convert YUV color space back to RGB
     DecodedImage rgbImage = Colorspace::convert_YUV_RGB(desampledImage);
-    
-    
-    
-    
-    // print_spaced(3, "(D) Original\n", source);
-    // print_spaced(3, "Output\n", rgbImage);
     
     
     return rgbImage;
@@ -302,12 +282,35 @@ Mat3b Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
 
 
 
+void Codec::configureCompression(const SourceImage &input) {
+    
+    print("Running debug configuration...");
+    print("Input image data: ", input.size());
+    
+    
+    
+}
 
 
 
 
 
-/* Codec write block to image */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Private. Codec write block to image */
 
 template<typename _Tp, int cn>
 void Codec::write(Mat_<Vec<_Tp, cn>> &to, ImageBlock &block) {
@@ -315,16 +318,18 @@ void Codec::write(Mat_<Vec<_Tp, cn>> &to, ImageBlock &block) {
     for (int row = 0; row < N; row++) {
         for (int col = 0; col < N; col++) {
             
-            Vec<_Tp, cn> imagePixel;
+            Vec<_Tp, cn> imagePixel = block.data<_Tp, cn>(col, row);
             
             for (int c = 0; c < cn; c++) {
                 
-                _Tp entry = block.data(c, {row, col});
-                imagePixel[c] = static_cast<_Tp>(entry);
+                //Block3s entry = block.data({row, col});
+                //imagePixel[c] = static_cast<_Tp>(entry);
+                
+                
                 
             }
             
-            to.template at<Vec<_Tp, cn>>(row, col) = imagePixel;
+            to.template at<Vec<_Tp, cn>>(col, row) = imagePixel;
             
         }
     }
