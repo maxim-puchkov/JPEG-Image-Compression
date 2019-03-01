@@ -15,12 +15,15 @@
 using namespace cv;
 using namespace block_t;
 
-using block_t::BlockDataType;
+
+
+
+
+
+
+
 
 struct Compression;
-
-
-
 
 
 /*******************************************************************************
@@ -29,7 +32,7 @@ struct Compression;
 
 
 struct Compression {
-
+    
     // Quantize DCT coefficients
     static Mat_<BlockDataType> quantization(const Mat_<BlockDataType> &dctCoefficients,
                                             QTable table);
@@ -63,8 +66,19 @@ Mat_<BlockDataType> Compression::quantization(const Mat_<BlockDataType> &dctCoef
     
     for (int row = 0; row < dctCoefficients.rows; row++) {
         for (int col = 0; col < dctCoefficients.cols; col++) {
-            BlockDataType entry = round(dctCoefficients.at<BlockDataType>(row, col) / table.at<uchar>(row, col));
-            quantizedCoefficients.at<BlockDataType>(row, col) = entry;
+            
+            BlockDataType coefficient = dctCoefficients.at<BlockDataType>(row, col);
+            uchar tableEntry = table.at<uchar>(row, col);
+            
+            int scaledTableEntry = tableEntry * qtables::QualityFactor;
+            if (scaledTableEntry == 0) {
+                scaledTableEntry = 1;
+            }
+
+            BlockDataType quantized = static_cast<BlockDataType>(round(coefficient / tableEntry));
+            
+            quantizedCoefficients.at<BlockDataType>(row, col) = quantized;
+            
         }
     }
     
