@@ -39,6 +39,10 @@ Mat3b rgb_image(int width, int height);
 Mat3b channel_3x(const Mat1b &grayscale);
 
 
+static void dbg(const Mat3b &src, int limit);
+
+
+
 // Compare 10 points on the images:
 //      test(img, img2, 10)
 static vector<Point2i> points(int, int, int);
@@ -158,6 +162,33 @@ void test(Mat3b& _in, Mat3b& _out, vector<Point2i> pts) {
 }
 
 
+const int dN = 8;
+void dbg(const Mat3b &src, int limit) {
+    int _or = src.rows;
+    int _oc = src.cols;
+    print("Debugging...");
+    print("R: ", _or, ", C: ", _oc);
+    int n = 0;
+    int fr, fc;
+    
+    print("Block #num at (row, col)\n");
+    for (int row = 0; row < _or; row += dN) {
+        for (int col = 0; col < _oc; col += dN) {
+            Point2i epoint(col, row); Rect earea(epoint, Size2i{dN,dN});
+            
+            print("\t Block #", n, " (", row, ", ", col, "):");
+            print("\t\t\t\t Point:\t ", epoint);
+            print("\t\t\t\t Area :\t ", earea);
+            
+            fr = row; fc = col; n++; if (n == limit) break;
+        }
+        
+        if (n == limit) break;
+    }
+    
+    print("Final (row, col) = (", fr, " ,", fc, ")");
+    
+}
 
 
 

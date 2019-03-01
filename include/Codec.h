@@ -19,36 +19,6 @@
 
 /*      ****     */
 #include "DebugData.h"
-
-static void dbg(const Mat3b &src, int limit);
-void dbg(const Mat3b &src, int limit) {
-    int _or = src.rows;
-    int _oc = src.cols;
-    print("Debugging...");
-    print("R: ", _or, ", C: ", _oc);
-    int n = 0;
-    int fr, fc;
-    
-    print("Block #num at (row, col)\n");
-    for (int row = 0; row < _or; row += N) {
-        for (int col = 0; col < _oc; col += N) {
-            Point2i epoint(col, row); Rect earea(epoint, Size2i{N,N});
-            
-            print("\t Block #", n, " (", row, ", ", col, "):");
-            print("\t\t\t\t Point:\t ", epoint);
-            print("\t\t\t\t Area :\t ", earea);
-            
-            fr = row; fc = col; n++; if (n == limit) break;
-        }
-        
-        if (n == limit) break;
-    }
-    
-    print("Final (row, col) = (", fr, " ,", fc, ")");
-    
-}
-
-
 /*      ****     */
 
 namespace image {
@@ -150,10 +120,9 @@ struct PartitionLimit {
 
 EncodedImage Codec::encode(const SourceImage &source) {
     
-    
-    // debug 100 blocks
-    dbg(source, 100);
-    
+    print("DEB e");
+    dbg(source, 100); // debug 100 blocks
+    print("DEB dbg complete");
     
     // Number of channels
     int nChannels = source.channels();
@@ -188,9 +157,11 @@ EncodedImage Codec::encode(const SourceImage &source) {
     
     
     
-    for (int col = 0; col < limit.cols; col += N) {
-        for (int row = 0; row < limit.rows; row += N) {
+    
+    for (int row = 0; (row + N) < (height); row += N) {
+        print("DEB nxt row");
         
+        for (int col = 0; (col + N) < (width); col += N) {
             
             // Block of Y, U, and V color intensities
             ImageBlock block(nChannels);
@@ -199,25 +170,31 @@ EncodedImage Codec::encode(const SourceImage &source) {
             Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
             block.partition<SourceImageType>(sampledImage(area));
-        
+            print("DEB part rc", row, col);
+            
+            
             
             // DCT transformation of each image block channel
             BlockTransform dct2 = Transform::dct2<BlockDataType>;
             block.apply(dct2);
+            print("DEB dct2");
             
             
             // Quantizing DCT coefficients
             BlockQuantization quantizationFormula = Compression::quantization;
             block.apply(quantizationFormula);
-
+            print("DEB q");
+            
             
             // Each DCT coefficients block is written to the output
             // with offset = 0
             Codec::write(encoded, origin, block, 0);
+            print("DEB wrt");
             
         }
     }
 
+    print("DEB e done");
     
     return encoded;
     
@@ -231,13 +208,28 @@ EncodedImage Codec::encode(const SourceImage &source) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* JPEG Decode */
 
 DecodedImage Codec::decode(const EncodedImage &source) {
     
-    // debug 100 blocks
-    dbg(source, 100);
-    
+    print("DEB d");
+    dbg(source, 100); // debug 100 blocks
+    print("DEB dbg complete");
     
     // Number of channels
     int nChannels = source.channels();
@@ -260,10 +252,11 @@ DecodedImage Codec::decode(const EncodedImage &source) {
     // Decode: 2D-IDCT transformations
     DecodedImage decodedImage(source.size(), DecodedChannelType);
     
-    for (int col = 0; col < limit.cols; col += N) {
-    
 
-            for (int row = 0; row < limit.rows; row += N) {
+    for (int row = 0; (row + N) < (height); row += N) {
+        
+        print("DEB nxt row");
+        for (int col = 0; (col + N) < (width); col += N) {
             
             // Block of Y, U, and V quantized DCT coefficients
             ImageBlock block(nChannels);
@@ -273,11 +266,13 @@ DecodedImage Codec::decode(const EncodedImage &source) {
             Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
             block.partition<DecodedImageType>(source(area));
+            print("DEB part rc", row, col);
             
             
             // 2D-IDCT of each channel
             BlockTransform idct2 = Transform::idct2<BlockDataType>;
             block.apply(idct2);
+            print("DEB idct2");
             
             
             //print("DE BLK");
@@ -285,21 +280,21 @@ DecodedImage Codec::decode(const EncodedImage &source) {
             // Write transformed block to image
             // with offset = -128
             Codec::write(decodedImage, origin, block, -128);
+            print("DEB wrt");
             
         }
     }
     
-    //print("DE OUT");
-    //print(decodedImage);
-    
     
     // Reverse 4:2:0 subsample ratio
     Mat3b desampledImage = ImageSampling::desample(decodedImage);
-    
+    print("DEB des");
     
     // Convert YUV color space back to RGB
     DecodedImage rgbImage = Colorspace::convert_YUV_RGB(desampledImage);
+    print("DEB to rgb");
     
+    print("DEB d done");
     
     return rgbImage;
     
@@ -420,8 +415,8 @@ PartitionLimit::PartitionLimit(int imageRows, int imageCols, int N) {
     int colCount = imageCols / N;
     
     this->blockCount = rowCount * colCount;
-    this->rows = rowCount * N;
-    this->cols = colCount * N;
+    this->rows = rowCount * N - N;
+    this->cols = colCount * N - N;
 }
     
 void PartitionLimit::display() {
