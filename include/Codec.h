@@ -19,18 +19,22 @@
 
 
 namespace image {
+    
+    using SourceImageType = unsigned char;
+    using SourceImage = Mat_<Vec3b>;
+    static const int SourceChannelType = CV_8UC3;
+
+    using EncodedImageType = unsigned char;
     using EncodedImage = Mat_<block_t::Block3s>;
     static const int EncodedChannelType = CV_16SC3;
     
+    using DecodedImageType = BlockDataType;
     using DecodedImage = Mat_<Vec3b>;
     static const int DecodedChannelType = CV_8UC3;
     
-    using SourceImage = Mat_<Vec3b>;
-    static const int SourceChannelType = CV_8UC3;
-    
-    using EncodedImageType = unsigned char;
-    using DecodedImageType = BlockDataType;
 }
+
+
 
 
 
@@ -61,10 +65,8 @@ public:
     // Encode
     static EncodedImage encode(const SourceImage &source);
     
-    
     // Decode
     static DecodedImage decode(const EncodedImage &source);
-    
     
     // Compare result (original - decompressed)
     static Mat compare(const SourceImage &input, const DecodedImage &decoded);
@@ -72,14 +74,7 @@ public:
     
     
     
-    
-    
-    
-    
-    
-    /* Codec configuration (verbose) */
-    
-    // Encode, decode, and compare with source
+    // Codec configuration: encode, decode, and compare with source  (verbose)
     static void configureCompression(const SourceImage &source);
     
     
@@ -161,8 +156,7 @@ EncodedImage Codec::encode(const SourceImage &source) {
             // Partition each 8×8 channel
             Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
-            block.partition<EncodedImageType>(source(area));
-            
+            block.partition<SourceImageType>(source(area));
         
             
             // DCT transformation of each image block channel
@@ -175,12 +169,16 @@ EncodedImage Codec::encode(const SourceImage &source) {
             block.apply(quantizationFormula);
 
             
+            
+            print("EE BLK");
+            block.display();
             // Each DCT coefficients block is written to the output
             Codec::write(output, origin, block, 0);
             
         }
     }
     
+    print("EE OUT");
     print(output);
     
     return output;
@@ -198,7 +196,6 @@ EncodedImage Codec::encode(const SourceImage &source) {
 /* JPEG Decode */
 
 DecodedImage Codec::decode(const EncodedImage &source) {
-    
     
     // Number of channels
     int nChannels = source.channels();
@@ -233,13 +230,16 @@ DecodedImage Codec::decode(const EncodedImage &source) {
             block.apply(idct2);
             
             
+            print("DE BLK");
+            block.display();
             // Write transformed block to image
-            Codec::write(decodedImage, origin, block, 128);
+            Codec::write(decodedImage, origin, block, -128);
             
         }
     }
     
-    
+    print("DE OUT");
+    print(decodedImage);
     
     
     // Reverse 4:2:0 subsample ratio

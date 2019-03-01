@@ -84,6 +84,9 @@ public:
     void partition(const Mat_<Vec<SourceType, 3>> &source);
     
     
+    Mat_<Block3s> combine();
+    
+    
     // Transform each channel
     void apply(BlockTransform transform);
     
@@ -178,6 +181,23 @@ void ImageBlock::partition(const Mat_<Vec<SourceType, 3>> &source) {
 }
 
 
+Mat_<Block3s> ImageBlock::combine() {
+    Mat combined(N, N, CV_16SC3);
+    
+    for (int row = 0; row < N; row++) {
+        for (int col = 0; col < N; col++) {
+            
+            Block3s data;
+            for (int c = 0; c < cn; c++) {
+                data[c] = this->at(c).at<BlockDataType>(row, col);
+            }
+            combined.at<Block3s>(row, col) = data;
+            
+        }
+    }
+    
+    return combined;
+}
 
 
 
