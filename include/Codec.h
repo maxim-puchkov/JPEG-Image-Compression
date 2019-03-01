@@ -36,12 +36,6 @@ struct PartitionLimit;
 
 struct Codec {
     
-    //template<typename _Tp>
-    //static void encode(const Mat_<_Tp> &source);
-
-    
-    //template<typename _Tp>
-    //static void decode(const Mat_<_Tp> &source);
     
     static CompressedImage encode(const SourceImage &source);
     
@@ -50,6 +44,10 @@ struct Codec {
     
     
     static Mat3b compare(const SourceImage &source, const CompressedImage &compressedSource);
+
+    
+    template<typename _Tp, int cn>
+    static void write(Mat_<Vec<_Tp, cn>> &to, ImageBlock &block);
     
 };
 
@@ -65,16 +63,6 @@ struct PartitionLimit {
     int blockCount;
     
 };
-
-//
-//template<typename _Tp>
-//static ImageBlock blockAt(const Mat_<_Tp> &source, int row, int col) {
-//    Point2i origin(row, col);
-//    Rect area(origin, block_t::SIZE);
-//    return ImageBlock(source(area));
-//}
-
-
 
 
 
@@ -97,102 +85,146 @@ struct PartitionLimit {
 
 /* JPEG Encode */
 
-//template<typename _Tp>
-//void Codec::encode(const Mat_<_Tp> &source) {
 CompressedImage Codec::encode(const SourceImage &source) {
     
-    CompressedImage output(source.size(), CompressedChannelType);
-    
-    // 1. Convert RGB (CV_8UC3) to YUV
-    // Mat_<_Tp> yuvImage = convert_RGB_YUV(source);
-    // print_spaced(10, yuvImage);
+    CompressedImage compressedImage(source.size(), CompressedChannelType);
     
     
-    // 2. Chroma subsampling 4:2:0
+    int nChannels = source.channels();
     
     
-    // 3. Compute limits. Disregard incomplete
-    //    blocks less than block_t::SIZE.
+    // Convert RGB (CV_8UC3) to YUV
+    Mat3b yuvImage = convert_RGB_YUV(source);
+    print_spaced(5, "Converted to YUV:\n", yuvImage);
+    
+    
+    
+    
+    // Chroma subsampling 4:2:0
+    Mat3b sampledImage = sample(yuvImage, 4, 2, 0);
+    print_spaced(5, "Sampled image\n", sampledImage);
+    
+    
+    
+    
+    // Compute limits. Disregard incomplete
+    // blocks less than block size.
     PartitionLimit limit(source.rows, source.cols, N);
+    print("Compressing ", limit.blockCount, " 3-channeled image blocks");
+    
+    
     
     
     for (int row = 0; row < limit.rows; row += N) {
         for (int col = 0; col < limit.cols; col += N) {
             
-            // 4. Partition each 8×8 3-channel block into
-            //    ImageBlock (three 8×8 1-channel blocks)
+            // Partition each 8×8 3-channel block into
+            // ImageBlock (three 8×8 1-channel blocks)
             Point2i origin(row, col);
             Rect area(origin, block_t::SIZE);
-            ImageBlock block(source(area));
+
+            ImageBlock block(nChannels);
+            block.partition<CompressedImageType>(sampledImage(area));
+            block.display();
+            
+        
             
             
-            // 5. DCT transformation of each image block channel
+            // DCT transformation of each image block channel
             BlockTransform dct2 = Transform::dct2<BlockDataType>;
             block.apply(dct2);
             
+            
+            
 
-            // 6. Quantizing DCT coefficients
+            // Quantizing DCT coefficients
             BlockQuantization quantizationFormula = Compression::quantization;
             block.apply(quantizationFormula);
 
             
-            // Resulting block stores quantized DCT coefficients
+            
+            
+            // Each DCT coefficients block is written to the output
+            Codec::write(compressedImage, block);
             
         }
     }
     
-    return output;
+    
+    
+    
+    print_spaced(3, "Result\n", compressedImage);
+    return compressedImage;
     
 }
 
 
 
 
+
+
+
+
+
 /* JPEG Decode */
 
-//template<typename _Tp>
-//void Codec::decode(const Mat_<_Tp> &source) {
 DecodedImage Codec::decode(const CompressedImage &source) {
     
-    DecodedImage output(source.size(), DecodedChannelType);
+    DecodedImage decompressedImage(source.size(), DecodedChannelType);
     
-    // 1. Compute limits. Disregard incomplete
-    //    blocks less than block_t::SIZE.
+    int nChannels = source.channels();
+    
+    
+    
+    
+    // Compute limits. Disregard incomplete
+    // blocks less than block size.
     PartitionLimit limit(source.rows, source.cols, N);
+    
+    
     
     
     for (int row = 0; row < limit.rows; row += N) {
         for (int col = 0; col < limit.cols; col += N) {
             
-            // 2. Partition each 8×8 3-channel block into
-            //    ImageBlock (three 8×8 1-channel blocks)
+            
+            // Partition each 8×8 3-channel block into
+            // ImageBlock (three 8×8 1-channel blocks)
             Point2i origin(row, col);
             Rect area(origin, block_t::SIZE);
-            ImageBlock block(source(area));
-
+ 
+            ImageBlock block(nChannels);
+            block.partition<UncompressedImageType>(source(area));
+            block.display();
             
-            // 3. 2D IDCT of each block (quantized DCT coefficients)
+            
+            
+            
+            // 2D IDCT of quantized DCT coefficients
             BlockTransform idct2 = Transform::idct2<BlockDataType>;
             block.apply(idct2);
-    
+            
+            
+            
+            // ...
             
 
+            
+            
+            Codec::write(decompressedImage, block);
             
         }
     }
     
-    // 4. Reverse 4:2:0 subsample ratio
+    // Reverse 4:2:0 subsample ratio
     
-    // 5. Convert YUV color space back to RGB
+    // Convert YUV color space back to RGB
     
-    
-    
-    // https://csil-git1.cs.surrey.sfu.ca/A2-365/JPEG-Image-Compression/tree/quantization#decode
+
     
     
     
-    
-    return output;
+    return decompressedImage;
     
 }
 
@@ -210,7 +242,32 @@ Mat3b Codec::compare(const SourceImage &source, const CompressedImage &compresse
 
 
 
-/* Block */
+
+
+
+/* Write */
+
+template<typename _Tp, int cn>
+void Codec::write(Mat_<Vec<_Tp, cn>> &to, ImageBlock &block) {
+    
+    for (int row = 0; row < N; row++) {
+        for (int col = 0; col < N; col++) {
+            
+            Vec<_Tp, cn> vec;
+            for (int c = 0; c < cn; c++) {
+                vec[c] = block.at(c).at<BlockDataType>(row, col);
+            }
+            to.template at<Vec<_Tp, cn>>(row, col) = vec;
+            
+        }
+    }
+    
+}
+
+
+
+
+
 
 
 
@@ -230,5 +287,23 @@ PartitionLimit::PartitionLimit(int imageRows, int imageCols, int N) {
     print("RC limits:    \t(", this->rows, ", ", this->cols, ")");
     print("Total blocks: \t", this->blockCount);
 }
+
+
+
+
+
+
+
+
+
+
+//void Codec::write() {
+//
+//}
+//
+//
+//void Codec::write() {
+//
+//}
 
 #endif /* Codec_h */
