@@ -14,8 +14,10 @@
 
 using namespace cv;
 
+using uchar = unsigned char;
+
 const int CN = 3;
-const cv::Size2i CM_SIZE = {CN, CN};
+const Size2i CM_SIZE = {CN, CN};
 
 
 
@@ -25,18 +27,30 @@ const cv::Size2i CM_SIZE = {CN, CN};
  *******************************************************************************/
 
 
-static Mat3b convert_RGB_YUV(const Mat3b &source);
+struct Colorspace {
 
-static Mat3b convert_YUV_RGB(const Mat3b &source);
+    static Mat3b convert_RGB_YUV(const Mat3b &source);
+
+    static Mat3b convert_YUV_RGB(const Mat3b &source);
+
+};
 
 
 
 
-static Mat3b sample(const Mat3b &source, int width, int chromSamples, int chromChange);
 
-static Mat3b desample(const Mat3b &source);
 
-static Mat3b reverse_sample(const Mat3b &source);
+
+struct ImageSampling {
+
+
+    static Mat3b sample(const Mat3b &source, int width, int chromSamples, int chromChange);
+
+    static Mat3b desample(const Mat3b &source);
+
+    static Mat3b reverse_sample(const Mat3b &source);
+    
+};
 
 
 
@@ -73,12 +87,12 @@ const Mat YUV_RGB = (Mat1d(CM_SIZE) <<
                      1.00,     -0.3946,     -0.58060,
                      1.00,      2.03211,    0);
 
-
+#include "Print.h"
 
 
 /* Conversion */
 
-Mat3b convert_RGB_YUV(const Mat3b &source) {
+Mat3b Colorspace::convert_RGB_YUV(const Mat3b &source) {
     Mat3b yuvImage = source.clone();
     const float WEIGHT_RED      = 0.299;
     const float WEIGHT_BLUE     = 0.114;
@@ -86,64 +100,73 @@ Mat3b convert_RGB_YUV(const Mat3b &source) {
     int nWidth = yuvImage.cols;
     int nHeight = yuvImage.rows;
     // Convert...
-        for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
-            for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
-                cv::Vec3b vRGB = yuvImage.at<cv::Vec3b>(height, width);
-                float red = vRGB[0]/255;
-                float green = vRGB[1]/255;
-                float blue = vRGB[2]/255;
-                float wR = WEIGHT_RED * red;
-                float wG = WEIGHT_GREEN * green;
-                float wB = WEIGHT_BLUE * blue;
-                float luminance = wR + wG + wB;
-                float Pb = (0.5/(1-0.114))*(blue-luminance);
-                float Pr = (0.5/(1-0.299))*(red-luminance);
-                float Cb = 128+224*Pb;
-                float Cr = 128+224*Pr;
-                luminance = 16+219*luminance;
-//                std::cout << "(" << round(luminance) << ", " << round(Cb) << ", " << round(Cr) << ") ";
-                yuvImage.at<cv::Vec3b>(height, width)[0] = (int)round(luminance);
-                yuvImage.at<cv::Vec3b>(height, width)[1] = (int)round(Cb);
-                yuvImage.at<cv::Vec3b>(height, width)[2] = (int)round(Cr);
-            }
+    for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
+        for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
+            cv::Vec3b vRGB = yuvImage.at<cv::Vec3b>(height, width);
+            float red = (float)vRGB[0]/255;
+            float green = (float)vRGB[1]/255;
+            float blue = (float)vRGB[2]/255;
+            float wR = WEIGHT_RED * red;
+            float wG = WEIGHT_GREEN * green;
+            float wB = WEIGHT_BLUE * blue;
+            float luminance = wR + wG + wB;
+            float Pb = (0.5/(1-0.114))*(blue-luminance);
+            float Pr = (0.5/(1-0.299))*(red-luminance);
+            float Cb = 128+224*Pb;
+            float Cr = 128+224*Pr;
+            luminance = 16+219*luminance;
+            //                std::cout << "(" << round(luminance) << ", " << round(Cb) << ", " << round(Cr) << ") ";
+            yuvImage.at<cv::Vec3b>(height, width)[0] = static_cast<uchar>(ceil(luminance));
+            yuvImage.at<cv::Vec3b>(height, width)[1] = static_cast<uchar>(ceil(Cb));
+            yuvImage.at<cv::Vec3b>(height, width)[2] = static_cast<uchar>(ceil(Cr));
         }
+    }
+    
     return yuvImage;
 }
 
-Mat3b convert_YUV_RGB(const Mat3b &source) {
+Mat3b Colorspace::convert_YUV_RGB(const Mat3b &source) {
     Mat3b rgbImage = source.clone();
-
+    
     int nWidth = rgbImage.cols;
     int nHeight = rgbImage.rows;
     // Convert...
-        for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
-            for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
-                cv::Vec3b vYUV = rgbImage.at<cv::Vec3b>(height, width);
-                float Pb = ((float)vYUV[1]-128)/224;
-                float Pr = ((float)vYUV[2]-128)/224;
-                float luminance = ((float)vYUV[0]-16)/219;
-                float blue = Pb/(0.5/(1-0.114))+luminance;
-                float red = Pr/(0.5/(1-0.299))+luminance;
-                float green = (luminance - 0.299*red - 0.114*blue)/0.587;
-                red = abs((int)(red*255));
-                green = abs((int)green*255);
-                blue = abs((int)blue*255);
-                if(red > 255){red--;}
-                if(blue > 255){blue --;}
-                if(green > 255){green--;}
-                std::cout << "(" << red << ", " << green << ", " << blue << ") ";
-                rgbImage.at<cv::Vec3b>(height, width)[0] = red;
-                rgbImage.at<cv::Vec3b>(height, width)[1] = green;
-                rgbImage.at<cv::Vec3b>(height, width)[2] = blue;
-            }
+    for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
+        for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
+            cv::Vec3b vYUV = rgbImage.at<cv::Vec3b>(height, width);
+            float Pb = ((float)vYUV[1]-128)/224;
+            float Pr = ((float)vYUV[2]-128)/224;
+            float luminance = ((float)vYUV[0]-16)/219;
+            float blue = Pb/(0.5/(1-0.114))+luminance;
+            float red = Pr/(0.5/(1-0.299))+luminance;
+            float green = (luminance - 0.299*red - 0.114*blue)/0.587;
+            red = abs((red*255));
+            green = abs(green*255);
+            blue = abs(blue*255);
+            if(red > 255){red--;}
+            if(blue > 255){blue --;}
+            if(green > 255){green--;}
+            //         std::cout << "(" << red << ", " << green << ", " << blue << ") ";
+            rgbImage.at<cv::Vec3b>(height, width)[0] = static_cast<uchar>(red);
+            rgbImage.at<cv::Vec3b>(height, width)[1] = static_cast<uchar>(green);
+            rgbImage.at<cv::Vec3b>(height, width)[2] = static_cast<uchar>(blue);
         }
+    }
     return rgbImage;
 }
 
 
+
+
+
+
+
+
+
+
 /* Sampling */
 
-Mat3b sample(const Mat3b &source,
+Mat3b ImageSampling::sample(const Mat3b &source,
              int width = 4,
              int chromSamples = 2,
              int chromChange = 0) {
@@ -174,7 +197,7 @@ Mat3b sample(const Mat3b &source,
     return sampled;
 }
 
-Mat3b desample(const Mat3b &source) {
+Mat3b ImageSampling::desample(const Mat3b &source) {
     Mat3b sampled = source.clone();
     int nWidth = sampled.cols;
     int nHeight = sampled.rows;
