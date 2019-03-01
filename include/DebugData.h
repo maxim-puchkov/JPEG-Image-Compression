@@ -28,6 +28,8 @@ using std::vector;
 //     gray3, gray3_2, rgb3, rand3, rand3sq, complex
 
 
+
+
 // Compare 10 points on the images:
 //      test(img, img2, 10)
 static bool test(Mat3b&, Mat3b&);
@@ -49,23 +51,9 @@ void dbg(const Mat_<T> &src, int limit);
 
 
 
-Mat3b channel_3x(const Mat1b &grayscale);
-
-// Random 0..255
-unsigned char uchar_random();
 
 
 
-
-//
-//void points(const Mat3b &original, const Mat3b &decoded);
-//
-//void points(const Mat3b &original, const Mat3b &decoded) {
-//    unsigned char points;
-//
-//
-//    uchar_random x =
-//}
 
 
 
@@ -81,10 +69,11 @@ unsigned char uchar_random();
 
 
 /*******************************************************************************
-                               YUV Range Adjustment
+ 
  *******************************************************************************/
 
-
+unsigned char uchar_random();
+Mat3b channel_3x(const Mat1b &grayscale);
 
 
 
@@ -168,7 +157,7 @@ bool test(Mat3b& _in, Mat3b& _out, vector<Point2i> pts) {
         print("\t", ov, " == ", iv, " ?");
         
     
-        if (ov != iv) { print("Error at ", pts[i]); return false; }
+        if (ov != iv) { print("\n Not equal: ", pts[i]), "\n"); return false; }
         
         print("\tOK");
     }
