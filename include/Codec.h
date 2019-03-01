@@ -37,17 +37,18 @@ struct PartitionLimit;
 struct Codec {
     
     
-    static CompressedImage encode(const SourceImage &source);
+    static EncodedImage encode(const SourceImage &source);
     
     
-    static DecodedImage decode(const CompressedImage &source);
+    static DecodedImage decode(const EncodedImage &source);
     
     
-    static Mat3b compare(const SourceImage &source, const CompressedImage &compressedSource);
+    static Mat3b compare(const SourceImage &source, const EncodedImage &compressedSource);
 
     
     template<typename _Tp, int cn>
     static void write(Mat_<Vec<_Tp, cn>> &to, ImageBlock &block);
+    
     
 };
 
@@ -85,23 +86,21 @@ struct PartitionLimit {
 
 /* JPEG Encode */
 
-CompressedImage Codec::encode(const SourceImage &source) {
+EncodedImage Codec::encode(const SourceImage &source) {
     
-    CompressedImage compressedImage(source.size(), CompressedChannelType);
-    
-    
+    EncodedImage EncodedImage(source.size(), CompressedChannelType);
     int nChannels = source.channels();
     
     
     // Convert RGB (CV_8UC3) to YUV
-    Mat3b yuvImage = convert_RGB_YUV(source);
+    Mat3b yuvImage = Colorspace::convert_RGB_YUV(source);
     print_spaced(5, "Converted to YUV:\n", yuvImage);
     
     
     
     
     // Chroma subsampling 4:2:0
-    Mat3b sampledImage = sample(yuvImage, 4, 2, 0);
+    Mat3b sampledImage = ImageSampling::sample(yuvImage, 4, 2, 0);
     print_spaced(5, "Sampled image\n", sampledImage);
     
     
@@ -118,14 +117,16 @@ CompressedImage Codec::encode(const SourceImage &source) {
     for (int row = 0; row < limit.rows; row += N) {
         for (int col = 0; col < limit.cols; col += N) {
             
-            // Partition each 8×8 3-channel block into
-            // ImageBlock (three 8×8 1-channel blocks)
+            
+            // Block of Y, U, and V color intensities
+            ImageBlock block(nChannels);
+            
+            
+            // Partition each 8×8 channel
             Point2i origin(row, col);
             Rect area(origin, block_t::SIZE);
-
-            ImageBlock block(nChannels);
-            block.partition<CompressedImageType>(sampledImage(area));
-            block.display();
+            block.partition<EncodedImageType>(source(area));
+            //block.display();
             
         
             
@@ -140,21 +141,22 @@ CompressedImage Codec::encode(const SourceImage &source) {
             // Quantizing DCT coefficients
             BlockQuantization quantizationFormula = Compression::quantization;
             block.apply(quantizationFormula);
-
+            
             
             
             
             // Each DCT coefficients block is written to the output
-            Codec::write(compressedImage, block);
+            Codec::write(EncodedImage, block);
+            
             
         }
     }
     
     
+    print_spaced(3, "Original\n", source);
+    print_spaced(3, "Output\n", EncodedImage);
     
-    
-    print_spaced(3, "Result\n", compressedImage);
-    return compressedImage;
+    return EncodedImage;
     
 }
 
@@ -168,9 +170,9 @@ CompressedImage Codec::encode(const SourceImage &source) {
 
 /* JPEG Decode */
 
-DecodedImage Codec::decode(const CompressedImage &source) {
+DecodedImage Codec::decode(const EncodedImage &source) {
     
-    DecodedImage decompressedImage(source.size(), DecodedChannelType);
+    DecodedImage decodedImage(source.size(), DecodedChannelType);
     
     int nChannels = source.channels();
     
@@ -188,19 +190,20 @@ DecodedImage Codec::decode(const CompressedImage &source) {
         for (int col = 0; col < limit.cols; col += N) {
             
             
-            // Partition each 8×8 3-channel block into
-            // ImageBlock (three 8×8 1-channel blocks)
+            // Block of Y, U, and V quantized DCT coefficients
+            ImageBlock block(nChannels);
+            
+            
+            // Partition each 8×8 channel
             Point2i origin(row, col);
             Rect area(origin, block_t::SIZE);
- 
-            ImageBlock block(nChannels);
-            block.partition<UncompressedImageType>(source(area));
+            block.partition<UnEncodedImageType>(source(area));
             block.display();
             
             
             
             
-            // 2D IDCT of quantized DCT coefficients
+            // 2D IDCT of each channel
             BlockTransform idct2 = Transform::idct2<BlockDataType>;
             block.apply(idct2);
             
@@ -211,7 +214,7 @@ DecodedImage Codec::decode(const CompressedImage &source) {
 
             
             
-            Codec::write(decompressedImage, block);
+            Codec::write(decodedImage, block);
             
         }
     }
@@ -224,7 +227,7 @@ DecodedImage Codec::decode(const CompressedImage &source) {
     
     
     
-    return decompressedImage;
+    return decodedImage;
     
 }
 
@@ -234,7 +237,6 @@ Mat3b Codec::compare(const SourceImage &source, const CompressedImage &compresse
     Mat3b output;
     
     return output;
-    
 }
 
 
