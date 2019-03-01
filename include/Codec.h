@@ -35,20 +35,24 @@ struct PartitionLimit;
 
 
 struct Codec {
+public:
     
-    
+    // Encode
     static EncodedImage encode(const SourceImage &source);
     
     
+    // Decode
     static DecodedImage decode(const EncodedImage &source);
     
     
+    // Compare result (original - decompressed)
     static Mat3b compare(const SourceImage &source, const EncodedImage &compressedSource);
 
     
+private:
+    
     template<typename _Tp, int cn>
     static void write(Mat_<Vec<_Tp, cn>> &to, ImageBlock &block);
-    
     
 };
 
@@ -173,7 +177,7 @@ EncodedImage Codec::encode(const SourceImage &source) {
 DecodedImage Codec::decode(const EncodedImage &source) {
     
     DecodedImage decodedImage(source.size(), DecodedChannelType);
-    
+
     int nChannels = source.channels();
     
     
@@ -232,11 +236,24 @@ DecodedImage Codec::decode(const EncodedImage &source) {
 }
 
 
-Mat3b Codec::compare(const SourceImage &source, const CompressedImage &compressedSource) {
+Mat3b Codec::compare(const SourceImage &input, const EncodedImage &compressed) {
     
-    Mat3b output;
+    CV_Assert(input.size() == compressed.size());
+    Mat3b output(input.size(), CV_8SC3);
+    
+    for (int row = 0; row < input.rows; row++) {
+        for (int col = 0; col < output.cols; col++) {
+            
+            Vec3b inputVec = input.at<Vec3b>(row, col);
+            Vec3b outputVec = compressed.at<Block3s>(row, col);
+            
+            output.at<Vec3b>(row, col) = inputVec - outputVec;
+            
+        }
+    }
     
     return output;
+    
 }
 
 
