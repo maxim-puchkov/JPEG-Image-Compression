@@ -29,10 +29,10 @@ namespace block_t {
     using Block1s = BlockDataType;
     using Block3s = Vec<BlockDataType, 3>;
     
-    using CompressedImageType = uchar;
-    using UncompressedImageType = BlockDataType;
+    using EncodedImageType = uchar;
+    using UnEncodedImageType = BlockDataType;
     
-    using CompressedImage = Mat_<Block3s>;
+    using EncodedImage = Mat_<Block3s>;
     static const int CompressedChannelType = CV_16SC3;
     
     using DecodedImage = Mat_<Vec3b>;
@@ -53,6 +53,16 @@ namespace block_t {
     static const BlockDataType DATA_OFFSET = 128;
     
 }
+
+
+
+
+
+
+
+
+
+
 
 
 using namespace cv;
@@ -164,6 +174,7 @@ void ImageBlock::partition(const Mat_<Vec<SourceType, 3>> &source) {
                 
                 BlockDataType data = vec[c] - DATA_OFFSET;
                 this->channelData[c].at<BlockDataType>(row, col) = data;
+                
             }
             
         }
@@ -196,8 +207,13 @@ void ImageBlock::apply(BlockTransform transform) {
 
 
 void ImageBlock::apply(BlockQuantization quantization) {
-    qtables::TableSet tables = QuantizationTable::standard();
+    
+    qtables::TableSet tables = QuantizationTable::set();
+    
+    // Luminance table
     this->at(0) = quantization(this->at(0), tables.luminance);
+    
+    // Chrominance table
     for (int c = 1; c < cn; c++) {
         this->at(c) = quantization(this->at(c), tables.chrominance);
     }
