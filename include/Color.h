@@ -204,40 +204,53 @@ Mat3b ImageSampling::desample(const Mat3b &source) {
     // Convert...
         for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
             for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
+                sum = 0;
                 cv::Vec3b vYUV = sampled.at<cv::Vec3b>(height, width);
-                if(vYUV[1] == 0 && (width % 2 == 1 || height % 2 == 1)){
-
-                    if(width > 0){
-                        if(height > 0 && height < nHeight-1){
-                            sum += sampled.at<cv::Vec3b>(height-1, width-1)[1];
-                            sum += sampled.at<cv::Vec3b>(height-1, width)[1];
-                            sum += sampled.at<cv::Vec3b>(height, width-1)[1];
-                            sum += sampled.at<cv::Vec3b>(height-1, width+1)[1];
-                            sum += sampled.at<cv::Vec3b>(height, width+1)[1];
-                            sum += sampled.at<cv::Vec3b>(height+1, width)[1];
-                            sum += sampled.at<cv::Vec3b>(height+1, width-1)[1];
-                            sum += sampled.at<cv::Vec3b>(height, width+1)[1];
-                            sum /= 8;
-                            vYUV[1] = sum;
-
-                        }
+                if(height % 2 == 1 && width % 2 == 0){
+                    if(height+1 >= nHeight){
+                        vYUV[1] = sampled.at<cv::Vec3b>(height-1, width)[1];
+                    }
+                    else{
+                        vYUV[1] = (sampled.at<cv::Vec3b>(height-1, width)[1] + sampled.at<cv::Vec3b>(height+1, width)[1])/2;
                     }
                 }
-                if(vYUV[2] == 0 && (width % 2 == 1 || height % 2 == 0)){
-
-                    if(width > 0){
-                        if(height > 0 && height < nHeight-1){
-                            sum += sampled.at<cv::Vec3b>(height-1, width-1)[2];
-                            sum += sampled.at<cv::Vec3b>(height-1, width)[2];
-                            sum += sampled.at<cv::Vec3b>(height, width-1)[2];
-                            sum += sampled.at<cv::Vec3b>(height-1, width+1)[2];
-                            sum += sampled.at<cv::Vec3b>(height, width+1)[2];
-                            sum += sampled.at<cv::Vec3b>(height+1, width)[2];
-                            sum += sampled.at<cv::Vec3b>(height+1, width-1)[2];
-                            sum += sampled.at<cv::Vec3b>(height, width+1)[2];
-                            sum /= 8;
-                            vYUV[2] = sum;
-
+                if(height % 2 == 0 && width % 2 == 0){
+                    if(height+1 <= 0){
+                        vYUV[2] = sampled.at<cv::Vec3b>(height+1, width)[2];
+                    }
+                    if(height+1 >= nHeight){
+                        vYUV[2] = sampled.at<cv::Vec3b>(height-1, width)[2];
+                    }
+                    else{
+                        vYUV[2] = (sampled.at<cv::Vec3b>(height-1, width)[2] + sampled.at<cv::Vec3b>(height+1, width)[2])/2;
+                    }
+                }
+                if(width % 2 == 1){
+                    if(height % 2 == 1){
+                        if(width+1 >= nWidth){
+                            vYUV[2] = sampled.at<cv::Vec3b>(height, width-1)[2];
+                        } else {
+                            vYUV[2] = (sampled.at<cv::Vec3b>(height, width-1)[2]+sampled.at<cv::Vec3b>(height, width+1)[2])/2;
+                        }
+                        if(height+1 >= nHeight){
+                            vYUV[1] = (sampled.at<cv::Vec3b>(height-1, width-1)[1]+sampled.at<cv::Vec3b>(height-1, width+1)[1])/2;
+                        } else {
+                            vYUV[1] = (sampled.at<cv::Vec3b>(height-1, width-1)[1]+sampled.at<cv::Vec3b>(height-1, width+1)[1]+sampled.at<cv::Vec3b>(height+1, width-1)[1]+sampled.at<cv::Vec3b>(height+1, width+1)[1])/4;
+                        }
+                    }
+                    if(height % 2 == 0){
+                        if(width+1 >= nWidth){
+                            vYUV[1] = sampled.at<cv::Vec3b>(height, width-1)[1];
+                        } else {
+                            vYUV[1] = (sampled.at<cv::Vec3b>(height, width-1)[1]+sampled.at<cv::Vec3b>(height, width+1)[1])/2;
+                        }
+                        if(height-1 < 0){
+                            vYUV[2] = (sampled.at<cv::Vec3b>(height+1, width-1)[2]+sampled.at<cv::Vec3b>(height+1, width+1)[2])/2;
+                        }
+                        else if(height+1 >= nHeight){
+                            vYUV[2] = (sampled.at<cv::Vec3b>(height-1, width-1)[2]+sampled.at<cv::Vec3b>(height-1, width+1)[2])/2;
+                        } else {
+                            vYUV[2] = (sampled.at<cv::Vec3b>(height-1, width-1)[2]+sampled.at<cv::Vec3b>(height-1, width+1)[2]+sampled.at<cv::Vec3b>(height+1, width-1)[2]+sampled.at<cv::Vec3b>(height+1, width+1)[2])/4;
                         }
                     }
                 }
