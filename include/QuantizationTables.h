@@ -39,8 +39,12 @@ namespace qtables {
     /* Default: JPEG standard tables at index 0 */
     static int QuantizationTableIndex = 0;
     
+    
     /* Default: Quantization does not compress 0 */
-    static int QualityFactor = 0; // 10 - max factor
+    static int QualityFactor = 1; // 10 - max factor, 1 - default
+    
+    
+    
     
     
     
