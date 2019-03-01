@@ -173,8 +173,7 @@ EncodedImage Codec::encode(const SourceImage &source) {
             
         }
     }
-
-    print("_sk_", encoded);
+    
     
     return encoded;
     
@@ -229,14 +228,12 @@ DecodedImage Codec::decode(const EncodedImage &source) {
             block.partition<DecodedImageType>(source(area));
             
             
-            
             // 2D-IDCT of each channel
             BlockTransform idct2 = Transform::idct2<BlockDataType>;
             block.apply(idct2);
             block.display();
             
             
-  
             // Write transformed block to image
             // with offset = -128
             Codec::write(decodedImage, origin, block, -128);
@@ -252,8 +249,6 @@ DecodedImage Codec::decode(const EncodedImage &source) {
     // Convert YUV color space back to RGB
     DecodedImage rgbImage = Colorspace::convert_YUV_RGB(desampledImage);
     
-    
-    print("_sk_", rgbImage);
     
     return rgbImage;
     
@@ -384,22 +379,13 @@ void Codec::configure(const SourceImage &source) {
 template<typename _Tp, int cn>
 void Codec::write(Mat_<Vec<_Tp, cn>> &to, Point2i origin, ImageBlock &block, short offset) {
     
-    print("_sk_ callee");
-    
     int ox = origin.x;
     int oy = origin.y;
-    int x = ox + N;
-    int y = oy + N;
     
-    print(ox, oy, x, y);
-    
-    for (int row = ox; row < x; row++) {
-        for (int col = oy; col < x; col++) {
+    for (int row = ox; row < (ox + N); row++) {
+        for (int col = oy; col < (oy + N); col++) {
         
-        
-            
             Vec<_Tp, cn> imagePixel = block.data<_Tp, cn>(row - ox, col - ox);
-            print(imagePixel);
             for (int c = 0; c < cn; c++) {
                 imagePixel[c] += offset;
             }
