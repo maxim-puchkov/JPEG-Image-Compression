@@ -18,8 +18,26 @@
 #include "Print.h"
 
 
+namespace image {
+    using EncodedImage = Mat_<block_t::Block3s>;
+    static const int CompressedChannelType = CV_16SC3;
+    
+    using DecodedImage = Mat_<Vec3b>;
+    static const int DecodedChannelType = CV_8UC3;
+    
+    using SourceImage = Mat_<Vec3b>;
+    static const int SourceChannelType = CV_8UC3;
+}
+
+
+
+
+
+
+
 using namespace cv;
 using namespace block_t;
+using namespace image;
 
 
 
@@ -35,7 +53,12 @@ struct PartitionLimit;
 
 
 struct Codec {
-public:
+
+
+    
+    
+ public:
+    
     
     // Encode
     static EncodedImage encode(const SourceImage &source);
@@ -46,7 +69,7 @@ public:
     
     
     // Compare result (original - decompressed)
-    static Mat3b compare(const SourceImage &source, const EncodedImage &compressedSource);
+    static Mat3b compare(const SourceImage &input, const DecodedImage &decoded);
 
     
 private:
@@ -92,7 +115,7 @@ struct PartitionLimit {
 
 EncodedImage Codec::encode(const SourceImage &source) {
     
-    EncodedImage EncodedImage(source.size(), CompressedChannelType);
+    // Number of channels
     int nChannels = source.channels();
     
     
@@ -101,21 +124,21 @@ EncodedImage Codec::encode(const SourceImage &source) {
     print_spaced(5, "Converted to YUV:\n", yuvImage);
     
     
-    
-    
     // Chroma subsampling 4:2:0
     Mat3b sampledImage = ImageSampling::sample(yuvImage, 4, 2, 0);
     print_spaced(5, "Sampled image\n", sampledImage);
     
-    
-    
-    
+
     // Compute limits. Disregard incomplete
     // blocks less than block size.
     PartitionLimit limit(source.rows, source.cols, N);
     print("Compressing ", limit.blockCount, " 3-channeled image blocks");
     
     
+    
+    
+    // Encode: 2D-DCT transformations and Quantization
+    EncodedImage EncodedImage(source.size(), CompressedChannelType);
     
     
     for (int row = 0; row < limit.rows; row += N) {
@@ -130,7 +153,6 @@ EncodedImage Codec::encode(const SourceImage &source) {
             Point2i origin(row, col);
             Rect area(origin, block_t::SIZE);
             block.partition<EncodedImageType>(source(area));
-            //block.display();
             
         
             
@@ -157,8 +179,11 @@ EncodedImage Codec::encode(const SourceImage &source) {
     }
     
     
-    print_spaced(3, "Original\n", source);
-    print_spaced(3, "Output\n", EncodedImage);
+    
+    
+    // print_spaced(3, "(E) Original\n", source);
+    // print_spaced(3, "Output\n", EncodedImage);
+    
     
     return EncodedImage;
     
@@ -176,11 +201,9 @@ EncodedImage Codec::encode(const SourceImage &source) {
 
 DecodedImage Codec::decode(const EncodedImage &source) {
     
-    DecodedImage decodedImage(source.size(), DecodedChannelType);
-
+    
+    // Number of channels
     int nChannels = source.channels();
-    
-    
     
     
     // Compute limits. Disregard incomplete
@@ -188,6 +211,10 @@ DecodedImage Codec::decode(const EncodedImage &source) {
     PartitionLimit limit(source.rows, source.cols, N);
     
     
+    
+    
+    // Decode: 2D-IDCT transformations
+    DecodedImage decodedImage(source.size(), DecodedChannelType);
     
     
     for (int row = 0; row < limit.rows; row += N) {
@@ -202,52 +229,68 @@ DecodedImage Codec::decode(const EncodedImage &source) {
             Point2i origin(row, col);
             Rect area(origin, block_t::SIZE);
             block.partition<UnEncodedImageType>(source(area));
-            block.display();
             
             
             
             
-            // 2D IDCT of each channel
+            // 2D-IDCT of each channel
             BlockTransform idct2 = Transform::idct2<BlockDataType>;
             block.apply(idct2);
             
             
             
-            // ...
-            
-
-            
             
             Codec::write(decodedImage, block);
+            
             
         }
     }
     
+    
+    
+    
     // Reverse 4:2:0 subsample ratio
+    Mat3b desampledImage = ImageSampling::desample(decodedImage);
+    
+    
+    
     
     // Convert YUV color space back to RGB
-    
-
-    
+    DecodedImage rgbImage = Colorspace::convert_YUV_RGB(desampledImage);
     
     
-    return decodedImage;
+    
+    
+    // print_spaced(3, "(D) Original\n", source);
+    // print_spaced(3, "Output\n", rgbImage);
+    
+    
+    return rgbImage;
     
 }
 
 
-Mat3b Codec::compare(const SourceImage &input, const EncodedImage &compressed) {
+
+
+
+
+
+
+
+/* Codec compare */
+
+Mat3b Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
     
-    CV_Assert(input.size() == compressed.size());
-    Mat3b output(input.size(), CV_8SC3);
+    CV_Assert(source.size() == decoded.size());
+    Mat3b output(source.size(), CV_8SC3);
     
-    for (int row = 0; row < input.rows; row++) {
-        for (int col = 0; col < output.cols; col++) {
+    for (int row = 0; row < source.rows; row++) {
+        for (int col = 0; col < source.cols; col++) {
             
-            Vec3b inputVec = input.at<Vec3b>(row, col);
-            Vec3b outputVec = compressed.at<Block3s>(row, col);
+            Vec3b sRgb = source.at<Vec3b>(row, col);
+            Vec3b dRgb = decoded.at<Block3s>(row, col);
             
-            output.at<Vec3b>(row, col) = inputVec - outputVec;
+            output.at<Vec3b>(row, col) = sRgb - dRgb;
             
         }
     }
@@ -264,7 +307,7 @@ Mat3b Codec::compare(const SourceImage &input, const EncodedImage &compressed) {
 
 
 
-/* Write */
+/* Codec write block to image */
 
 template<typename _Tp, int cn>
 void Codec::write(Mat_<Vec<_Tp, cn>> &to, ImageBlock &block) {
@@ -272,11 +315,16 @@ void Codec::write(Mat_<Vec<_Tp, cn>> &to, ImageBlock &block) {
     for (int row = 0; row < N; row++) {
         for (int col = 0; col < N; col++) {
             
-            Vec<_Tp, cn> vec;
+            Vec<_Tp, cn> imagePixel;
+            
             for (int c = 0; c < cn; c++) {
-                vec[c] = block.at(c).at<BlockDataType>(row, col);
+                
+                _Tp entry = block.data(c, {row, col});
+                imagePixel[c] = static_cast<_Tp>(entry);
+                
             }
-            to.template at<Vec<_Tp, cn>>(row, col) = vec;
+            
+            to.template at<Vec<_Tp, cn>>(row, col) = imagePixel;
             
         }
     }
