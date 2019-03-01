@@ -192,7 +192,9 @@ void MainWindow::convertImage() {
 //    convertedImg = Codec::encode(newthing);
 //    print(Codec::decode(convertedImg));
     print(cvImg);
-    convertedImg = Codec::encode(cvImg,QuantizationNum->value(),::a);
+    QuantizationTable::setQTableSet(::a);
+    QuantizationTable::setQuality(QuantizationNum->value());
+    convertedImg = Codec::encode(cvImg);
 
 //    img2->setPixmap(QPixmap::fromImage(qImage));
     /*********************************************
