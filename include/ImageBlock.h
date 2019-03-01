@@ -187,7 +187,7 @@ Mat_<Block3s> ImageBlock::combine() {
     for (int row = 0; row < N; row++) {
         for (int col = 0; col < N; col++) {
             
-            Block3s data;
+            Block3s data(0, 0, 0);
             for (int c = 0; c < cn; c++) {
                 data[c] = this->at(c).at<BlockDataType>(row, col);
             }

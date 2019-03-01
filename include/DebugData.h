@@ -29,6 +29,7 @@ unsigned char uchar_random();
 
 
 // Random RGB
+Mat3b rgb_image(int width);
 Mat3b rgb_image(int width, int height);
 
 
@@ -70,6 +71,10 @@ unsigned char uchar_random() {
 
 
 // Create and fill a new debug image with randomized RGB vectors
+Mat3b rgb_image(int width) {
+    return rgb_image(width, width);
+}
+
 Mat3b rgb_image(int width, int height) {
     Mat3b image = Mat(height, width, CV_8UC3);
     
@@ -221,5 +226,25 @@ namespace debug {
     }
 
 }
+
+
+/* Test data */
+
+using namespace debug;
+
+
+const Mat3b gray3 = channel_3x(grayscale_block);
+
+const Mat3b gray3_2 = channel_3x(grayscale_block_2);
+
+const Mat3b rgb3 = rgb_block;
+
+const Mat3b rand3 = rgb_image(rand() % 40 + 1, rand() % 40 + 1);
+
+const Mat3b rand3sq = rgb_image(rand() % 40 + 1);
+
+const Mat3b complex = Mat(31, 15, CV_8U, Vec3b(3,uchar_random(),4));
+
+
 
 #endif /* DebugData_h */

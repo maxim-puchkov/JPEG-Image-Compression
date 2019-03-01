@@ -121,30 +121,29 @@ struct PartitionLimit {
 
 EncodedImage Codec::encode(const SourceImage &source) {
     
+    print("Size: ", source.size());
+    
     // Number of channels
     int nChannels = source.channels();
+    int width = source.cols;
+    int height = source.rows;
     
     
     // Convert RGB (CV_8UC3) to YUV
     Mat3b yuvImage = Colorspace::convert_RGB_YUV(source);
-    // print_spaced(5, "Converted to YUV:\n", yuvImage);
     
     
     // Chroma subsampling 4:2:0
     Mat3b sampledImage = ImageSampling::sample(yuvImage, 4, 2, 0);
-    // print_spaced(5, "Sampled image\n", sampledImage);
     
 
     // Compute limits. Disregard incomplete
     // blocks less than block size.
     PartitionLimit limit(source.rows, source.cols, N);
-    print("Compressing ", limit.blockCount, " 3-channeled image blocks");
-    
-    
-    
+
     
     // Encode: 2D-DCT transformations and Quantization
-    EncodedImage output(source.size(), EncodedChannelType);
+    EncodedImage output(width, height, EncodedChannelType);
     
     
     for (int row = 0; row < limit.rows; row += N) {
@@ -169,17 +168,12 @@ EncodedImage Codec::encode(const SourceImage &source) {
             block.apply(quantizationFormula);
 
             
-            
-            print("EE BLK");
-            block.display();
             // Each DCT coefficients block is written to the output
             Codec::write(output, origin, block, 0);
             
         }
     }
-    
-    print("EE OUT");
-    print(output);
+
     
     return output;
     
@@ -197,8 +191,12 @@ EncodedImage Codec::encode(const SourceImage &source) {
 
 DecodedImage Codec::decode(const EncodedImage &source) {
     
+    print("Size: ", source.size());
+    
     // Number of channels
     int nChannels = source.channels();
+    int width = source.cols;
+    int height = source.rows;
     
     
     // Compute limits. Disregard incomplete
@@ -209,7 +207,7 @@ DecodedImage Codec::decode(const EncodedImage &source) {
     
     
     // Decode: 2D-IDCT transformations
-    DecodedImage decodedImage(source.size(), DecodedChannelType);
+    DecodedImage decodedImage(height, width, DecodedChannelType);
     
     
     for (int row = 0; row < limit.rows; row += N) {
@@ -220,7 +218,7 @@ DecodedImage Codec::decode(const EncodedImage &source) {
             
             
             // Partition each 8×8 channel
-            Point2i origin(col, row);
+            Point2i origin(row, col);
             Rect area(origin, block_t::SIZE);
             block.partition<DecodedImageType>(source(area));
             
@@ -230,16 +228,16 @@ DecodedImage Codec::decode(const EncodedImage &source) {
             block.apply(idct2);
             
             
-            print("DE BLK");
-            block.display();
+            //print("DE BLK");
+            //block.display();
             // Write transformed block to image
             Codec::write(decodedImage, origin, block, -128);
             
         }
     }
     
-    print("DE OUT");
-    print(decodedImage);
+    //print("DE OUT");
+    //print(decodedImage);
     
     
     // Reverse 4:2:0 subsample ratio
@@ -274,7 +272,7 @@ Mat Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
             
             Vec3b sRgb = source.at<Vec3b>(row, col);
             Block3s dRgb = decoded.at<Block3s>(row, col);
-            Vec3s compared;
+            Vec3s compared(0, 0, 0);
             
             for (int c = 0; c < 3; c++) {
                 compared[c] = static_cast<short>(sRgb[c] - dRgb[c]);

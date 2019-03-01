@@ -43,7 +43,6 @@ struct Colorspace {
 
 struct ImageSampling {
 
-
     static Mat3b sample(const Mat3b &source, int width, int chromSamples, int chromChange);
 
     static Mat3b desample(const Mat3b &source);
