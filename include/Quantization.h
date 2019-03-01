@@ -75,7 +75,7 @@ Mat_<BlockDataType> Compression::quantization(const Mat_<BlockDataType> &dctCoef
                 scaledTableEntry = 1;
             }
 
-            BlockDataType quantized = static_cast<BlockDataType>(round(coefficient / tableEntry));
+            BlockDataType quantized = static_cast<BlockDataType>(round(coefficient / scaledTableEntry));
             
             quantizedCoefficients.at<BlockDataType>(row, col) = quantized;
             
