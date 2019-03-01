@@ -345,7 +345,7 @@ void Codec::write(Mat_<Vec<_Tp, cn>> &to, Point2i origin, ImageBlock &block, sho
                 imagePixel[c] += offset;
             }
             
-            to.template at<Vec<_Tp, cn>>(col + oy, row + ox) = imagePixel;
+            to.template at<Vec<_Tp, cn>>(row + ox, col + oy) = imagePixel;
             
         }
     }
