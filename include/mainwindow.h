@@ -8,6 +8,8 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QRadioButton>
+#include <QSpinBox>
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QImageReader>
@@ -37,14 +39,18 @@ public:
 private slots:
     void loadImage();
     void convertImage();
+     void decodeImage();
     cv::Mat YUVTORGB(const cv::Mat3b &src);
+     void first();
+     void second();
+     void third();
 
 private:
-    
+
     // Convert an RGB Matrix to an Qt image
     QImage MatRGB2QImage(const cv::Mat3b &src);
     QImage MatYUV2QImage(const cv::Mat3b &src);
-    
+
     // Convert Grayscale matrix to Qt image
     QImage MatGrayScale2QImage(const cv::Mat_<double> &src);
 
@@ -53,7 +59,9 @@ private:
     QLabel *img1, *img2;
     QScrollArea *scrollArea1, *scrollArea2;
     QLayout *mainLayout, *buttonLayout;
-    QPushButton *openButton, *convertButton;
+    QPushButton *openButton, *convertButton, *decodeButton;
+    QRadioButton *firstSetting, *secondSetting, *thirdSetting;
+    QSpinBox *QuantizationNum;
     Mat cvImg, convertedImg;
 
 };
