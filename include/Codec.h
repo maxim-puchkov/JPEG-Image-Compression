@@ -9,6 +9,8 @@
 #ifndef Codec_h
 #define Codec_h
 
+/* Indiviual tests are in Codec */
+
 #include <string>
 #include <functional>
 #include "Matrix.h"
@@ -49,6 +51,27 @@ struct Codec;
 struct Codec {
 public:
     
+    /* Run individual tests (see end of this file) */
+    /* Each test prints out image it tests and output */
+    static void testColor();            // Convert RGB -> YUV -> RGB
+    static void testSample();           // Sample and desample an image
+    static void testDCT();              // Apply DCT to a block (offset -128); then IDCT
+    static void testQuantization();     // Apply DCT to a block (offset -128) and then quantize coefficients;
+                                        // then dequantize and IDCT to get the same block (+128)
+    // Quantization quality factor, qf, or table
+    // index, qti, can be changed (determined by button option)
+    static void testQuantization(int qf, int qti) {
+        qtables::QualityFactor = qf;
+        qtables::QuantizationTableIndex = qti;
+        testQuantization();
+    }
+    
+    
+    // Test Quality factor of 0, 1, 5, and 10 for the same image
+    // Quality factor is 0 (none) to 10 (max); default = 1 (no affect on compression)
+    static void testQualityFactor();
+    
+    
     /* Encode, decode */
     static EncodedImage encode(const SourceImage &source);
     static DecodedImage decode(const EncodedImage &source);
@@ -75,17 +98,6 @@ public:
     static int limit;
     static int shown;
     static void display_step(std::string msg, const Mat &m);
-    
-    
-    
-    /* Run individual tests (see end of this file) */
-    /* Each test prints out image it tests and output */
-    static void testColor();            // Convert RGB -> YUV -> RGB
-    static void testSample();           // Sample and desample an image
-    static void testDCT();              // Apply DCT to a block (offset -128); then IDCT
-    static void testQuantization();     // Apply DCT to a block (offset -128) and then quantize coefficients;
-    // then dequantize and IDCT to get the same block (+128)
-    
     
 private:
     
@@ -152,10 +164,8 @@ EncodedImage Codec::encode(const SourceImage &source) {
     Mat3b yuvImage = Colorspace::convert_RGB_YUV(source);
     Mat3b sampledImage = ImageSampling::sample(yuvImage, 4, 2, 0);
     
-    
     // Encode: 2D-DCT transformations and Quantization
     EncodedImage encoded(source.size(), EncodedChannelType);
-    print(sampledImage);
     
     for (int row = 0; (row + N - 1) < (height); row += N) {
         for (int col = 0; (col + N - 1) < (width); col += N) {
@@ -166,7 +176,9 @@ EncodedImage Codec::encode(const SourceImage &source) {
             // Partition each 8×8 channel
             Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
-            block.partition<SourceImageType>(source(area), -128);
+            
+            block.partition<SourceImageType>(sampledImage(area), -128);
+            //block.partition<SourceImageType>(source(area), -128);
            
             
             // DCT transformation of each image block channel
@@ -234,7 +246,6 @@ DecodedImage Codec::decode(const EncodedImage &source) {
             Point2i origin(row, col);
             Rect area(origin, block_t::SIZE);
             block.partition<EncodedImageType>(source(area));
-            print(block.combine());
             
             
             // Dequantize
@@ -454,12 +465,12 @@ void Codec::write(Mat_<Vec<_Tp, cn>> &to, Point2i origin, Mat_<Vec<B, cn>> &bloc
     for (int row = ox; row < (ox + N); row++) {
         for (int col = oy; col < (oy + N); col++) {
         
-            Vec<_Tp, cn> imagePixel = block.template at<Vec<B, cn>>(row - ox, col - ox);
+            Vec<_Tp, cn> imagePixel = block.template at<Vec<B, cn>>(col - oy, row - ox);
             for (int c = 0; c < cn; c++) {
                 imagePixel[c] += offset;
             }
             
-            to.template at<Vec<_Tp, cn>>(row + ox, col + oy) = imagePixel;
+            to.template at<Vec<_Tp, cn>>(col, row) = imagePixel;
             
         }
     }
@@ -623,8 +634,35 @@ void Codec::testQuantization() {
     
     Mat3b cmpRes = compare(test, idctRes);
     print_spaced(2, "f(i, j)-f~(i, j) compared \n", cmpRes);
-    
     print("Average difference of images: ", average(test, idctRes));
+}
+
+void Codec::testQualityFactor() {
+    Codec::limit = 0; // intermediate display
+    
+    Mat3b test = rgb3_2;   // lena (example 2)
+    
+    // Perform a test for: 0, 1, 5, 10
+    int n = 4; // 4 total
+    int qFactorTests[4] = {0, 1, 5, 10};
+    
+    print("Compare: ");
+    print_spaced(2, "f(i, j) Original\n", test);
+
+    for (int i = 0; i < n; i++) {
+        int qf = qFactorTests[i];
+        qtables::QualityFactor = qf;
+        Mat compressionResult = Codec::encode(test);
+        Mat decoded = Codec::decode(compressionResult);
+        Mat3b cmpRes = compare(test, decoded);
+        
+        print_spaced(1, "F^(u, v) Compression result for factor ", qf, "\n", compressionResult);
+        print_spaced(2, "f(i, j)-f~(i, j) compared \n", cmpRes);
+    }
+
+    
+    
+    
 }
 
 #endif /* Codec_h */
