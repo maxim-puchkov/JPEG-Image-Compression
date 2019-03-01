@@ -59,7 +59,7 @@ struct Codec {
 public:
     
     // Encode
-    static EncodedImage encode(const SourceImage &source);
+    static EncodedImage encode(const SourceImage &source,int Quant, int selection);
     
     // Decode
     static DecodedImage decode(const EncodedImage &source);
@@ -118,8 +118,9 @@ struct PartitionLimit {
 
 /* JPEG Encode */
 
-EncodedImage Codec::encode(const SourceImage &source) {
-    
+EncodedImage Codec::encode(const SourceImage &source, int Quant, int selection) {
+    QuantizationTable::setQTableSet(selection);
+    QuantizationTable::setQuality(Quant);
     print("DEB e");
     dbg(source, 100); // debug 100 blocks
     print("DEB dbg complete");
@@ -338,21 +339,21 @@ Mat Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
 
 
 
-void Codec::configureCompression(const SourceImage &source) {
+//void Codec::configureCompression(const SourceImage &source) {
     
-    print("Running debug configuration...");
-    print("Input image data: ", source.size());
+//    print("Running debug configuration...");
+//    print("Input image data: ", source.size());
     
-    PartitionLimit cfgLimit(source.rows, source.cols, N);
-    print("RC limits:    \t(", cfgLimit.rows, ", ", cfgLimit.cols, ")");
-    print("Total blocks: \t", cfgLimit.blockCount);
+//    PartitionLimit cfgLimit(source.rows, source.cols, N);
+//    print("RC limits:    \t(", cfgLimit.rows, ", ", cfgLimit.cols, ")");
+//    print("Total blocks: \t", cfgLimit.blockCount);
     
-    EncodedImage e = Codec::encode(source);
-    print("Image encoded.");
+//    EncodedImage e = Codec::encode(source);
+//    print("Image encoded.");
     
-    DecodedImage d = Codec::decode(e);
+//    DecodedImage d = Codec::decode(e);
     
-}
+//}
 
 
 

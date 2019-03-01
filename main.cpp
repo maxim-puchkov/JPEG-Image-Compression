@@ -7,7 +7,7 @@
 //
 
 #include "mainwindow.h"
-#include "Color.h"
+
 #include <QApplication>
 
 int main(int argc, char * argv[]) {

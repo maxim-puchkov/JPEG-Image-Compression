@@ -21,10 +21,10 @@
 
 
 
-
-
-
-#include "include/mainwindow.h"
+#include "include/DebugData.h"
+#include "include/Codec.h"
+#include "include/Print.h"
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 // Constructor of MainWindow  layouts the graphical
@@ -42,7 +42,13 @@ scrollArea2(new QScrollArea),
 mainLayout(new QHBoxLayout),
 buttonLayout(new QVBoxLayout),
 openButton(new QPushButton),
-convertButton(new QPushButton) {
+convertButton(new QPushButton),
+  decodeButton(new QPushButton),
+  firstSetting(new QRadioButton),
+  secondSetting(new QRadioButton),
+  thirdSetting(new QRadioButton),
+
+QuantizationNum (new QSpinBox){
     
     // Main window size is always fixed to 700 columns, 300 rows
     ui->setupUi(this);
@@ -57,9 +63,19 @@ convertButton(new QPushButton) {
     // two buttons and a layout containing the buttons
     openButton->setText("Open");
     convertButton->setText("Convert");
+    decodeButton->setText("Decode");
+    firstSetting->setText("First Setting");
+    secondSetting->setText("Second Setting");
+    thirdSetting->setText("Third Setting");
+    QuantizationNum->setMaximum(100);
+
     buttonLayout->addWidget(openButton);
     buttonLayout->addWidget(convertButton);
-    
+    buttonLayout->addWidget(decodeButton);
+    buttonLayout->addWidget(firstSetting);
+    buttonLayout->addWidget(secondSetting);
+    buttonLayout->addWidget(thirdSetting);
+
     
     // main layout and its container
     setCentralWidget(container);
@@ -67,8 +83,9 @@ convertButton(new QPushButton) {
     buttonContainer->setLayout(buttonLayout);
     mainLayout->addWidget(img1);
     mainLayout->addWidget(buttonContainer);
+    mainLayout->addWidget(QuantizationNum);
     mainLayout->addWidget(img2);
-    
+
     
     // title
     setWindowTitle(tr("Image Converter"));
@@ -79,6 +96,15 @@ convertButton(new QPushButton) {
             this, SLOT (loadImage()));
     connect(convertButton, SIGNAL(clicked()),
             this, SLOT (convertImage()));
+    connect(decodeButton, SIGNAL(clicked()),
+            this, SLOT (decodeImage()));
+    connect(firstSetting, SIGNAL(clicked()),
+            this, SLOT (first()));
+    connect(secondSetting, SIGNAL(clicked()),
+            this, SLOT (second()));
+    connect(thirdSetting, SIGNAL(clicked()),
+            this, SLOT (third()));
+
     
 }
 
@@ -89,6 +115,21 @@ MainWindow::~MainWindow() {
 }
 
 
+
+int a = -1;
+
+
+void MainWindow::first(){
+    ::a = 0;
+}
+
+void MainWindow::second(){
+    ::a = 1;
+}
+
+void MainWindow::third(){
+    ::a = 2;
+}
 
 
 
@@ -115,16 +156,23 @@ void MainWindow::loadImage() {
 
 
 
-
+void MainWindow::decodeImage(){
+    if (convertedImg.empty() || ::a == -1) {
+        std::cout << "nani";
+        return;
+    }
+    QImage qImage = MatRGB2QImage(Codec::decode(convertedImg));
+    img2->setPixmap(QPixmap::fromImage(qImage));
+}
 
 
 /*******************************************************************************
                     Step 2. Color Space Conversion: RGB to YUV
  *******************************************************************************/
 void MainWindow::convertImage() {
-    
+    std::cout << QuantizationNum->value();
     // Guard: stop if original image's Mat cvImg is empty
-    if (cvImg.empty()) {
+    if (cvImg.empty() || ::a == -1) {
         return;
     }
     
@@ -138,8 +186,14 @@ void MainWindow::convertImage() {
     // Create an output image which has the same size (nWidth, nHeight) as the input image.
     // CV_8U means the output image has one channel, each channel has an unsigned byte.
     convertedImg.create(cvImg.size(), cvImg.type());
-    
-    
+//    Mat3b newthing = cvImg;
+//    print(newthing);
+//    convertedImg = Codec::encode(newthing);
+//    print(Codec::decode(convertedImg));
+    print(cvImg);
+    convertedImg = Codec::encode(cvImg,QuantizationNum->value(),::a);
+
+//    img2->setPixmap(QPixmap::fromImage(qImage));
     /*********************************************
      
      Final convertedImg type: CV_8UC3,
@@ -184,58 +238,57 @@ void MainWindow::convertImage() {
     
 
     
-    int nWidth = convertedImg.cols;
-    int nHeight = convertedImg.rows;
-    std::cout << convertedImg;
+//    int nWidth = convertedImg.cols;
+//    int nHeight = convertedImg.rows;
+//    std::cout << convertedImg;
     
-    for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
-        for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
+//    for (int width = 0; width < nWidth; width += 1) { /* For: Width - Horizontal - Columns */
+//        for (int height = 0; height < nHeight; height += 1) { /* For: Height - Vertical - Rows */
             
-            cv::Vec3b vRGB = cvImg.at<cv::Vec3b>(height, width);
+//            cv::Vec3b vRGB = cvImg.at<cv::Vec3b>(height, width);
             
 
 
             
-            // Compute weighted values
-            float wR = WEIGHT_RED * vRGB[0];
-            float wG = WEIGHT_GREEN * vRGB[1];
-            float wB = WEIGHT_BLUE * vRGB[2];
+//            // Compute weighted values
+//            float wR = WEIGHT_RED * vRGB[0];
+//            float wG = WEIGHT_GREEN * vRGB[1];
+//            float wB = WEIGHT_BLUE * vRGB[2];
             
             
-            // Luminance is the sum of weighted RGB channels: wR, wG, and wB
-            float luminance = wR + wG + wB;
-            float U = -1*WEIGHT_RED*vRGB[0] + -1*WEIGHT_GREEN*vRGB[1] + 0.886*vRGB[2];
-            float V = 0.701*vRGB[0] + -1*WEIGHT_GREEN*vRGB[1] + -1*WEIGHT_BLUE*vRGB[2];
+//            // Luminance is the sum of weighted RGB channels: wR, wG, and wB
+//            float luminance = wR + wG + wB;
+//            float U = -1*WEIGHT_RED*vRGB[0] + -1*WEIGHT_GREEN*vRGB[1] + 0.886*vRGB[2];
+//            float V = 0.701*vRGB[0] + -1*WEIGHT_GREEN*vRGB[1] + -1*WEIGHT_BLUE*vRGB[2];
             
-            // Mat(height, width) convertedImg writes the determined luminance value
-            convertedImg.at<cv::Vec3b>(height, width)[0] = luminance;
-            convertedImg.at<cv::Vec3b>(height, width)[1] = U;
-            convertedImg.at<cv::Vec3b>(height, width)[2] = V;
+//            // Mat(height, width) convertedImg writes the determined luminance value
+//            convertedImg.at<cv::Vec3b>(height, width)[0] = luminance;
+//            convertedImg.at<cv::Vec3b>(height, width)[1] = U;
+//            convertedImg.at<cv::Vec3b>(height, width)[2] = V;
             
-            /*********************************************
+//            /*********************************************
              
-             Vec3b is vector of 3 small numbers
-                == Vec<unsigned char, 3>
-                ~ 3 numbers in range 0..255
+//             Vec3b is vector of 3 small numbers
+//                == Vec<unsigned char, 3>
+//                ~ 3 numbers in range 0..255
             
              
-             Vec3b rgbRedColor(255, 0, 0);
+//             Vec3b rgbRedColor(255, 0, 0);
              
              
-             Mat3b is a matrix of Vec3b like
-                 [(255, 0, 0), (1, 2, 3);
-                  (r, g, b),   (or y, u, v)]
+//             Mat3b is a matrix of Vec3b like
+//                 [(255, 0, 0), (1, 2, 3);
+//                  (r, g, b),   (or y, u, v)]
              
-             *********************************************/
+//             *********************************************/
             
-        }
-    }
+//        }
+//    }
 
 
     // QImage is created with Grayscale values of Mat convertedImg.
 
-    // QImage qImage = MatYUV2QImage(convertedImg);
-    // img2->setPixmap(QPixmap::fromImage(qImage));
+
     
 }
 
