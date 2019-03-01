@@ -6,8 +6,7 @@
 //  Copyright © 2019 maximpuchkov. All rights reserved.
 //
 
-#include "mainwindow.h"
-#include "Color.h"
+#include "include/mainwindow.h"
 #include <QApplication>
 
 int main(int argc, char * argv[]) {

@@ -49,8 +49,6 @@ struct Codec;
 
 struct PartitionLimit;
 
-// struct JPEG;
-
 
 /*******************************************************************************
                                    JPEG Codec
@@ -72,7 +70,7 @@ public:
     
     
     
-    // Codec configuration: encode, decode, and compare with source (verbose)
+    // Codec configuration: encode, decode, and compare with source  (verbose)
     static void configureCompression(const SourceImage &source);
     
     
@@ -83,10 +81,8 @@ private:
     template<typename _Tp, int cn>
     static void write(Mat_<Vec<_Tp, cn>> &to, Point2i origin, ImageBlock &block, short offset);
     
-    template<typename _Tp, int cn>
-    static _Tp dc(const Mat_<Vec<_Tp, cn>> &mat);
-    
 };
+
 
 
 // Drop blocks if image is not multiple of 8
@@ -100,12 +96,6 @@ struct PartitionLimit {
     int blockCount;
     
 };
-
-
-//struct JPEG {
-//    template<typename _Tp, int cn>
-//    static _Tp dc(const Mat_<Vec<_Tp, cn>> &mat);
-//};
 
 
 
@@ -122,7 +112,7 @@ struct PartitionLimit {
 
 
 /*******************************************************************************
-                                    Encode
+                                Implementation
  *******************************************************************************/
 
 
@@ -131,6 +121,8 @@ struct PartitionLimit {
 EncodedImage Codec::encode(const SourceImage &source) {
     
     print("DEB e");
+    dbg(source, 100); // debug 100 blocks
+    print("DEB dbg complete");
     
     // Number of channels
     int nChannels = source.channels();
@@ -167,17 +159,19 @@ EncodedImage Codec::encode(const SourceImage &source) {
     
     
     for (int row = 0; (row + N) < (height); row += N) {
+        print("DEB nxt row");
+        
         for (int col = 0; (col + N) < (width); col += N) {
             
             // Block of Y, U, and V color intensities
             ImageBlock block(nChannels);
-            
             
             // Partition each 8×8 channel
             Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
             block.partition<SourceImageType>(sampledImage(area));
             print("DEB part rc", row, col);
+            
             
             
             // DCT transformation of each image block channel
@@ -229,14 +223,13 @@ EncodedImage Codec::encode(const SourceImage &source) {
 
 
 
-/*******************************************************************************
-                                    Decode
- *******************************************************************************/
+/* JPEG Decode */
 
 DecodedImage Codec::decode(const EncodedImage &source) {
     
     print("DEB d");
-    
+    dbg(source, 100); // debug 100 blocks
+    print("DEB dbg complete");
     
     // Number of channels
     int nChannels = source.channels();
@@ -260,6 +253,8 @@ DecodedImage Codec::decode(const EncodedImage &source) {
     
 
     for (int row = 0; (row + N) < (height); row += N) {
+        
+        print("DEB nxt row");
         for (int col = 0; (col + N) < (width); col += N) {
             
             // Block of Y, U, and V quantized DCT coefficients
@@ -312,77 +307,32 @@ DecodedImage Codec::decode(const EncodedImage &source) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*******************************************************************************
-                                Implementation
- *******************************************************************************/
-
+/* Codec compare */
 
 Mat Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
     
     CV_Assert(source.size() == decoded.size());
     Mat3b output(source.size(), CV_8SC3);
     
-    print("DEB c");
-    
-    print("DEB loop");
-    for(int i = 0; i < source.rows; i++) {
-        const uchar *srcVal = source.ptr<uchar>(i);
-        const uchar *decodedVal = decoded.ptr<uchar>(i);
-        
-        for(int j = 0; j < source.cols; j++) {
-            uchar entry = srcVal - decodedVal;
-            output.at<uchar>(i, j) = entry;
+    for (int row = 0; row < source.rows; row++) {
+        for (int col = 0; col < source.cols; col++) {
+            
+            Vec3b sRgb = source.at<Vec3b>(row, col);
+            Block3s dRgb = decoded.at<Block3s>(row, col);
+            Vec3s compared(0, 0, 0);
+            
+            for (int c = 0; c < 3; c++) {
+                compared[c] = static_cast<short>(sRgb[c] - dRgb[c]);
+            }
+            
+            output.at<Vec3s>(row, col) = compared;
+            
         }
     }
-    print("DEB out");
-    
-    print("DEB c done");
     
     return output;
     
 }
-    
-//
-//    for (int row = 0; row < source.rows; row++) {
-//        for (int col = 0; col < source.cols; col++) {
-//
-//            Vec3b sRgb = source.at<Vec3b>(row, col);
-//            Block3s dRgb = decoded.at<Block3s>(row, col);
-//            Vec3s compared(0, 0, 0);
-//
-//            for (int c = 0; c < 3; c++) {
-//                compared[c] = static_cast<short>(sRgb[c] - dRgb[c]);
-//            }
-//
-//            output.at<Vec3s>(row, col) = compared;
-//
-//        }
-//   }
-
-
-
-
-
-
 
 
 
@@ -515,9 +465,7 @@ void PartitionLimit::display() {
     print("Total blocks: ", this->blockCount);
 }
 
-          
-//template<typename _Tp, int cn>
-//_Tp JPEG::dc(const Mat_<Vec<_Tp, cn>> &mat);
+
 
 
 
