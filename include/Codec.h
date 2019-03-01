@@ -55,68 +55,70 @@ struct Codec;
 struct Codec {
 public:
     
-    // Encode
+    /* Encode, decode */
     static EncodedImage encode(const SourceImage &source);
-    
-    // Decode
     static DecodedImage decode(const EncodedImage &source);
+
     
-    // Compare result (original - decompressed)
-    static Mat compare(const SourceImage &input, const DecodedImage &decoded);
+    
+    /* Stati
+     stics: compare f(i, j) - f~(i, j), and get average difference */
+    static Mat3b compare(const SourceImage &input, const DecodedImage &decoded);
+    static double average(const SourceImage &input, const DecodedImage &decoded);
     
     
     
     // Codec configuration (verbose).
     // Complete encode, decode, and compare operations
     static void configure(const SourceImage &source);
+    static void configure(int qualityFactor, int quantTableIndex); // custom qf, qti
+    static void configure(const SourceImage &source, int qualityFactor, int quantTableIndex);
     static void configure(); // config with gray (r = g = b) lena image from fig 9.2
-    
 
+    
     // Show intermediate steps or limit number of steps to show
     // By default shows 3: dct, dequantization, and idct
-    static const int limit;
+    static int limit;
+    static int shown;
     static void display_step(std::string msg, const Mat &m);
     
     
     
-    
-    
-    
-    
-    /* Run individual tests (defined at the end of this file) */
+    /* Run individual tests (see end of this file) */
     /* Each test prints out image it tests and output */
-    
-    
-    // Convert RGB -> YUV -> RGB
-    static void testColor();
-    
-    
-    // Sample and desample an image
-    static void testSample();
-    
-    
-    // Apply DCT to a block (offset -128); then IDCT
-    static void testDCT();
-    
-    
-    // Apply DCT to a block (offset -128) and then quantize coefficients;
-    // then dequantize and IDCT to get the same block (+128)
-    static void testQuantization();
-    
-    
+    static void testColor();            // Convert RGB -> YUV -> RGB
+    static void testSample();           // Sample and desample an image
+    static void testDCT();              // Apply DCT to a block (offset -128); then IDCT
+    static void testQuantization();     // Apply DCT to a block (offset -128) and then quantize coefficients;
+                                        // then dequantize and IDCT to get the same block (+128)
     
     
 private:
     
+    // QuantizationTableIndex and QualityFactor affect result
     static BlockQuantization quantization;
     static BlockQuantization dequantization;
     static BlockTransform dct2;
     static BlockTransform idct2;
     
-    template<typename _Tp, int cn, typename B>
-    static void write(Mat_<Vec<_Tp, cn>> &to, Point2i origin, Mat_<Vec<B, cn>> &block, short offset);
+//    template<typename _Tp>
+//    static void write(Mat_<_Tp> &to, Point2i origin, Mat_<_Tp> &block);
+//
+//    static void write(Mat_<Vec3b> &to, Point2i origin, Mat_<Vec3b> &from);
+//    static void write(Mat_<Block3s> &to, Point2i origin, Mat_<Block3s> &from);
     
-    static int shown;
+    template<typename T>
+    static void write(Mat_<Vec<T, 3>> &to, Point2i origin, Vec<Vec<T, 3>, 8> &from, int r);
+    
+    
+    template<typename T>
+    void write(Mat_<T> &to, Point2i origin, Mat &from) {
+        for (int i = 0; i < N; i++) {
+            to.rowRange(0, 8) = from.row(i);
+        }
+        
+    }
+
     
 };
 
@@ -127,8 +129,8 @@ private:
 
 // Limit intermediate steps display
 
-// default 3: first DCT, Dequant and IDCT transforms
-const int Codec::limit = 3;
+// config default 3: first DCT, Dequant and IDCT transforms
+int Codec::limit = 0;
 int Codec::shown = 0;
 
 
@@ -178,15 +180,16 @@ EncodedImage Codec::encode(const SourceImage &source) {
     
     
     for (int row = 0; (row + N - 1) < (height); row += N) {
+        
+        
+        
         for (int col = 0; (col + N - 1) < (width); col += N) {
             
-            // Block of Y, U, and V color intensities
+            // Block of Y, U, and V color intensities. Partition each 8×8 channel
             ImageBlock block(nChannels);
-            
-            // Partition each 8×8 channel
             Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
-            block.partition<SourceImageType>(sampledImage(area), -128);
+            block.partition<SourceImageType>(source(area), -128);
 
             
             // DCT transformation of each image block channel
@@ -196,15 +199,20 @@ EncodedImage Codec::encode(const SourceImage &source) {
             
             // Quantizing DCT coefficients
             block.apply(quantization);
+            print(block.combine());
             // display_step("\n\t Result after quantization:\n", block.combine());
             
             
             // Each DCT coefficients block is written to the output
             // with offset = 0
+
             Mat_<Block3s> b3s = block.combine();
-            Codec::write(encoded, origin, b3s, 0);
+            // print(b3s);
+            Codec::write(encoded, {0,0}, b3s);
             
         }
+        
+
     }
     
     return encoded;
@@ -243,17 +251,15 @@ DecodedImage Codec::decode(const EncodedImage &source) {
     
     
     for (int row = 0; (row + N - 1) < (height); row += N) {
+        ImageBlock block(nChannels);
+        
         for (int col = 0; (col + N - 1) < (width); col += N) {
-            
-            // Block of Y, U, and V quantized DCT coefficients
+            //lock = ImageBlock(nChannels);
+            // Block of quantized DCT coefficients. Partition each 8×8 channel
             ImageBlock block(nChannels);
-            
-            
-            // Partition each 8×8 channel
-            Point2i origin(row, col);
+            Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
             block.partition<EncodedImageType>(source(area));
-            print(block.combine());
             
             
             // Dequantize
@@ -267,13 +273,16 @@ DecodedImage Codec::decode(const EncodedImage &source) {
             
             
             // Write transformed block to image
-            Mat_<Vec3b> b3b = block.to3b(128);
-            Codec::write(decodedImage, origin, b3b, 0);
+            
+            //Codec::write(decodedImage, origin, b3b);
             
         }
+        
+        Mat_<Vec3b> b3b = block.to3b(128);
+        Codec::write(encoded, {0,0}, b3b);
+        //print(b3b);
+        //Codec::write(decodedImage, {0,0}, b3b.row(row), row);
     }
-    
-    print("DEcodednaaaaa___:", decodedImage);
     
     // Reverse 4:2:0 subsample ratio and Convert YUV color space back to RGB
     Mat3b desampledImage = ImageSampling::desample(decodedImage);
@@ -297,9 +306,8 @@ DecodedImage Codec::decode(const EncodedImage &source) {
  *******************************************************************************/
 
 
-Mat Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
-    CV_Assert(source.size() == decoded.size());
-    Mat3b output = source.clone();
+Mat3b Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
+    SourceImage output = source.clone();
     
     for (int row = 0; row < source.rows; row++) {
         for (int col = 0; col < source.cols; col++) {
@@ -311,7 +319,27 @@ Mat Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
     
     return output;
 }
+
+
+// Compute average difference in results
+double Codec::average(const SourceImage &source, const DecodedImage &decoded) {
+    int totalDiff = 0;
     
+    for (int row = 0; row < source.rows; row++) {
+        for (int col = 0; col < source.cols; col++) {
+            Vec3b sv = source.at<Vec3b>(row, col);
+            Vec3b dv = decoded.at<Vec3b>(row, col);
+            Vec3b diff = sv - dv;
+            for (int c = 0; c < 3; c++) {
+                totalDiff += diff[c];
+            }
+        }
+    }
+    
+    
+    double avg = totalDiff / (source.rows * source.cols);
+    return avg;
+}
     
     
 //
@@ -335,17 +363,32 @@ Mat Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
  *******************************************************************************/
 
 
-void Codec::configure() { configure(gray3); }
+void Codec::configure() {
+    configure(gray3);
+}
+
+void Codec::configure(int qualityFactor, int quantTableIndex) {
+    qtables::QualityFactor = qualityFactor;
+    qtables::QuantizationTableIndex = quantTableIndex;
+    configure();
+}
+
+void Codec::configure(const SourceImage &source, int qualityFactor, int quantTableIndex) {
+    qtables::QualityFactor = qualityFactor;
+    qtables::QuantizationTableIndex = quantTableIndex;
+    configure(source);
+}
+
 
 void Codec::configure(const SourceImage &source) {
     
+    Codec::limit = 3; // intermediate display
     int brk = 6; // 6 lines after spaced
     
     // variables
     Rect area(Point2i{0, 0}, Size2i{8, 8});
     int qti = qtables::QuantizationTableIndex;
     int qf = qtables::QualityFactor;
-    
     
     
     
@@ -376,8 +419,7 @@ void Codec::configure(const SourceImage &source) {
     // Encode
     print("Encoding image...");
     EncodedImage e = Codec::encode(source);
-    print("OK: JPEG encode completed.");
-    print_spaced(brk, "\tEncoded block:\n", e(area));
+    print_spaced(6, "OK: JPEG encode completed. Encoded block:\n", e(area));
     
     
     // Decode
@@ -418,8 +460,8 @@ void Codec::configure(const SourceImage &source) {
 // Init codec functions
 BlockQuantization Codec::quantization = Compression::quantization;
 BlockQuantization Codec::dequantization = Compression::dequantization;
-BlockTransform Codec::dct2 = Transform::dct2;//<BlockDataType>;
-BlockTransform Codec::idct2 = Transform::idct2;//<BlockDataType>;
+BlockTransform Codec::dct2 = Transform::dct2;
+BlockTransform Codec::idct2 = Transform::idct2;
 
 
 
@@ -427,27 +469,97 @@ BlockTransform Codec::idct2 = Transform::idct2;//<BlockDataType>;
 
 /* Private. Codec write block to image */
 
-template<typename _Tp, int cn, typename B>
-void Codec::write(Mat_<Vec<_Tp, cn>> &to, Point2i origin, Mat_<Vec<B, cn>> &block, short offset) {
-//void Codec::write(Mat_<Vec<_Tp, cn>> &to, Point2i origin, ImageBlock &block, short offset) {
+
+
+
+//
+//void Codec::write(Mat_<BlockDataType> &to, Point2i origin, Mat_<BlockDataType> &from) {
+//    int ox = origin.x;
+//    int oy = origin.y;
+//
+//    to.
+//
+//
+//    for (int i = 0; i < origin.x + N - 1; i++) {
+//        for (j = 0; j < origin.y + N - 1; j++)
+//            to(
+//        }
+//    }
+//
+//
+
+//    for (int i = 0 ; i < N; i++) {
+//        Block3s *p = to.ptr<Block3s *>(i);
+//        for (int j = 0; j < N; j++) {
+//
+//            Block3s *entry = p[j];
+//            to.at<Block3s>(i + ox, j + oy) = entry;
+//            p++;
+//            print("B3", p[j]);
+//        }
+//    }
+//
+//    to.copyTo(
+//    for (int row = ox; row < (ox + N - 1); row++) {
+//        for (int col = oy; col < (oy + N - 1); col++) {
+//            Block3s imagePixel = from.at<Block3s>(row - ox, col - oy);
+//            //print("b3s:, ", imagePixel);
+//            //print(row - ox, col - oy);
+//            //to.at<Block3s>(row, col) = imagePixel;
+//            print("to: ", to.at<Block3s>(row, col));
+//            //print(row, col);
+//        }
+//    }
+//}
+//
+//void Codec::write(Mat_<Vec3b> &to, Point2i origin, Mat_<Vec3b> &from) {
+//    int ox = origin.x;
+//    int oy = origin.y;
+//
+//    for (int i = 0 ; i < N; i++) {
+//        Vec3b *p = to.ptr<Vec3b*>(i);
+//        for (int j = 0; j < N; j++) {
+//
+//            Vec3b entry = p[j];
+//            to.at<Vec3b>(i + ox, j + oy) = entry;
+//            p++;
+//            print("v3", p[j]);
+//        }
+//    }
+//}
+
     
-    int ox = origin.x;
-    int oy = origin.y;
+    //from.copyTo(to);
     
-    for (int row = ox; row < (ox + N); row++) {
-        for (int col = oy; col < (oy + N); col++) {
-        
-            Vec<_Tp, cn> imagePixel = block.template at<Vec<B, cn>>(row - ox, col - ox);
-            for (int c = 0; c < cn; c++) {
-                imagePixel[c] += offset;
-            }
-            
-            to.template at<Vec<_Tp, cn>>(row + ox, col + oy) = imagePixel;
-            
-        }
-    }
+
     
-}
+    
+//    for (int row = ox; row < (ox + N - 1); row++) {
+//        for (int col = oy; col < (oy + N - 1); col++) {
+//            Vec3b imagePixel = from.at<Vec3b>(row - ox, col - oy);
+//            to.at<Vec3b>(row, col) = imagePixel;
+//        }
+//    }
+//}
+
+
+//template<typename _Tp>
+//void Codec::write(Mat_<_Tp> &to, Point2i origin, Mat_<_Tp> &block) {
+////void Codec::write(Mat_<Vec<_Tp, cn>> &to, Point2i origin, ImageBlock &block, short offset) {
+//
+//    int ox = origin.x;
+//    int oy = origin.y;
+//
+//    for (int row = ox; row < (ox + N - 1); row++) {
+//        for (int col = oy; col < (oy + N - 1); col++) {
+//
+//            _Tp imagePixel = block.template at<_Tp>(col - oy, row - ox);
+//            to.template at<_Tp>(col, row) = imagePixel;
+//
+//        }
+//    }
+//
+//}
 
 
 
@@ -520,10 +632,9 @@ void Codec::display_step(std::string msg, const Mat &m) {
 void Codec::testColor() {
     Mat3b test = rgb3; // top: red, green;   bottom: blue, white
     
-    //
+    // Convert to YUV and back to RGB
     Mat3b yuv = Colorspace::convert_RGB_YUV(test);
     Mat3b result = Colorspace::convert_YUV_RGB(yuv);
-    
     
     print("Compare: ");
     print_spaced(2, "Original\n", test);
@@ -545,6 +656,8 @@ void Codec::testSample() {
 
 
 void Codec::testDCT() {
+    Codec::limit = 3; // intermediate display
+    
     // 3 identical channels of grayscale image block (lena)
     Mat3b test = gray3_2; // second grayscale block shown in the example
     
@@ -569,6 +682,8 @@ void Codec::testDCT() {
 
 
 void Codec::testQuantization() {
+    Codec::limit = 3; // intermediate display
+    
     // 3 identical channels of grayscale image block (lena)
     Mat3b test = gray3;   // first grayscale block shown in the example
     
@@ -593,6 +708,8 @@ void Codec::testQuantization() {
     
     
     // Matches example // Fig. 9.2: JPEG compression for a smooth image block.
+    // (if not sampling encode)
+    //  ~ block.partition<SourceImageType>(source(area), -128);
     print("Compare: ");
     print_spaced(2, "f(i, j) Original\n", test);
     print_spaced(2, "F(u, v) DCT coefficients\n", dctRes);
@@ -600,7 +717,10 @@ void Codec::testQuantization() {
     print_spaced(2, "F~(u, v) dequantized DCT coefficients\n", deqRes);
     print_spaced(4, "f~(i, j) decoded original \n", idctRes);
     
-    //compare(test, idctRes);
+    Mat3b cmpRes = compare(test, idctRes);
+    print_spaced(2, "f(i, j)-f~(i, j) compared \n", cmpRes);
+    
+    print("Average difference of images: ", average(test, idctRes));
 }
 
 #endif /* Codec_h */

@@ -88,6 +88,32 @@ public:
     Mat_<Block3s> combine();
     Mat3b to3b();
     Mat3b to3b(int off);
+//    
+//    Vec<Vec<BlockDataType, 3>, 8> t1(int off) {
+//        Vec<Vec<BlockDataType, 3>, 8> v1;
+//        for (int i = 0; i < N; i++) {
+//            Vec<BlockDataType, 3> v2;
+//            for (int j = 0; j < N; j++) {
+//                v2 = data<BlockDataType, 3>(i, j) - off;
+//            }
+//            v1[i] = v2;
+//        }
+//        return v1;
+//    }
+//    
+//    
+//    
+//    Vec<Vec<BlockDataType, 3>, 8> t2(int off) {
+//        Vec<Vec<uchar, 3>, 8> v1;
+//        for (int i = 0; i < N; i++) {
+//            Vec<uchar, 3> v2;
+//            for (int j = 0; j < N; j++) {
+//                v2 = data<uchar, 3>(i, j) - off;
+//            }
+//            v1[i] = v2;
+//        }
+//        return v1;
+//    }
     static ImageBlock toBlock(const Mat3b &source, int off);
     
     

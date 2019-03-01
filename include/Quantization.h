@@ -69,6 +69,7 @@ Mat_<BlockDataType> Compression::quantization(const Mat_<BlockDataType> &dctCoef
     
     Mat_<BlockDataType> quantizedCoefficients(dctCoefficients.size(), block_t::CHANNEL_TYPE);
     
+    
     for (int row = 0; row < dctCoefficients.rows; row++) {
         for (int col = 0; col < dctCoefficients.cols; col++) {
             
@@ -100,7 +101,7 @@ Mat_<BlockDataType> Compression::dequantization(const Mat_<BlockDataType> &quant
             
             BlockDataType coefficient = quantizedCoefficients.at<BlockDataType>(row, col);
             
-            uchar tableEntry = table.at<uchar>(row, col);
+            uchar tableEntry = table.at<uchar>(row , col);
             int scaledTableEntry = tableEntry * qtables::QualityFactor;
             if (scaledTableEntry == 0) { scaledTableEntry = 1; }
             
