@@ -32,15 +32,6 @@ namespace block_t {
     using EncodedImageType = uchar;
     using UnEncodedImageType = BlockDataType;
     
-    using EncodedImage = Mat_<Block3s>;
-    static const int CompressedChannelType = CV_16SC3;
-    
-    using DecodedImage = Mat_<Vec3b>;
-    static const int DecodedChannelType = CV_8UC3;
-    
-    using SourceImage = Mat_<Vec3b>;
-    static const int SourceChannelType = CV_8UC3;
-    
     using IBDecoded3 = Vec<BlockDataType, 3>;
     using IBEncoded3 = Vec<unsigned char, 3>;
     
@@ -108,11 +99,18 @@ public:
     void display() const;
         
     
+    
+    
+    // Retrieve data (+offset)
+    //BlockDataType data(unsigned int channel, int row, int column) const;
+    BlockDataType data(unsigned int channel, Point2i position) const;
+    
+    
     // Checked and Unchecked channel access
     Mat_<BlockDataType> at(unsigned int index) const noexcept;
     Mat_<BlockDataType> &at(unsigned int index) noexcept;
-    Mat_<BlockDataType> operator[](unsigned int index) const;
-    Mat_<BlockDataType> &operator[](unsigned int index);
+    //Mat_<BlockDataType> operator[](unsigned int index) const;
+    //Mat_<BlockDataType> &operator[](unsigned int index);
     
 private:
     
@@ -152,19 +150,23 @@ private:
 
 ImageBlock::ImageBlock(int cn)
 : cn(cn)
-{ }
+{
+    this->channelData.reserve(cn);
+}
 
 
 
 template<typename SourceType>
 void ImageBlock::partition(const Mat_<Vec<SourceType, 3>> &source) {
-    this->channelData.reserve(cn);
     
+    // Allocate
     for (int c = 0; c < cn; c++) {
         Mat_<BlockDataType> channel(SIZE, CV_16S);
         this->channelData.push_back(channel);
     }
     
+    
+    // Store each channel matrix
     for (int row = 0; row < source.rows; row++) {
         for (int col = 0; col < source.cols; col++) {
             
@@ -180,7 +182,6 @@ void ImageBlock::partition(const Mat_<Vec<SourceType, 3>> &source) {
         }
     }
     
-    this->display();
 }
 
 
@@ -198,10 +199,6 @@ void ImageBlock::apply(BlockTransform transform) {
         Mat1d transformed = transform(this->at(c));
         this->at(c) = round<BlockDataType>(transformed);
     }
-    
-    
-    
-    this->display();
 }
 
 
@@ -217,9 +214,7 @@ void ImageBlock::apply(BlockQuantization quantization) {
     for (int c = 1; c < cn; c++) {
         this->at(c) = quantization(this->at(c), tables.chrominance);
     }
-    
-    
-    this->display();
+
 }
 
 
@@ -263,13 +258,9 @@ Mat_<BlockDataType> &ImageBlock::at(unsigned int index) noexcept {
 }
 
 
-Mat_<BlockDataType> ImageBlock::operator[](unsigned int index) const {
-    return this->channelData[index];
-}
-
-
-Mat_<BlockDataType> &ImageBlock::operator[](unsigned int index) {
-    return this->channelData[index];
+BlockDataType ImageBlock::data(unsigned int channel, Point2i position) const {
+    Mat_<BlockDataType> m = this->at(channel);
+    return m.at<BlockDataType>(position) + DATA_OFFSET;
 }
 
 #endif /* ImageBlock_h */
