@@ -113,16 +113,14 @@ struct PartitionLimit {
 
 
 /*******************************************************************************
-                                Implementation
+                                  JPEG Encode
  *******************************************************************************/
 
 
-/* JPEG Encode */
-
 EncodedImage Codec::encode(const SourceImage &source) {
     
+    print(source);
     
-    dbg(source, 100); // debug 100 blocks
     
     
     // Number of channels
@@ -160,8 +158,6 @@ EncodedImage Codec::encode(const SourceImage &source) {
     
     
     for (int row = 0; (row + N) < (height); row += N) {
-        
-        
         for (int col = 0; (col + N) < (width); col += N) {
             
             // Block of Y, U, and V color intensities
@@ -178,7 +174,7 @@ EncodedImage Codec::encode(const SourceImage &source) {
             // DCT transformation of each image block channel
             BlockTransform dct2 = Transform::dct2<BlockDataType>;
             block.apply(dct2);
-            
+            block.display();
             
             
             // Quantizing DCT coefficients
@@ -195,7 +191,7 @@ EncodedImage Codec::encode(const SourceImage &source) {
         }
     }
 
-    
+    print("_sk_", encoded);
     
     return encoded;
     
@@ -224,12 +220,15 @@ EncodedImage Codec::encode(const SourceImage &source) {
 
 
 
-/* JPEG Decode */
+/*******************************************************************************
+                                JPEG Decode
+ *******************************************************************************/
+
 
 DecodedImage Codec::decode(const EncodedImage &source) {
     
     
-    dbg(source, 100); // debug 100 blocks
+    print(source);
     
     
     // Number of channels
@@ -254,8 +253,6 @@ DecodedImage Codec::decode(const EncodedImage &source) {
     
 
     for (int row = 0; (row + N) < (height); row += N) {
-        
-        
         for (int col = 0; (col + N) < (width); col += N) {
             
             // Block of Y, U, and V quantized DCT coefficients
@@ -272,11 +269,10 @@ DecodedImage Codec::decode(const EncodedImage &source) {
             // 2D-IDCT of each channel
             BlockTransform idct2 = Transform::idct2<BlockDataType>;
             block.apply(idct2);
+            block.display();
             
             
-            
-            //print("DE BLK");
-            //block.display();
+  
             // Write transformed block to image
             // with offset = -128
             Codec::write(decodedImage, origin, block, -128);
@@ -294,7 +290,7 @@ DecodedImage Codec::decode(const EncodedImage &source) {
     DecodedImage rgbImage = Colorspace::convert_YUV_RGB(desampledImage);
     
     
-    
+    print("_sk_", rgbImage);
     
     return rgbImage;
     
@@ -308,26 +304,24 @@ DecodedImage Codec::decode(const EncodedImage &source) {
 
 
 
-/* Codec compare */
+
+/*******************************************************************************
+                                    Compare
+ *******************************************************************************/
+
 
 Mat Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
     
     CV_Assert(source.size() == decoded.size());
     Mat3b output(source.size(), CV_8SC3);
     
-    for (int row = 0; row < source.rows; row++) {
-        for (int col = 0; col < source.cols; col++) {
-            
-            Vec3b sRgb = source.at<Vec3b>(row, col);
-            Block3s dRgb = decoded.at<Block3s>(row, col);
-            Vec3s compared(0, 0, 0);
-            
-            for (int c = 0; c < 3; c++) {
-                compared[c] = static_cast<short>(sRgb[c] - dRgb[c]);
-            }
-            
-            output.at<Vec3s>(row, col) = compared;
-            
+    for(int i = 0; i < source.rows; i++) {
+        const uchar *srcVal = source.ptr<uchar>(i);
+        const uchar *decodedVal = decoded.ptr<uchar>(i);
+        
+        for(int j = 0; j < source.cols; j++) {
+            uchar entry = srcVal - decodedVal;
+            output.at<uchar>(i, j) = entry;
         }
     }
     
@@ -339,6 +333,10 @@ Mat Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
 
 
 
+
+/*******************************************************************************
+                                Configure (debugging)
+ *******************************************************************************/
 
 
 void Codec::configure(const SourceImage &source) {
@@ -373,18 +371,19 @@ void Codec::configure(const SourceImage &source) {
     print("Input image data: ", source.size());
     print_spaced(2, "\tImage block :\n", source(area));
     
+    
     // Encode
     print("Encoding image...");
     EncodedImage e = Codec::encode(source);
     print("OK: JPEG encode completed.");
-    print_spaced(2, "\tEncoded block:\n", e(area));
+    print_spaced(2, "\tEncoded block (offset = -128):\n", e(area));
     
     
     // Decode
     print("Decoding image...");
     DecodedImage d = Codec::decode(e);
     print("OK: JPEG decode compeleted.");
-    print_spaced(2, "\nDecoded block:\n", d(area));
+    print_spaced(2, "\nDecoded block (offset = -128):\n", d(area));
     
     
     // Compare
@@ -428,7 +427,7 @@ void Codec::write(Mat_<Vec<_Tp, cn>> &to, Point2i origin, ImageBlock &block, sho
     int y = oy + N;
     
     for (int col = oy; col < (y - oy); col++) {
-    for (int row = 0; row < (x - ox); row++) {
+        for (int row = 0; row < (x - ox); row++) {
         
             
             Vec<_Tp, cn> imagePixel = block.data<_Tp, cn>(col, row);
