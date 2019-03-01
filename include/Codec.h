@@ -118,24 +118,11 @@ struct PartitionLimit {
 
 
 EncodedImage Codec::encode(const SourceImage &source) {
-    
-    print(source);
-    
-    
-    
-    // Number of channels
+
+    // Source properties
     int nChannels = source.channels();
     int width = source.cols;
     int height = source.rows;
-    
-    
-    print("Encode. Input:");
-    print("\tSize: ", source.size());
-    print("\tRows: ", source.rows, "; columns: ", source.cols);
-    print("\tWidth: ", width, "; height: ", height);
-    
-    
-
     
     
     // Convert RGB (CV_8UC3) to YUV
@@ -145,20 +132,18 @@ EncodedImage Codec::encode(const SourceImage &source) {
     // Chroma subsampling 4:2:0
     Mat3b sampledImage = ImageSampling::sample(yuvImage, 4, 2, 0);
     
-
+    
     // Compute limits. Disregard incomplete
     // blocks less than block size.
-    PartitionLimit limit(source.cols, source.rows, N);
+    PartitionLimit limit(source.rows, source.cols, N);
     
     
     // Encode: 2D-DCT transformations and Quantization
     EncodedImage encoded(source.size(), EncodedChannelType);
     
     
-    
-    
-    for (int row = 0; (row + N) < (height); row += N) {
-        for (int col = 0; (col + N) < (width); col += N) {
+    for (int row = 0; (row + N - 1) < (height); row += N) {
+        for (int col = 0; (col + N - 1) < (width); col += N) {
             
             // Block of Y, U, and V color intensities
             ImageBlock block(nChannels);
@@ -167,13 +152,13 @@ EncodedImage Codec::encode(const SourceImage &source) {
             Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
             block.partition<SourceImageType>(sampledImage(area));
-            
-            
-            
+
             
             // DCT transformation of each image block channel
             BlockTransform dct2 = Transform::dct2<BlockDataType>;
             block.apply(dct2);
+            print("D");
+            block.display();
             block.display();
             
             
@@ -181,12 +166,10 @@ EncodedImage Codec::encode(const SourceImage &source) {
             BlockQuantization quantizationFormula = Compression::quantization;
             block.apply(quantizationFormula);
             
-            
-            
+            print(block.combine());
             // Each DCT coefficients block is written to the output
             // with offset = 0
             Codec::write(encoded, origin, block, 0);
-            
             
         }
     }
@@ -211,15 +194,6 @@ EncodedImage Codec::encode(const SourceImage &source) {
 
 
 
-
-
-
-
-
-
-
-
-
 /*******************************************************************************
                                 JPEG Decode
  *******************************************************************************/
@@ -227,20 +201,10 @@ EncodedImage Codec::encode(const SourceImage &source) {
 
 DecodedImage Codec::decode(const EncodedImage &source) {
     
-    
-    print(source);
-    
-    
-    // Number of channels
+    // Source properties
     int nChannels = source.channels();
     int width = source.cols;
     int height = source.rows;
-    
-    
-    print("Decode. Input:");
-    print("\tSize: ", source.size());
-    print("\tRows: ", source.rows, "; columns: ", source.cols);
-    print("\tWidth: ", width, "; height: ", height);
     
     
     // Compute limits. Disregard incomplete
@@ -251,16 +215,16 @@ DecodedImage Codec::decode(const EncodedImage &source) {
     // Decode: 2D-IDCT transformations
     DecodedImage decodedImage(source.size(), DecodedChannelType);
     
-
-    for (int row = 0; (row + N) < (height); row += N) {
-        for (int col = 0; (col + N) < (width); col += N) {
+    
+    for (int row = 0; (row + N - 1) < (height); row += N) {
+        for (int col = 0; (col + N - 1) < (width); col += N) {
             
             // Block of Y, U, and V quantized DCT coefficients
             ImageBlock block(nChannels);
             
             
             // Partition each 8×8 channel
-            Point2i origin(col, row);
+            Point2i origin(row, col);
             Rect area(origin, block_t::SIZE);
             block.partition<DecodedImageType>(source(area));
             
@@ -276,7 +240,6 @@ DecodedImage Codec::decode(const EncodedImage &source) {
             // Write transformed block to image
             // with offset = -128
             Codec::write(decodedImage, origin, block, -128);
-            
             
         }
     }
@@ -421,21 +384,27 @@ void Codec::configure(const SourceImage &source) {
 template<typename _Tp, int cn>
 void Codec::write(Mat_<Vec<_Tp, cn>> &to, Point2i origin, ImageBlock &block, short offset) {
     
+    print("_sk_ callee");
+    
     int ox = origin.x;
     int oy = origin.y;
     int x = ox + N;
     int y = oy + N;
     
-    for (int col = oy; col < (y - oy); col++) {
-        for (int row = 0; row < (x - ox); row++) {
+    print(ox, oy, x, y);
+    
+    for (int row = ox; row < x; row++) {
+        for (int col = oy; col < x; col++) {
+        
         
             
-            Vec<_Tp, cn> imagePixel = block.data<_Tp, cn>(col, row);
+            Vec<_Tp, cn> imagePixel = block.data<_Tp, cn>(row - ox, col - ox);
+            print(imagePixel);
             for (int c = 0; c < cn; c++) {
                 imagePixel[c] += offset;
             }
             
-            to.template at<Vec<_Tp, cn>>(col + oy, row + ox) = imagePixel;
+            to.template at<Vec<_Tp, cn>>(row + ox, col + oy) = imagePixel;
             
         }
     }
