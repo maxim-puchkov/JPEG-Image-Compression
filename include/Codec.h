@@ -46,68 +46,50 @@ using namespace image;
 
 struct Codec;
 
-
-/*******************************************************************************
-                                   JPEG Codec
- *******************************************************************************/
-
-
 struct Codec {
 public:
     
-    // Encode
+    /* Encode, decode */
     static EncodedImage encode(const SourceImage &source);
-    
-    // Decode
     static DecodedImage decode(const EncodedImage &source);
     
-    // Compare result (original - decompressed)
-    static Mat compare(const SourceImage &input, const DecodedImage &decoded);
+    
+    
+    /* Stati
+     stics: compare f(i, j) - f~(i, j), and get average difference */
+    static Mat3b compare(const SourceImage &input, const DecodedImage &decoded);
+    static double average(const SourceImage &input, const DecodedImage &decoded);
     
     
     
     // Codec configuration (verbose).
     // Complete encode, decode, and compare operations
     static void configure(const SourceImage &source);
+    static void configure(int qualityFactor, int quantTableIndex); // custom qf, qti
+    static void configure(const SourceImage &source, int qualityFactor, int quantTableIndex);
     static void configure(); // config with gray (r = g = b) lena image from fig 9.2
     
-
+    
     // Show intermediate steps or limit number of steps to show
     // By default shows 3: dct, dequantization, and idct
-    static const int limit;
+    static int limit;
+    static int shown;
     static void display_step(std::string msg, const Mat &m);
     
     
     
-    
-    
-    
-    
-    /* Run individual tests (defined at the end of this file) */
+    /* Run individual tests (see end of this file) */
     /* Each test prints out image it tests and output */
-    
-    
-    // Convert RGB -> YUV -> RGB
-    static void testColor();
-    
-    
-    // Sample and desample an image
-    static void testSample();
-    
-    
-    // Apply DCT to a block (offset -128); then IDCT
-    static void testDCT();
-    
-    
-    // Apply DCT to a block (offset -128) and then quantize coefficients;
+    static void testColor();            // Convert RGB -> YUV -> RGB
+    static void testSample();           // Sample and desample an image
+    static void testDCT();              // Apply DCT to a block (offset -128); then IDCT
+    static void testQuantization();     // Apply DCT to a block (offset -128) and then quantize coefficients;
     // then dequantize and IDCT to get the same block (+128)
-    static void testQuantization();
-    
-    
     
     
 private:
     
+    // QuantizationTableIndex and QualityFactor affect result
     static BlockQuantization quantization;
     static BlockQuantization dequantization;
     static BlockTransform dct2;
@@ -115,8 +97,6 @@ private:
     
     template<typename _Tp, int cn, typename B>
     static void write(Mat_<Vec<_Tp, cn>> &to, Point2i origin, Mat_<Vec<B, cn>> &block, short offset);
-    
-    static int shown;
     
 };
 
@@ -128,7 +108,7 @@ private:
 // Limit intermediate steps display
 
 // default 3: first DCT, Dequant and IDCT transforms
-const int Codec::limit = 3;
+int Codec::limit = 3;
 int Codec::shown = 0;
 
 
@@ -175,7 +155,7 @@ EncodedImage Codec::encode(const SourceImage &source) {
     
     // Encode: 2D-DCT transformations and Quantization
     EncodedImage encoded(source.size(), EncodedChannelType);
-    
+    print(sampledImage);
     
     for (int row = 0; (row + N - 1) < (height); row += N) {
         for (int col = 0; (col + N - 1) < (width); col += N) {
@@ -186,8 +166,11 @@ EncodedImage Codec::encode(const SourceImage &source) {
             // Partition each 8×8 channel
             Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
-            block.partition<SourceImageType>(sampledImage(area), -128);
-
+            block.partition<SourceImageType>(source(area), -128);
+           
+            
+            
+            print("B____", block.combine());
             
             // DCT transformation of each image block channel
             block.apply(dct2);
@@ -297,7 +280,7 @@ DecodedImage Codec::decode(const EncodedImage &source) {
  *******************************************************************************/
 
 
-Mat Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
+Mat3b Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
     CV_Assert(source.size() == decoded.size());
     Mat3b output = source.clone();
     
