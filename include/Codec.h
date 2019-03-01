@@ -169,9 +169,6 @@ EncodedImage Codec::encode(const SourceImage &source) {
             block.partition<SourceImageType>(source(area), -128);
            
             
-            
-            print("B____", block.combine());
-            
             // DCT transformation of each image block channel
             block.apply(dct2);
             display_step("\n\t Result after 2D-DCT (after offset -128):\n", block.combine());
@@ -256,7 +253,6 @@ DecodedImage Codec::decode(const EncodedImage &source) {
         }
     }
     
-    print("DEcodednaaaaa___:", decodedImage);
     
     // Reverse 4:2:0 subsample ratio and Convert YUV color space back to RGB
     Mat3b desampledImage = ImageSampling::desample(decodedImage);
