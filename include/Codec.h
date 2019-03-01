@@ -30,20 +30,15 @@ void dbg(const Mat3b &src, int limit) {
     int fr, fc;
     
     print("Block #num at (row, col)\n");
-    for (int row = 0; row < _or; row++) {
-        for (int col = 0; col < _oc; col++) {
-            Point2i epoint(col, row);
-            //Point2i dpoint(row, col);
-            
-            Rect earea(epoint, Size2i{8,8});
-            //Rect darea(dpoint, block_t::SIZE);
+    for (int row = 0; row < _or; row += N) {
+        for (int col = 0; col < _oc; col += N) {
+            Point2i epoint(col, row); Rect earea(epoint, Size2i{N,N});
             
             print("\t Block #", n, " (", row, ", ", col, "):");
             print("\t\t\t\t Point:\t ", epoint);
             print("\t\t\t\t Area :\t ", earea);
             
-            fr = row, fc = col, n++;
-            if (n == limit) break;
+            fr = row; fc = col; n++; if (n == limit) break;
         }
         
         if (n == limit) break;
@@ -185,15 +180,17 @@ EncodedImage Codec::encode(const SourceImage &source) {
 
     // Compute limits. Disregard incomplete
     // blocks less than block size.
-    PartitionLimit limit(source.rows, source.cols, N);
+    PartitionLimit limit(source.cols, source.rows, N);
     
     
     // Encode: 2D-DCT transformations and Quantization
-    EncodedImage output(source.cols, source.rows, EncodedChannelType);
+    EncodedImage encoded(source.size(), EncodedChannelType);
     
     
-    for (int row = 0; row < limit.rows; row += N) {
-        for (int col = 0; col < limit.cols; col += N) {
+    
+    for (int col = 0; col < limit.cols; col += N) {
+        for (int row = 0; row < limit.rows; row += N) {
+        
             
             // Block of Y, U, and V color intensities
             ImageBlock block(nChannels);
@@ -201,7 +198,7 @@ EncodedImage Codec::encode(const SourceImage &source) {
             // Partition each 8×8 channel
             Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
-            block.partition<SourceImageType>(source(area));
+            block.partition<SourceImageType>(sampledImage(area));
         
             
             // DCT transformation of each image block channel
@@ -215,13 +212,14 @@ EncodedImage Codec::encode(const SourceImage &source) {
 
             
             // Each DCT coefficients block is written to the output
-            Codec::write(output, origin, block, 0);
+            // with offset = 0
+            Codec::write(encoded, origin, block, 0);
             
         }
     }
 
     
-    return output;
+    return encoded;
     
 }
 
@@ -256,15 +254,16 @@ DecodedImage Codec::decode(const EncodedImage &source) {
     
     // Compute limits. Disregard incomplete
     // blocks less than block size.
-    PartitionLimit limit(source.rows, source.cols, N);
+    PartitionLimit limit(source.cols, source.rows, N);
     
     
     // Decode: 2D-IDCT transformations
-    DecodedImage decodedImage(source.cols, source.rows, DecodedChannelType);
+    DecodedImage decodedImage(source.size(), DecodedChannelType);
     
+    for (int col = 0; col < limit.cols; col += N) {
     
-    for (int row = 0; row < limit.rows; row += N) {
-        for (int col = 0; col < limit.cols; col += N) {
+
+            for (int row = 0; row < limit.rows; row += N) {
             
             // Block of Y, U, and V quantized DCT coefficients
             ImageBlock block(nChannels);
@@ -284,6 +283,7 @@ DecodedImage Codec::decode(const EncodedImage &source) {
             //print("DE BLK");
             //block.display();
             // Write transformed block to image
+            // with offset = -128
             Codec::write(decodedImage, origin, block, -128);
             
         }
@@ -388,15 +388,16 @@ void Codec::write(Mat_<Vec<_Tp, cn>> &to, Point2i origin, ImageBlock &block, sho
     int x = ox + N;
     int y = oy + N;
     
+    for (int col = oy; col < (y - oy); col++) {
     for (int row = 0; row < (x - ox); row++) {
-        for (int col = oy; col < (y - oy); col++) {
+        
             
-            Vec<_Tp, cn> imagePixel = block.data<_Tp, cn>(row, col);
+            Vec<_Tp, cn> imagePixel = block.data<_Tp, cn>(col, row);
             for (int c = 0; c < cn; c++) {
                 imagePixel[c] += offset;
             }
             
-            to.template at<Vec<_Tp, cn>>(row + ox, col + oy) = imagePixel;
+            to.template at<Vec<_Tp, cn>>(col + oy, row + ox) = imagePixel;
             
         }
     }
