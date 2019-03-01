@@ -246,8 +246,7 @@ ImageBlock ImageBlock::toBlock(const Mat3b &source, int off) {
 
 void ImageBlock::apply(BlockTransform transform) {
     for (int c = 0; c < cn; c++) {
-        Mat1d transformed = transform(this->at(c));
-        print(transformed);
+        Mat_<double> transformed = transform(this->at(c));
         this->at(c) = round<BlockDataType>(transformed);
     }
 }

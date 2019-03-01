@@ -176,6 +176,7 @@ EncodedImage Codec::encode(const SourceImage &source) {
     // Encode: 2D-DCT transformations and Quantization
     EncodedImage encoded(source.size(), EncodedChannelType);
     
+    
     for (int row = 0; (row + N - 1) < (height); row += N) {
         for (int col = 0; (col + N - 1) < (width); col += N) {
             
@@ -240,6 +241,7 @@ DecodedImage Codec::decode(const EncodedImage &source) {
     // Decode: Qequantization and 2D-IDCT transformations
     DecodedImage decodedImage(source.size(), DecodedChannelType);
     
+    
     for (int row = 0; (row + N - 1) < (height); row += N) {
         for (int col = 0; (col + N - 1) < (width); col += N) {
             
@@ -296,23 +298,32 @@ DecodedImage Codec::decode(const EncodedImage &source) {
 
 
 Mat Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
-    
     CV_Assert(source.size() == decoded.size());
-    Mat3b output(source.size(), CV_8SC3);
+    Mat3b output = source.clone();
     
-    for(int i = 0; i < source.rows; i++) {
-        const uchar *srcVal = source.ptr<uchar>(i);
-        const uchar *decodedVal = decoded.ptr<uchar>(i);
-        
-        for(int j = 0; j < source.cols; j++) {
-            uchar entry = srcVal - decodedVal;
-            output.at<uchar>(i, j) = entry;
+    for (int row = 0; row < source.rows; row++) {
+        for (int col = 0; col < source.cols; col++) {
+            Vec3b sv = source.at<Vec3b>(row, col);
+            Vec3b dv = decoded.at<Vec3b>(row, col);
+            output.at<Vec3b>(row, col) = sv - dv;
         }
     }
     
     return output;
-    
 }
+    
+    
+    
+//
+//    for(int i = 0; i < source.rows; i++) {
+//        const uchar *srcVal = source.ptr<uchar>(i);
+//        const uchar *decodedVal = decoded.ptr<uchar>(i);
+//
+//        for(int j = 0; j < source.cols; j++) {
+//            uchar entry = srcVal - decodedVal;
+//            output.at<uchar>(i, j) = entry;
+//        }
+//    }
 
 
 
@@ -407,8 +418,8 @@ void Codec::configure(const SourceImage &source) {
 // Init codec functions
 BlockQuantization Codec::quantization = Compression::quantization;
 BlockQuantization Codec::dequantization = Compression::dequantization;
-BlockTransform Codec::dct2 = Transform::dct2<BlockDataType>;
-BlockTransform Codec::idct2 = Transform::idct2<BlockDataType>;
+BlockTransform Codec::dct2 = Transform::dct2;//<BlockDataType>;
+BlockTransform Codec::idct2 = Transform::idct2;//<BlockDataType>;
 
 
 
@@ -587,7 +598,9 @@ void Codec::testQuantization() {
     print_spaced(2, "F(u, v) DCT coefficients\n", dctRes);
     print_spaced(2, "F^(u, v) Quantized DCT coefficients\n", qRes);
     print_spaced(2, "F~(u, v) dequantized DCT coefficients\n", deqRes);
-    print_spaced(2, "f~(i, j) decoded original \n", idctRes);
+    print_spaced(4, "f~(i, j) decoded original \n", idctRes);
+    
+    //compare(test, idctRes);
 }
 
 #endif /* Codec_h */
