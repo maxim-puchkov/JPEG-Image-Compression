@@ -208,7 +208,7 @@ void ImageBlock::apply(BlockTransform transform) {
 
 void ImageBlock::apply(BlockQuantization quantization) {
     
-    qtables::TableSet tables = QuantizationTable::set();
+    qtables::TableSet tables = QuantizationTable::tableSet();
     
     // Luminance table
     this->at(0) = quantization(this->at(0), tables.luminance);
