@@ -63,6 +63,10 @@ struct Transform {
     template<typename _Tp>
     static Mat1d idct2(const Mat_<_Tp> &matrix);
     
+//    static Mat1d idct2(const Mat1s &matrix) {
+//        return mul<double, double>(mul<double, short>(Transform::DCT_T, matrix), Transform::DCT);
+//    }
+    
 };
 
 
@@ -132,7 +136,7 @@ Mat1d Transform::dct2(const Mat_<_Tp> &matrix) {
 
 template<typename _Tp>
 Mat1d Transform::idct2(const Mat_<_Tp> &matrix) {
-    return mul(mul(Transform::DCT_T, matrix), Transform::DCT);
+    return mul(mul<double, _Tp>(Transform::DCT_T, matrix), Transform::DCT);
 }
 
 #endif /* Transform_h */

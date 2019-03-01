@@ -36,6 +36,11 @@ struct Compression {
     // Quantize DCT coefficients
     static Mat_<BlockDataType> quantization(const Mat_<BlockDataType> &dctCoefficients,
                                             QTable table);
+    
+    
+    // Dequantize DCT coefficients
+    static Mat_<BlockDataType> dequantization(const Mat_<BlockDataType> &quantizedCoefficients,
+                                              QTable table);
 
 };
 
@@ -60,7 +65,7 @@ struct Compression {
 // Reduce high frequency DCT by quantizing coefficients.
 //      Quantization Formula:       F^(u, v) = round(F(u,v) / Q(u, v))
 Mat_<BlockDataType> Compression::quantization(const Mat_<BlockDataType> &dctCoefficients,
-                                                    QTable table) {
+                                              QTable table) {
     
     Mat_<BlockDataType> quantizedCoefficients(dctCoefficients.size(), block_t::CHANNEL_TYPE);
     
@@ -68,12 +73,10 @@ Mat_<BlockDataType> Compression::quantization(const Mat_<BlockDataType> &dctCoef
         for (int col = 0; col < dctCoefficients.cols; col++) {
             
             BlockDataType coefficient = dctCoefficients.at<BlockDataType>(row, col);
-            uchar tableEntry = table.at<uchar>(row, col);
             
+            uchar tableEntry = table.at<uchar>(row, col);
             int scaledTableEntry = tableEntry * qtables::QualityFactor;
-            if (scaledTableEntry == 0) {
-                scaledTableEntry = 1;
-            }
+            if (scaledTableEntry == 0) { scaledTableEntry = 1; }
 
             BlockDataType quantized = static_cast<BlockDataType>(round(coefficient / scaledTableEntry));
             
@@ -85,5 +88,31 @@ Mat_<BlockDataType> Compression::quantization(const Mat_<BlockDataType> &dctCoef
     return quantizedCoefficients;
     
 }
+
+
+Mat_<BlockDataType> Compression::dequantization(const Mat_<BlockDataType> &quantizedCoefficients,
+                                                QTable table) {
+
+    Mat_<BlockDataType> dctCoefficients(quantizedCoefficients.size(), block_t::CHANNEL_TYPE);
+
+    for (int row = 0; row < quantizedCoefficients.rows; row++) {
+        for (int col = 0; col < quantizedCoefficients.cols; col++) {
+            
+            BlockDataType coefficient = quantizedCoefficients.at<BlockDataType>(row, col);
+            
+            uchar tableEntry = table.at<uchar>(row, col);
+            int scaledTableEntry = tableEntry * qtables::QualityFactor;
+            if (scaledTableEntry == 0) { scaledTableEntry = 1; }
+            
+            BlockDataType dequantized = static_cast<BlockDataType>(coefficient * scaledTableEntry);
+            
+            dctCoefficients.at<BlockDataType>(row, col) = dequantized;
+            
+        }
+    }
+    
+    return dctCoefficients;
+}
+
 
 #endif /* Quantization_h */

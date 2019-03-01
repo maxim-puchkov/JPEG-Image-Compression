@@ -253,23 +253,22 @@ namespace debug {
             Vec3b(255, 255, 255), Vec3b(255, 255, 255), Vec3b(255, 255, 255), Vec3b(255, 255, 255)
     );
 
+    
+    
 
-
-
-    // Block pattern of two random YUV colors
-    const Vec3b a(100, 75, 50);
-    const Vec3b b(200, 20, 25);
-    const Mat3b yuv_block = (
-        Mat_<Vec3b>(BLOCK_SIZE) <<
-            a, a, a, a, a, a, a, a,
-            a, a, a, a, a, a, a, a,
-            b, b, b, b, b, b, b, b,
-            b, b, b, b, b, b, b, b,
-            a, a, a, a, a, a, a, a,
-            a, a, a, a, a, a, a, a,
-            b, b, b, b, b, b, b, b,
-            b, b, b, b, b, b, b, b
-    );
+    const Vec3b a(255, 0, 0);
+    const Vec3b b(0, 255, 0);
+    const Mat3b rgb3_2 = (
+                             Mat_<Vec3b>(BLOCK_SIZE) <<
+                             a, a, a, a, a, a, a, a,
+                             a, a, a, a, a, a, a, a,
+                             b, b, b, b, b, b, b, b,
+                             b, b, b, b, b, b, b, b,
+                             a, a, a, a, a, a, a, a,
+                             a, a, a, a, a, a, a, a,
+                             b, b, b, b, b, b, b, b,
+                             b, b, b, b, b, b, b, b
+                             );
 
 
 

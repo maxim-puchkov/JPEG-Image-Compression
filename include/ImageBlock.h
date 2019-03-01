@@ -42,23 +42,25 @@ namespace block_t {
     
 }
 
-
-
-
-
-
-
-
-
-
-
-
 using namespace cv;
 using namespace block_t;
 
 
+
+
+
+
+
+
+
+
+
+
+
 //template<typename>
 class ImageBlock;
+
+struct PartitionLimit;
 
 
 /*******************************************************************************
@@ -80,18 +82,17 @@ public:
     ImageBlock(int cn);
     
     
-    template<typename SourceType>
-    void partition(const Mat_<Vec<SourceType, 3>> &source);
-    
+    template<typename SourceType> void partition(const Mat_<Vec<SourceType, 3>> &source);
+    template<typename SourceType> void partition(const Mat_<Vec<SourceType, 3>> &source, int off);
     
     Mat_<Block3s> combine();
+    Mat3b to3b();
+    Mat3b to3b(int off);
+    static ImageBlock toBlock(const Mat3b &source, int off);
     
     
-    // Transform each channel
+    // Transform / (De)Quantize each channel
     void apply(BlockTransform transform);
-    
-    
-    // Quantize each channel
     void apply(BlockQuantization quantization);
     
     
@@ -153,6 +154,11 @@ ImageBlock::ImageBlock(int cn)
 
 template<typename SourceType>
 void ImageBlock::partition(const Mat_<Vec<SourceType, 3>> &source) {
+    partition(source, 0);
+}
+
+template<typename SourceType>
+void ImageBlock::partition(const Mat_<Vec<SourceType, 3>> &source, int off) {
     
     // Allocate
     for (int c = 0; c < cn; c++) {
@@ -169,7 +175,7 @@ void ImageBlock::partition(const Mat_<Vec<SourceType, 3>> &source) {
             
             for (int c = 0; c < cn; c++) {
                 
-                BlockDataType data = vec[c] - DATA_OFFSET;
+                BlockDataType data = vec[c] + off;
                 this->channelData[c].at<BlockDataType>(row, col) = data;
                 
             }
@@ -178,6 +184,9 @@ void ImageBlock::partition(const Mat_<Vec<SourceType, 3>> &source) {
     }
     
 }
+
+
+
 
 
 Mat_<Block3s> ImageBlock::combine() {
@@ -199,6 +208,35 @@ Mat_<Block3s> ImageBlock::combine() {
 }
 
 
+Mat3b ImageBlock::to3b() { return to3b(0); }
+
+Mat3b ImageBlock::to3b(int off) {
+    Mat combined(N, N, CV_8UC3);
+    for (int row = 0; row < N; row++) {
+        for (int col = 0; col < N; col++) {
+            
+            Vec3b data(0, 0, 0);
+            for (int c = 0; c < cn; c++) {
+                data[c] = static_cast<uchar>(this->at(c).at<BlockDataType>(row, col)+off);
+            }
+            combined.at<Vec3b>(col, row) = data;
+            
+        }
+    }
+
+    return combined;
+}
+
+
+ImageBlock ImageBlock::toBlock(const Mat3b &source, int off) {
+    ImageBlock block(3);
+    Rect area(Point2i{0, 0}, Size2i{8, 8});
+    block.partition(source(area), off);
+    return block;
+}
+
+
+
 
 
 
@@ -209,6 +247,7 @@ Mat_<Block3s> ImageBlock::combine() {
 void ImageBlock::apply(BlockTransform transform) {
     for (int c = 0; c < cn; c++) {
         Mat1d transformed = transform(this->at(c));
+        print(transformed);
         this->at(c) = round<BlockDataType>(transformed);
     }
 }
@@ -281,5 +320,38 @@ Vec<RType, Tc> ImageBlock::data(int row, int col) const {
     
     return data;
 }
+
+
+
+/* Partition Limit */
+
+// Drop blocks if image is not multiple of 8
+struct PartitionLimit {
+    
+    PartitionLimit(int imageRows, int imageCols, int N);
+    
+    void display();
+    int rows;
+    int cols;
+    int blockCount;
+    
+};
+
+PartitionLimit::PartitionLimit(int imageRows, int imageCols, int N) {
+    int rowCount = imageRows / N;
+    int colCount = imageCols / N;
+    
+    this->blockCount = rowCount * colCount;
+    this->rows = rowCount * N - N;
+    this->cols = colCount * N - N;
+}
+
+void PartitionLimit::display() {
+    print("Rows to scan: ", this->rows);
+    print("Columns to scan: ", this->cols);
+    print("Total blocks: ", this->blockCount);
+}
+
+
 
 #endif /* ImageBlock_h */
