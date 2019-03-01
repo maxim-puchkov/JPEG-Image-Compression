@@ -17,6 +17,44 @@
 #include "Quantization.h"
 #include "Print.h"
 
+/*      ****     */
+#include "DebugData.h"
+
+static void dbg(const Mat3b &src, int limit);
+void dbg(const Mat3b &src, int limit) {
+    int _or = src.rows;
+    int _oc = src.cols;
+    print("Debugging...");
+    print("R: ", _or, ", C: ", _oc);
+    int n = 0;
+    int fr, fc;
+    
+    print("Block #num at (row, col)\n");
+    for (int row = 0; row < _or; row++) {
+        for (int col = 0; col < _oc; col++) {
+            Point2i epoint(col, row);
+            //Point2i dpoint(row, col);
+            
+            Rect earea(epoint, Size2i{8,8});
+            //Rect darea(dpoint, block_t::SIZE);
+            
+            print("\t Block #", n, " (", row, ", ", col, "):");
+            print("\t\t\t\t Point:\t ", epoint);
+            print("\t\t\t\t Area :\t ", earea);
+            
+            fr = row, fc = col, n++;
+            if (n == limit) break;
+        }
+        
+        if (n == limit) break;
+    }
+    
+    print("Final (row, col) = (", fr, " ,", fc, ")");
+    
+}
+
+
+/*      ****     */
 
 namespace image {
     
@@ -33,13 +71,6 @@ namespace image {
     static const int DecodedChannelType = CV_8UC3;
     
 }
-
-
-
-
-
-
-
 
 
 using namespace cv;
@@ -78,6 +109,8 @@ public:
     static void configureCompression(const SourceImage &source);
     
     
+    
+    
 private:
     
     template<typename _Tp, int cn>
@@ -92,6 +125,7 @@ struct PartitionLimit {
     
     PartitionLimit(int imageRows, int imageCols, int N);
     
+    void display();
     int rows;
     int cols;
     int blockCount;
@@ -121,12 +155,24 @@ struct PartitionLimit {
 
 EncodedImage Codec::encode(const SourceImage &source) {
     
-    print("Size: ", source.size());
+    
+    // debug 100 blocks
+    dbg(source, 100);
+    
     
     // Number of channels
     int nChannels = source.channels();
     int width = source.cols;
     int height = source.rows;
+    
+    
+    print("Encode. Input:");
+    print("\tSize: ", source.size());
+    print("\tRows: ", source.rows, "; columns: ", source.cols);
+    print("\tWidth: ", width, "; height: ", height);
+    
+    
+
     
     
     // Convert RGB (CV_8UC3) to YUV
@@ -140,10 +186,10 @@ EncodedImage Codec::encode(const SourceImage &source) {
     // Compute limits. Disregard incomplete
     // blocks less than block size.
     PartitionLimit limit(source.rows, source.cols, N);
-
+    
     
     // Encode: 2D-DCT transformations and Quantization
-    EncodedImage output(width, height, EncodedChannelType);
+    EncodedImage output(source.cols, source.rows, EncodedChannelType);
     
     
     for (int row = 0; row < limit.rows; row += N) {
@@ -191,7 +237,9 @@ EncodedImage Codec::encode(const SourceImage &source) {
 
 DecodedImage Codec::decode(const EncodedImage &source) {
     
-    print("Size: ", source.size());
+    // debug 100 blocks
+    dbg(source, 100);
+    
     
     // Number of channels
     int nChannels = source.channels();
@@ -199,15 +247,20 @@ DecodedImage Codec::decode(const EncodedImage &source) {
     int height = source.rows;
     
     
+    print("Decode. Input:");
+    print("\tSize: ", source.size());
+    print("\tRows: ", source.rows, "; columns: ", source.cols);
+    print("\tWidth: ", width, "; height: ", height);
+    
+    
+    
     // Compute limits. Disregard incomplete
     // blocks less than block size.
     PartitionLimit limit(source.rows, source.cols, N);
     
     
-    
-    
     // Decode: 2D-IDCT transformations
-    DecodedImage decodedImage(height, width, DecodedChannelType);
+    DecodedImage decodedImage(source.cols, source.rows, DecodedChannelType);
     
     
     for (int row = 0; row < limit.rows; row += N) {
@@ -218,7 +271,7 @@ DecodedImage Codec::decode(const EncodedImage &source) {
             
             
             // Partition each 8×8 channel
-            Point2i origin(row, col);
+            Point2i origin(col, row);
             Rect area(origin, block_t::SIZE);
             block.partition<DecodedImageType>(source(area));
             
@@ -369,5 +422,18 @@ PartitionLimit::PartitionLimit(int imageRows, int imageCols, int N) {
     this->rows = rowCount * N;
     this->cols = colCount * N;
 }
+    
+void PartitionLimit::display() {
+    print("Rows to scan: ", this->rows);
+    print("Columns to scan: ", this->cols);
+    print("Total blocks: ", this->blockCount);
+}
+
+
+
+
+
+
+
 
 #endif /* Codec_h */

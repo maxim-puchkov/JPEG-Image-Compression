@@ -12,16 +12,18 @@
 #include <opencv2/opencv.hpp>
 #include "Color.h"
 #include "Print.h"
-
+#include <vector>
 
 using namespace cv;
-
+using std::vector;
 
 
 
 /*******************************************************************************
                                     Debug
  *******************************************************************************/
+
+
 
 
 // Random 0..255
@@ -37,6 +39,27 @@ Mat3b rgb_image(int width, int height);
 Mat3b channel_3x(const Mat1b &grayscale);
 
 
+// Compare 10 points on the images:
+//      test(img, img2, 10)
+static vector<Point2i> points(int, int, int);
+static void test(Mat3b&, Mat3b&);
+static void test(Mat3b&, Mat3b&, int);
+static void test(Mat3b&, Mat3b&, vector<Point2i>);
+
+
+
+
+
+
+//
+//void points(const Mat3b &original, const Mat3b &decoded);
+//
+//void points(const Mat3b &original, const Mat3b &decoded) {
+//    unsigned char points;
+//
+//
+//    uchar_random x =
+//}
 
 
 
@@ -105,7 +128,34 @@ Mat3b channel_3x(const Mat1b &grayscale) {
     return image;
 }
 
+vector<Point2i> points(int count, int rows, int cols) {
+    vector<Point2i> pts;
+    for (int i = 0; i < count; i++) {
+        Point2i p(rand() % rows, rand() % cols);
+        pts.push_back(p);
+    }
+    return pts;
+}
 
+static void test(Mat3b& _in, Mat3b& _out, int n) {
+    auto pts = points(n, _in.rows, _in.cols);
+}
+
+void test(Mat3b& _in, Mat3b& _out) {
+    auto pts = points(10, _in.rows, _in.cols);
+    test(_in, _out, pts);
+}
+
+void test(Mat3b& _in, Mat3b& _out, vector<Point2i> pts) {
+    for (int i = 0; i < pts.size(); i++) {
+        print("Checking Vec3b at ", pts[i]);
+        
+        Vec3b ov = _out.at<Vec3b>(pts[i]);
+        Vec3b iv = _in.at<Vec3b>(pts[i]);
+        
+        print((ov == iv) ? "OK" : "<< ERROR >>");
+    }
+}
 
 
 
