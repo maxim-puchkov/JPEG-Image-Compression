@@ -16,10 +16,8 @@
 #include "Transform.h"
 #include "Quantization.h"
 #include "Print.h"
-
-/*      ****     */
 #include "DebugData.h"
-/*      ****     */
+
 
 namespace image {
     
@@ -70,8 +68,11 @@ public:
     
     
     
-    // Codec configuration: encode, decode, and compare with source  (verbose)
-    static void configureCompression(const SourceImage &source);
+    
+    
+    // Codec configuration (verbose).
+    // Complete encode, decode, and compare operations
+    static void configure(const SourceImage &source);
     
     
     
@@ -337,7 +338,10 @@ Mat Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
 
 
 
-void Codec::configureCompression(const SourceImage &source) {
+
+
+
+void Codec::configure(const SourceImage &source) {
     
     // variables
     Rect area(Point2i{0, 0}, Size2i{8, 8});
