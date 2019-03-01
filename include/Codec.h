@@ -183,6 +183,7 @@ EncodedImage Codec::encode(const SourceImage &source) {
             // with offset = 0
             Mat_<Block3s> b3s = block.combine();
             Codec::write(encoded, origin, b3s, 0);
+            //encoded(area) = b3s;
             
         }
     }
@@ -249,7 +250,7 @@ DecodedImage Codec::decode(const EncodedImage &source) {
             // Write transformed block to image
             Mat_<Vec3b> b3b = block.to3b(128);
             Codec::write(decodedImage, origin, b3b, 0);
-            
+            //decodedImage(area) = b3b;
         }
     }
     
@@ -291,8 +292,29 @@ Mat3b Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
     return output;
 }
     
+
+
+// Compute average difference in results
+double Codec::average(const SourceImage &source, const DecodedImage &decoded) {
+    int totalDiff = 0;
+    
+    for (int row = 0; row < source.rows; row++) {
+        for (int col = 0; col < source.cols; col++) {
+            Vec3b sv = source.at<Vec3b>(row, col);
+            Vec3b dv = decoded.at<Vec3b>(row, col);
+            Vec3b diff = sv - dv;
+            for (int c = 0; c < 3; c++) {
+                totalDiff += diff[c];
+            }
+        }
+    }
     
     
+    double avg = totalDiff / (source.rows * source.cols);
+    return avg;
+}
+
+
 //
 //    for(int i = 0; i < source.rows; i++) {
 //        const uchar *srcVal = source.ptr<uchar>(i);
@@ -310,11 +332,27 @@ Mat3b Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
 
 
 /*******************************************************************************
-                                Configure (debugging)
+ Configure (debugging)
  *******************************************************************************/
 
 
-void Codec::configure() { configure(gray3); }
+void Codec::configure() {
+    configure(gray3);
+}
+
+void Codec::configure(int qualityFactor, int quantTableIndex) {
+    qtables::QualityFactor = qualityFactor;
+    qtables::QuantizationTableIndex = quantTableIndex;
+    configure();
+}
+
+void Codec::configure(const SourceImage &source, int qualityFactor, int quantTableIndex) {
+    qtables::QualityFactor = qualityFactor;
+    qtables::QuantizationTableIndex = quantTableIndex;
+    configure(source);
+}
+
+
 
 void Codec::configure(const SourceImage &source) {
     
@@ -490,7 +528,6 @@ void Codec::display_step(std::string msg, const Mat &m) {
 
 
 
-
 /*******************************************************************************
                                 Tests (debugging)
  *******************************************************************************/
@@ -499,10 +536,9 @@ void Codec::display_step(std::string msg, const Mat &m) {
 void Codec::testColor() {
     Mat3b test = rgb3; // top: red, green;   bottom: blue, white
     
-    //
+    // Convert to YUV and back to RGB
     Mat3b yuv = Colorspace::convert_RGB_YUV(test);
     Mat3b result = Colorspace::convert_YUV_RGB(yuv);
-    
     
     print("Compare: ");
     print_spaced(2, "Original\n", test);
@@ -524,6 +560,8 @@ void Codec::testSample() {
 
 
 void Codec::testDCT() {
+    Codec::limit = 3; // intermediate display
+    
     // 3 identical channels of grayscale image block (lena)
     Mat3b test = gray3_2; // second grayscale block shown in the example
     
@@ -548,6 +586,8 @@ void Codec::testDCT() {
 
 
 void Codec::testQuantization() {
+    Codec::limit = 3; // intermediate display
+    
     // 3 identical channels of grayscale image block (lena)
     Mat3b test = gray3;   // first grayscale block shown in the example
     
@@ -572,6 +612,8 @@ void Codec::testQuantization() {
     
     
     // Matches example // Fig. 9.2: JPEG compression for a smooth image block.
+    // (if not sampling encode)
+    //  ~ block.partition<SourceImageType>(source(area), -128);
     print("Compare: ");
     print_spaced(2, "f(i, j) Original\n", test);
     print_spaced(2, "F(u, v) DCT coefficients\n", dctRes);
@@ -579,7 +621,10 @@ void Codec::testQuantization() {
     print_spaced(2, "F~(u, v) dequantized DCT coefficients\n", deqRes);
     print_spaced(4, "f~(i, j) decoded original \n", idctRes);
     
-    //compare(test, idctRes);
+    Mat3b cmpRes = compare(test, idctRes);
+    print_spaced(2, "f(i, j)-f~(i, j) compared \n", cmpRes);
+    
+    print("Average difference of images: ", average(test, idctRes));
 }
 
 #endif /* Codec_h */
