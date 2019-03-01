@@ -250,7 +250,6 @@ DecodedImage Codec::decode(const EncodedImage &source) {
     print("\tWidth: ", width, "; height: ", height);
     
     
-    
     // Compute limits. Disregard incomplete
     // blocks less than block size.
     PartitionLimit limit(source.cols, source.rows, N);
@@ -390,27 +389,58 @@ Mat Codec::compare(const SourceImage &source, const DecodedImage &decoded) {
 
 void Codec::configureCompression(const SourceImage &source) {
     
-    print("Running debug configuration...");
-    print("Input image data: ", source.size());
+    // variables
+    Rect area(Point2i{0, 0}, Size2i{8, 8});
+    int qti = qtables::QuantizationTableIndex;
+    int qf = qtables::QualityFactor;
     
+    
+    
+    
+    
+    // Debug
+    print("Running debug configuration...");
+    print("First 8x8 will be shown for each step.");
+
+    
+    // Preferrences
+    print("User-defined settings:");
+    print("\tQuantization table index: ", qti, " (default = 0)");
+    print("\tQuality factor: ", qf, " (default = 1; 0 - no loss, 10 - max loss)");
+    
+    
+    // Data
     PartitionLimit cfgLimit(source.rows, source.cols, N);
-    print("RC limits:    \t(", cfgLimit.rows, ", ", cfgLimit.cols, ")");
+    print("Row-Column limits:    \t(", cfgLimit.rows, ", ", cfgLimit.cols, ")");
     print_spaced(2, "Total blocks: \t", cfgLimit.blockCount);
     
     
+    // Image
+    print("Input image data: ", source.size());
+    print_spaced(2, "\tImage block :\n", source(area));
     
+    // Encode
     print("Encoding image...");
     EncodedImage e = Codec::encode(source);
-    print("OK: JPEG image encoded.");
+    print("OK: JPEG encode completed.");
+    print_spaced(2, "\tEncoded block:\n", e(area));
     
     
-    
+    // Decode
     print("Decoding image...");
     DecodedImage d = Codec::decode(e);
-    print("OK: JPEG image decoded.");
+    print("OK: JPEG decode compeleted.");
+    print_spaced(2, "\nDecoded block:\n", d(area));
     
     
+    // Compare
+    print("Comparing source and decoded images...");
+    Mat c = Codec::compare(source, d);
+    print("OK: image comparison completed.");
+    print_spaced(2, "\nBlock differences :\n", c(area));
     
+    
+    print("Configuration finished.");
     
 }
 

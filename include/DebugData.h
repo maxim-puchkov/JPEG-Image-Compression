@@ -143,26 +143,25 @@ bool test(Mat3b& _in, Mat3b& _out) {
 
 bool test(Mat3b& _in, Mat3b& _out, vector<Point2i> pts) {
     CV_Assert(_in.size() == _out.size());
+    bool res = true;
+    
     for (int i = 0; i < pts.size(); i++) {
         print((i+1), ". Checking Vec3b at ", pts[i]);
         
-        print("Row/Y check");
-        CV_Assert(_in.rows > pts[i].y);
-        
-        print("Col/X check");
-        CV_Assert(_in.cols > pts[i].x);
+        print("Row/Y, Col/X check"); CV_Assert(_in.rows > pts[i].y); CV_Assert(_in.cols > pts[i].x);
             
         Vec3b ov = _out.at<Vec3b>(pts[i]);
         Vec3b iv = _in.at<Vec3b>(pts[i]);
         print("\t", ov, " == ", iv, " ?");
         
     
-        if (ov != iv) { print("\n Not equal: ", pts[i]), "\n"); return false; }
+        if (ov != iv) { print_spaced(3, "Not equal at: ", pts[i]); res = false; }
+        else { print("\tOK"); }
         
-        print("\tOK");
+        
     }
     
-    return true;
+    return res;
 
 
 }
