@@ -99,18 +99,14 @@ public:
     void display() const;
         
     
+    // Checked block access
+    template<typename RType, int Tc>
+    Vec<RType, Tc> data(int row, int col) const;
     
     
-    // Retrieve data (+offset)
-    //BlockDataType data(unsigned int channel, int row, int column) const;
-    BlockDataType data(unsigned int channel, Point2i position) const;
-    
-    
-    // Checked and Unchecked channel access
+    // Checked channel access
     Mat_<BlockDataType> at(unsigned int index) const noexcept;
     Mat_<BlockDataType> &at(unsigned int index) noexcept;
-    //Mat_<BlockDataType> operator[](unsigned int index) const;
-    //Mat_<BlockDataType> &operator[](unsigned int index);
     
 private:
     
@@ -258,9 +254,16 @@ Mat_<BlockDataType> &ImageBlock::at(unsigned int index) noexcept {
 }
 
 
-BlockDataType ImageBlock::data(unsigned int channel, Point2i position) const {
-    Mat_<BlockDataType> m = this->at(channel);
-    return m.at<BlockDataType>(position) + DATA_OFFSET;
+template<typename RType, int Tc>
+Vec<RType, Tc> ImageBlock::data(int row, int col) const {
+    Vec<RType, Tc> data;
+    for (int c = 0; c < cn; c++) {
+        RType channelEntry = static_cast<RType>(this->at(c).at<BlockDataType>(row, col));
+        channelEntry += DATA_OFFSET;
+        data[c] = channelEntry;
+    }
+    
+    return data;
 }
 
 #endif /* ImageBlock_h */
