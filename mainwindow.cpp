@@ -194,8 +194,27 @@ void MainWindow::convertImage() {
     print(cvImg);
     QuantizationTable::setQTableSet(::a);
     QuantizationTable::setQuality(QuantizationNum->value());
-    convertedImg = Codec::encode(cvImg);
 
+//    //Convert Input Image to YUV values
+    convertedImg = Colorspace::convert_RGB_YUV(cvImg);
+  //  print(convertedImg);
+    //Sample YUV image
+    Mat3b sampled = ImageSampling::sample(convertedImg);
+    print(sampled);
+    //Desample YUV Image
+    Mat3b desampled = ImageSampling::desample(sampled);
+  //  print(desampled);
+    //Convert YUV image to RGB Image
+    Mat3b rgbimage = Colorspace::convert_YUV_RGB(desampled);
+//    print(rgbimage);
+    QImage qImage = MatRGB2QImage(rgbimage);
+    img2->setPixmap(QPixmap::fromImage(qImage));
+//    Codec::testColor();
+//    Codec::testDCT();
+//    Codec::testQualityFactor();
+//    Codec::testQuantization();
+//    Codec::testSample();
+//    convertedImg = Codec::encode(cvImg);
 //    img2->setPixmap(QPixmap::fromImage(qImage));
     /*********************************************
 
